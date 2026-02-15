@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>PetalRush</title>
+<title>PetalRush Login</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -14,40 +13,22 @@
 
 <body>
 
-<header class="header">
+<div class="authCard">
 
-<img src="logo.png" class="logo">
-
-<div id="userBox"></div>
-
-</header>
-
-
-<div class="container">
-
-<div class="authBox">
-
-<h2>Login / Signup</h2>
+<h2>PetalRush</h2>
 
 <input id="email" placeholder="Email">
 
 <input id="password" type="password" placeholder="Password">
 
+<select id="role">
+<option value="buyer">Buyer</option>
+<option value="seller">Seller</option>
+</select>
+
 <button onclick="signup()">Signup</button>
 
 <button onclick="login()">Login</button>
-
-</div>
-
-
-<h2>Flowers</h2>
-
-<div id="flowers" class="grid"></div>
-
-
-<h2>Your Orders</h2>
-
-<div id="orders"></div>
 
 </div>
 
