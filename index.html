@@ -14,51 +14,42 @@
 
 <body>
 
-<header>
+<header class="header">
+
 <img src="logo.png" class="logo">
+
+<div id="userBox"></div>
+
 </header>
 
-<section class="hero">
 
-<h1>Welcome to PetalRush 🌸</h1>
+<div class="container">
 
-<p>Order Flowers Like Never Before</p>
-
-</section>
-
-
-<section class="login">
+<div class="authBox">
 
 <h2>Login / Signup</h2>
 
 <input id="email" placeholder="Email">
 
-<input id="password" placeholder="Password" type="password">
+<input id="password" type="password" placeholder="Password">
 
 <button onclick="signup()">Signup</button>
 
 <button onclick="login()">Login</button>
 
-</section>
+</div>
 
 
-<section>
+<h2>Flowers</h2>
 
-<h2>Popular Flowers</h2>
+<div id="flowers" class="grid"></div>
 
-<div id="flowers"></div>
-
-</section>
-
-
-<section>
 
 <h2>Your Orders</h2>
 
 <div id="orders"></div>
 
-</section>
-
+</div>
 
 <script src="app.js"></script>
 
