@@ -1,17 +1,43 @@
 body {
+  margin: 0;
   font-family: Arial;
-  text-align: center;
-  padding: 50px;
-  background: #fff;
+  background: #f5f5f5;
 }
 
-h1 {
+.header {
+  background: black;
+  padding: 15px;
+  text-align: center;
+}
+
+.logo {
+  width: 200px;
+}
+
+.hero {
+  text-align: center;
+  padding: 40px;
+}
+
+.hero h1 {
   color: #ff4d8d;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 25px;
   background: green;
   color: white;
   border: none;
+  font-size: 16px;
+}
+
+.flowers {
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 10px;
 }

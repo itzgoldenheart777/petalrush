@@ -1,23 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PetalRush</title>
+  <title>PetalRush – Order Flowers Like Never Before</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff4d8d">
 
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
 
-  <meta name="theme-color" content="#ff4d8d">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
-<h1>🌸 PetalRush</h1>
-<p>Order Flowers Like Never Before</p>
+<!-- HEADER -->
+<header class="header">
 
-<button onclick="test()">Test App</button>
+  <img src="logo.png" class="logo">
+
+</header>
+
+<!-- MAIN -->
+<section class="hero">
+
+  <h1>Welcome to PetalRush 🌸</h1>
+
+  <p>Order Flowers Like Never Before</p>
+
+  <button onclick="test()">Order Now</button>
+
+</section>
+
+<!-- FLOWER SECTION -->
+<section class="flowers">
+
+  <h2>Popular Flowers</h2>
+
+  <div class="card">
+    🌹 Rose Bouquet – ₹499
+  </div>
+
+  <div class="card">
+    🌷 Tulip Bouquet – ₹699
+  </div>
+
+  <div class="card">
+    🌼 Lily Bouquet – ₹899
+  </div>
+
+</section>
 
 <script src="app.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
 
 </body>
 </html>
