@@ -1,0 +1,8 @@
+{
+  "name": "PetalRush",
+  "short_name": "PetalRush",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff4d8d"
+}
