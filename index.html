@@ -1,63 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PetalRush – Order Flowers Like Never Before</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ff4d8d">
+<title>PetalRush</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header class="header">
-
-  <img src="logo.png" class="logo">
-
+<header>
+<img src="logo.png" class="logo">
 </header>
 
-<!-- MAIN -->
 <section class="hero">
 
-  <h1>Welcome to PetalRush 🌸</h1>
+<h1>Welcome to PetalRush 🌸</h1>
 
-  <p>Order Flowers Like Never Before</p>
-
-  <button onclick="test()">Order Now</button>
+<p>Order Flowers Like Never Before</p>
 
 </section>
 
-<!-- FLOWER SECTION -->
-<section class="flowers">
 
-  <h2>Popular Flowers</h2>
+<section class="login">
 
-  <div class="card">
-    🌹 Rose Bouquet – ₹499
-  </div>
+<h2>Login / Signup</h2>
 
-  <div class="card">
-    🌷 Tulip Bouquet – ₹699
-  </div>
+<input id="email" placeholder="Email">
 
-  <div class="card">
-    🌼 Lily Bouquet – ₹899
-  </div>
+<input id="password" placeholder="Password" type="password">
+
+<button onclick="signup()">Signup</button>
+
+<button onclick="login()">Login</button>
 
 </section>
 
-<script src="app.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<section>
+
+<h2>Popular Flowers</h2>
+
+<div id="flowers"></div>
+
+</section>
+
+
+<section>
+
+<h2>Your Orders</h2>
+
+<div id="orders"></div>
+
+</section>
+
+
 <script src="app.js"></script>
 
 </body>
