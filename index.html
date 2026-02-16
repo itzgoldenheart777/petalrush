@@ -8,112 +8,80 @@
 
 <link rel="stylesheet" href="css/index.css">
 
+<!-- Supabase CDN (ONLY ONCE) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
 <body>
 
-<!-- SPLASH SCREEN -->
 
-<div id="splash" class="screen center">
+<!-- Splash Screen -->
+<div id="splash">
 
 <img src="logo.png" class="logo">
 
-<h1 class="brand">PetalRush</h1>
+<h1>PetalRush</h1>
 
-<p class="tagline">Order Flowers Like Never Before</p>
+<p>Order Flowers Like Never Before</p>
 
-<button class="btn" onclick="showAuth()">Get Started</button>
+<button onclick="showAuth()">Get Started</button>
 
 </div>
 
 
-<!-- AUTH CHOICE -->
-
-<div id="authChoice" class="screen center hidden">
+<!-- Auth Options -->
+<div id="auth" class="hidden">
 
 <h2>Welcome</h2>
 
-<button class="btn" onclick="showLogin()">Login</button>
+<button onclick="showLogin()">Login</button>
 
-<button class="btn-outline" onclick="showSignup()">Create Account</button>
+<button onclick="showSignup()">Signup</button>
+
+<button onclick="backSplash()">Back</button>
 
 </div>
 
 
-<!-- LOGIN -->
-
-<div id="loginScreen" class="screen center hidden">
-
-<div class="card">
+<!-- Login -->
+<div id="login" class="hidden">
 
 <h2>Login</h2>
 
-<input id="loginEmail" placeholder="Email">
+<input type="email" id="loginEmail" placeholder="Email">
 
-<input id="loginPassword" type="password" placeholder="Password">
+<input type="password" id="loginPassword" placeholder="Password">
 
-<button class="btn" onclick="login()">Login</button>
+<button onclick="login()">Login</button>
 
-<p class="link" onclick="showForgot()">Forgot Password?</p>
+<button onclick="forgot()">Forgot Password</button>
 
-<p class="link" onclick="back()">Back</p>
-
-</div>
+<button onclick="backAuth()">Back</button>
 
 </div>
 
 
-<!-- SIGNUP -->
-
-<div id="signupScreen" class="screen center hidden">
-
-<div class="card">
+<!-- Signup -->
+<div id="signup" class="hidden">
 
 <h2>Create Account</h2>
 
-<input id="signupEmail" placeholder="Email">
+<input type="email" id="signupEmail" placeholder="Email">
 
-<input id="signupPassword" type="password" placeholder="Password">
+<input type="password" id="signupPassword" placeholder="Password">
 
-<select id="signupRole">
-
+<select id="role">
 <option value="buyer">Buyer</option>
-
 <option value="seller">Seller</option>
-
 </select>
 
-<button class="btn" onclick="signup()">Signup</button>
+<button onclick="signup()">Signup</button>
 
-<p class="link" onclick="back()">Back</p>
-
-</div>
+<button onclick="backAuth()">Back</button>
 
 </div>
 
-
-<!-- FORGOT -->
-
-<div id="forgotScreen" class="screen center hidden">
-
-<div class="card">
-
-<h2>Reset Password</h2>
-
-<input id="forgotEmail" placeholder="Email">
-
-<button class="btn" onclick="sendReset()">Send Reset Email</button>
-
-<p class="link" onclick="back()">Back</p>
-
-</div>
-
-</div>
-
-
-<script src="js/supabase.js"></script>
 
 <script src="js/index.js"></script>
 
