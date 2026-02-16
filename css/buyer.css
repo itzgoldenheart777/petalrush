@@ -1,7 +1,18 @@
 body{
-margin:0;
+
 font-family:Arial;
+padding:20px;
+
 }
+
+.card{
+
+border:1px solid #ddd;
+padding:10px;
+margin:10px;
+
+}
+
 
 #header{
 background:#ff4d8d;
@@ -26,3 +37,4 @@ justify-content:space-around;
 padding:10px;
 box-shadow:0 -2px 5px rgba(0,0,0,0.1);
 }
+
