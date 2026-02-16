@@ -2,27 +2,31 @@
 <html>
 <head>
 
-<title>Seller Dashboard</title>
+<title>Seller</title>
 
-<link rel="stylesheet" href="style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<link rel="stylesheet" href="css/style.css">
 
 </head>
 
 <body>
 
-<h2>Seller Dashboard</h2>
+<header>
+
+<h2 style="color:white">Seller Dashboard</h2>
+
+</header>
+
+<h3>Add Flower</h3>
 
 <input id="name" placeholder="Flower name">
 
 <input id="price" placeholder="Price">
 
-<button onclick="addFlower()">Add Flower</button>
+<button onclick="addFlower()">Add</button>
 
-<div id="myFlowers"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="seller.js"></script>
+<script src="js/seller.js"></script>
 
 </body>
 </html>
