@@ -2,29 +2,114 @@
 <html>
 <head>
 
-<title>Seller</title>
+<title>Seller Dashboard</title>
 
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/seller.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
 <body>
 
-<header>
 
-<h2 style="color:white">Seller Dashboard</h2>
+<div class="header">
 
-</header>
+<h2>Seller Dashboard</h2>
 
-<h3>Add Flower</h3>
+<button onclick="logout()">Logout</button>
 
-<input id="name" placeholder="Flower name">
+</div>
+
+
+<div class="container">
+
+
+<div class="left">
+
+<button onclick="showProfile()">Profile</button>
+
+<button onclick="showBank()">Bank Details</button>
+
+<button onclick="showCatalog()">Catalog Upload</button>
+
+<button onclick="showProducts()">My Products</button>
+
+</div>
+
+
+
+<div class="right">
+
+
+<!-- PROFILE -->
+<div id="profile">
+
+<h3>Profile</h3>
+
+<input id="name" placeholder="Your Name">
+
+<button onclick="saveProfile()">Save</button>
+
+</div>
+
+
+
+<!-- BANK -->
+<div id="bank" class="hidden">
+
+<h3>Bank Details</h3>
+
+<input id="bank_name" placeholder="Bank Name">
+
+<input id="account_number" placeholder="Account Number">
+
+<input id="ifsc" placeholder="IFSC">
+
+<button onclick="saveBank()">Save Bank</button>
+
+</div>
+
+
+
+<!-- CATALOG -->
+<div id="catalog" class="hidden">
+
+<h3>Upload Product</h3>
+
+<input id="pname" placeholder="Product Name">
 
 <input id="price" placeholder="Price">
 
-<button onclick="addFlower()">Add</button>
+<input id="qty" placeholder="Quantity">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<input id="desc" placeholder="Description">
+
+<input id="location" placeholder="Pickup Location">
+
+<input id="image" placeholder="Image URL">
+
+<button onclick="uploadProduct()">Upload</button>
+
+</div>
+
+
+
+<!-- PRODUCTS -->
+<div id="products" class="hidden">
+
+<h3>My Products</h3>
+
+<div id="productList"></div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
 
 <script src="js/seller.js"></script>
 
