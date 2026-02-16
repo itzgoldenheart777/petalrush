@@ -7,6 +7,7 @@
 
 <title>PetalRush</title>
 
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,30 +16,28 @@
 
 <body>
 
-<header>
-
+<header class="header">
 <img src="logo.png" class="logo">
-
 </header>
 
-<div class="auth-box">
+<div class="auth-container">
 
 <h2>Welcome to PetalRush 🌸</h2>
 
-<input type="email" id="email" placeholder="Email">
+<input id="email" placeholder="Email" class="input">
 
-<input type="password" id="password" placeholder="Password">
+<input id="password" type="password" placeholder="Password" class="input">
 
-<select id="role">
-
+<select id="role" class="input">
 <option value="buyer">Buyer</option>
 <option value="seller">Seller</option>
-
 </select>
 
-<button onclick="signup()">Signup</button>
+<button onclick="signup()" class="btn">Signup</button>
 
-<button onclick="login()">Login</button>
+<button onclick="login()" class="btn">Login</button>
+
+<p id="status"></p>
 
 </div>
 
