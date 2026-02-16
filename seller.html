@@ -2,36 +2,50 @@
 <html>
 <head>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Seller Dashboard</title>
 
-<link rel="stylesheet" href="css/seller.css">
+<link rel="stylesheet" href="css/style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
-<body>
+
+<body style="background:black;color:white;">
 
 
-<div class="header">
+<!-- HEADER -->
 
-<h2>Seller Dashboard</h2>
+<div style="
+background:#ff4081;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
+
+<h3>Seller Dashboard</h3>
 
 <button onclick="logout()">Logout</button>
 
 </div>
 
 
-<div class="container">
+
+<div style="display:flex">
 
 
-<div class="left">
+<!-- SIDEBAR -->
+
+<div style="width:200px">
 
 <button onclick="showProfile()">Profile</button>
 
-<button onclick="showBank()">Bank Details</button>
+<button onclick="showBank()">Bank</button>
 
-<button onclick="showCatalog()">Catalog Upload</button>
+<button onclick="showCatalog()">Upload Product</button>
 
 <button onclick="showProducts()">My Products</button>
 
@@ -39,26 +53,36 @@
 
 
 
-<div class="right">
+<!-- CONTENT -->
+
+<div style="flex:1;padding:20px">
 
 
 <!-- PROFILE -->
+
 <div id="profile">
 
 <h3>Profile</h3>
 
-<input id="name" placeholder="Your Name">
+<input id="name" placeholder="Name">
 
-<button onclick="saveProfile()">Save</button>
+<br><br>
+
+<button onclick="saveProfile()">
+
+Save Profile
+
+</button>
 
 </div>
 
 
 
 <!-- BANK -->
-<div id="bank" class="hidden">
 
-<h3>Bank Details</h3>
+<div id="bank" style="display:none">
+
+<h3>Bank</h3>
 
 <input id="bank_name" placeholder="Bank Name">
 
@@ -66,13 +90,20 @@
 
 <input id="ifsc" placeholder="IFSC">
 
-<button onclick="saveBank()">Save Bank</button>
+<br><br>
+
+<button onclick="saveBank()">
+
+Save Bank
+
+</button>
 
 </div>
 
 
 
 <!-- CATALOG -->
+
 <div id="catalog" style="display:none">
 
 <h3>Upload Product</h3>
@@ -93,13 +124,13 @@ accept="image/*"
 onchange="previewImage(event)">
 
 
+
 <br>
 
 <img id="preview"
 width="120"
 height="120"
-style="object-fit:cover;
-border-radius:12px;">
+style="object-fit:cover;">
 
 
 <br>
@@ -114,9 +145,9 @@ Upload Product
 
 
 
-
 <!-- PRODUCTS -->
-<div id="products" class="hidden">
+
+<div id="products" style="display:none">
 
 <h3>My Products</h3>
 
@@ -125,13 +156,14 @@ Upload Product
 </div>
 
 
-</div>
 
+</div>
 
 </div>
 
 
 <script src="js/seller.js"></script>
+
 
 </body>
 </html>
