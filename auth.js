@@ -1,66 +1,83 @@
-const supabaseUrl =
-"https://lssjsgfppehhclxqulso.supabase.co";
+const supabaseUrl = "https://lssjsgfppehhclxqulso.supabase.co";
 
-const supabaseKey =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
-const client =
-supabase.createClient(
-supabaseUrl,
-supabaseKey
-);
+const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 
+// Signup
 async function signup(){
 
-const email =
-document.getElementById("email").value;
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+const role = document.getElementById("role").value;
 
-const password =
-document.getElementById("password").value;
+if(!email || !password){
 
-const role =
-document.getElementById("role").value;
-
-await client
-.from("users")
-.insert([{email,password,role}]);
-
-alert("Signup success");
-
-}
-
-
-async function login(){
-
-const email =
-document.getElementById("email").value;
-
-const password =
-document.getElementById("password").value;
-
-const { data } =
-await client
-.from("users")
-.select("*")
-.eq("email",email)
-.eq("password",password)
-.single();
-
-if(!data){
-
-alert("Login failed");
-
+alert("Enter email and password");
 return;
 
 }
 
-localStorage.setItem("user",email);
-localStorage.setItem("role",data.role);
+const { data, error } = await client
+.from("users")
+.insert([{ email, password, role }]);
 
-if(data.role==="buyer"){
+if(error){
 
-location.href="buyer.html";
+alert("Signup error: " + error.message);
+
+}else{
+
+alert("Signup successful");
+
+}
+
+}
+
+
+// Login
+async function login(){
+
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+
+const { data, error } = await client
+.from("users")
+.select("*")
+.eq("email", email)
+.eq("password", password);
+
+if(error){
+
+alert(error.message);
+return;
+
+}
+
+if(!data || data.length === 0){
+
+alert("Invalid login");
+return;
+
+}
+
+const user = data[0];
+
+localStorage.setItem("user", user.email);
+localStorage.setItem("role", user.role);
+
+alert("Login successful");
+
+if(user.role === "buyer"){
+
+window.location.href = "buyer.html";
+
+}
+
+if(user.role === "seller"){
+
+window.location.href = "seller.html";
 
 }
 
