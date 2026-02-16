@@ -2,31 +2,39 @@ const supabaseUrl = "https://lssjsgfppehhclxqulso.supabase.co";
 
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+const client=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+load();
 
 
-loadFlowers();
 
+async function load(){
 
-async function loadFlowers(){
+const {data}=await client
+.from("products")
+.select("*");
 
-const { data } = await client.from("flowers").select("*");
 
 let html="";
 
-data.forEach(f=>{
+
+data.forEach(p=>{
 
 html+=`
 
-<div>
+<div class="card">
 
-<h4>${f.name}</h4>
+<img src="${p.image_url}" width="100">
 
-<p>₹${f.price}</p>
+<h3>${p.name}</h3>
 
-<button onclick="order('${f.name}',${f.price})">
-Order
-</button>
+<p>₹${p.price}</p>
+
+<button onclick="order('${p.id}')">Buy</button>
 
 </div>
 
@@ -34,22 +42,30 @@ Order
 
 });
 
-document.getElementById("flowers").innerHTML=html;
+
+document.getElementById("products").innerHTML=html;
 
 }
 
 
-async function order(name,price){
 
-const email=localStorage.getItem("user");
+async function order(id){
 
-await client.from("orders").insert([{
+const user=
+JSON.parse(localStorage.getItem("user"));
 
-flower_name:name,
-price:price,
-user_email:email
+await client
+
+.from("orders")
+
+.insert([{
+
+buyer_email:user.email,
+
+product_id:id
 
 }]);
+
 
 alert("Order placed");
 
