@@ -73,7 +73,7 @@
 
 
 <!-- CATALOG -->
-<div id="catalog" class="hidden">
+<div id="catalog" style="display:none">
 
 <h3>Upload Product</h3>
 
@@ -87,11 +87,31 @@
 
 <input id="location" placeholder="Pickup Location">
 
-<input id="image" placeholder="Image URL">
 
-<button onclick="uploadProduct()">Upload</button>
+<input type="file"
+accept="image/*"
+onchange="previewImage(event)">
+
+
+<br>
+
+<img id="preview"
+width="120"
+height="120"
+style="object-fit:cover;
+border-radius:12px;">
+
+
+<br>
+
+<button onclick="uploadProduct()">
+
+Upload Product
+
+</button>
 
 </div>
+
 
 
 
