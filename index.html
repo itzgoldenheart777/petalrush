@@ -6,54 +6,119 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PetalRush</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ff4081">
 
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
 
+<meta name="theme-color" content="#ff4081">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
 
-if ("serviceWorker" in navigator) {
-
-navigator.serviceWorker.register("sw.js")
-
-.then(() => console.log("SW registered"));
-
-}
-
-</script>
 </head>
 
 <body>
 
-<header class="header">
-<img src="logo.png" class="logo">
-</header>
 
-<div class="auth-container">
+<!-- INTRO SECTION -->
 
-<h2>Welcome to PetalRush 🌸</h2>
+<div class="intro">
 
-<input id="email" placeholder="Email" class="input">
+<img src="logo.png" class="intro-logo">
 
-<input id="password" type="password" placeholder="Password" class="input">
+<h1>PetalRush</h1>
 
-<select id="role" class="input">
+<p class="tagline">Order Flowers Like Never Before</p>
+
+<button onclick="showLogin()" class="main-btn">Login</button>
+
+<button onclick="showSignup()" class="main-btn-outline">Create Account</button>
+
+</div>
+
+
+
+<!-- LOGIN SECTION -->
+
+<div id="loginBox" class="auth-box" style="display:none">
+
+<h2>Login</h2>
+
+<input id="loginEmail" placeholder="Email" class="input">
+
+<input id="loginPassword" type="password" placeholder="Password" class="input">
+
+<button onclick="login()" class="btn">Login</button>
+
+<p onclick="showSignup()" class="link">Create new account</p>
+
+<p onclick="forgotPassword()" class="link">Forgot Password?</p>
+
+</div>
+
+
+
+<!-- SIGNUP SECTION -->
+
+<div id="signupBox" class="auth-box" style="display:none">
+
+<h2>Create Account</h2>
+
+<input id="signupEmail" placeholder="Email" class="input">
+
+<input id="signupPassword" type="password" placeholder="Password" class="input">
+
+<select id="signupRole" class="input">
+
 <option value="buyer">Buyer</option>
+
 <option value="seller">Seller</option>
+
 </select>
 
 <button onclick="signup()" class="btn">Signup</button>
 
-<button onclick="login()" class="btn">Login</button>
-
-<p id="status"></p>
+<p onclick="showLogin()" class="link">Already have account? Login</p>
 
 </div>
 
+
+<p id="status"></p>
+
+
 <script src="js/auth.js"></script>
+
+
+<script>
+
+function showLogin(){
+
+document.querySelector(".intro").style.display="none";
+
+document.getElementById("loginBox").style.display="block";
+
+}
+
+function showSignup(){
+
+document.querySelector(".intro").style.display="none";
+
+document.getElementById("signupBox").style.display="block";
+
+}
+
+</script>
+
+
+<script>
+
+if ("serviceWorker" in navigator) {
+
+navigator.serviceWorker.register("sw.js");
+
+}
+
+</script>
+
 
 </body>
 </html>

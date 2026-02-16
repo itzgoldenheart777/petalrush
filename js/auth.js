@@ -1,3 +1,5 @@
+
+
 const supabase = window.supabase.createClient(
 
 "https://lssjsgfppehhclxqulso.supabase.co",
@@ -7,13 +9,15 @@ const supabase = window.supabase.createClient(
 );
 
 
+// SIGNUP
 async function signup(){
 
-const email = document.getElementById("email").value;
+const email = document.getElementById("signupEmail").value;
 
-const password = document.getElementById("password").value;
+const password = document.getElementById("signupPassword").value;
 
-const role = document.getElementById("role").value;
+const role = document.getElementById("signupRole").value;
+
 
 const { error } = await supabase
 
@@ -21,25 +25,26 @@ const { error } = await supabase
 
 .insert([{ email, password, role }]);
 
+
 if(error){
 
 document.getElementById("status").innerText = error.message;
 
 }else{
 
-document.getElementById("status").innerText = "Signup successful";
+document.getElementById("status").innerText = "Account created. Please login.";
 
 }
 
 }
 
 
-
+// LOGIN
 async function login(){
 
-const email = document.getElementById("email").value;
+const email = document.getElementById("loginEmail").value;
 
-const password = document.getElementById("password").value;
+const password = document.getElementById("loginPassword").value;
 
 
 const { data, error } = await supabase
@@ -57,7 +62,7 @@ const { data, error } = await supabase
 
 if(error){
 
-document.getElementById("status").innerText = "Login failed";
+document.getElementById("status").innerText = "Invalid login";
 
 return;
 
@@ -69,14 +74,20 @@ localStorage.setItem("user", JSON.stringify(data));
 
 if(data.role === "buyer"){
 
-window.location = "buyer.html";
+window.location="buyer.html";
+
+}else{
+
+window.location="seller.html";
 
 }
 
-else{
-
-window.location = "seller.html";
-
 }
+
+
+// FORGOT PASSWORD
+function forgotPassword(){
+
+alert("Contact support to reset password (Supabase reset coming next)");
 
 }
