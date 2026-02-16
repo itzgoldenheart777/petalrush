@@ -1,28 +1,32 @@
-// ==========================
 // SUPABASE CONFIG
-// ==========================
 
-const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_URL =
+"https://lssjsgfppehhclxqulso.supabase.co";
 
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
-// create client
-const client = supabase.createClient(
+const client =
+supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
 
-// get logged user
-const user = JSON.parse(localStorage.getItem("user"));
+
+// CHECK USER
+
+const user =
+JSON.parse(localStorage.getItem("user"));
 
 if(!user){
+
 window.location="index.html";
+
 }
 
 
-// ==========================
+
 // LOGOUT
-// ==========================
 
 function logout(){
 
@@ -33,15 +37,17 @@ window.location="index.html";
 }
 
 
-// ==========================
+
 // NAVIGATION
-// ==========================
 
 function hideAll(){
 
 document.getElementById("profile").style.display="none";
+
 document.getElementById("bank").style.display="none";
+
 document.getElementById("catalog").style.display="none";
+
 document.getElementById("products").style.display="none";
 
 }
@@ -50,6 +56,7 @@ document.getElementById("products").style.display="none";
 function showProfile(){
 
 hideAll();
+
 document.getElementById("profile").style.display="block";
 
 }
@@ -58,6 +65,7 @@ document.getElementById("profile").style.display="block";
 function showBank(){
 
 hideAll();
+
 document.getElementById("bank").style.display="block";
 
 }
@@ -66,6 +74,7 @@ document.getElementById("bank").style.display="block";
 function showCatalog(){
 
 hideAll();
+
 document.getElementById("catalog").style.display="block";
 
 }
@@ -74,6 +83,7 @@ document.getElementById("catalog").style.display="block";
 function showProducts(){
 
 hideAll();
+
 document.getElementById("products").style.display="block";
 
 loadProducts();
@@ -82,19 +92,18 @@ loadProducts();
 
 
 
-// ==========================
 // SAVE PROFILE
-// ==========================
 
 async function saveProfile(){
 
-const name = document.getElementById("name").value;
+const name =
+document.getElementById("name").value;
 
-const {error} = await client
+const {error} =
+await client
 .from("users")
-.update({ name })
-.eq("email", user.email);
-
+.update({name})
+.eq("email",user.email);
 
 if(error){
 
@@ -102,7 +111,7 @@ alert(error.message);
 
 }else{
 
-alert("Profile saved");
+alert("Saved");
 
 }
 
@@ -110,9 +119,7 @@ alert("Profile saved");
 
 
 
-// ==========================
 // SAVE BANK
-// ==========================
 
 async function saveBank(){
 
@@ -126,7 +133,8 @@ const ifsc =
 document.getElementById("ifsc").value;
 
 
-const {error} = await client
+const {error} =
+await client
 .from("users")
 .update({
 
@@ -135,7 +143,7 @@ account_number,
 ifsc
 
 })
-.eq("email", user.email);
+.eq("email",user.email);
 
 
 if(error){
@@ -144,7 +152,7 @@ alert(error.message);
 
 }else{
 
-alert("Bank saved");
+alert("Bank Saved");
 
 }
 
@@ -152,11 +160,9 @@ alert("Bank saved");
 
 
 
-// ==========================
 // IMAGE PREVIEW
-// ==========================
 
-let imageFile=null;
+let imageFile;
 
 function previewImage(event){
 
@@ -177,9 +183,7 @@ reader.readAsDataURL(imageFile);
 
 
 
-// ==========================
-// UPLOAD PRODUCT IMAGE
-// ==========================
+// UPLOAD PRODUCT
 
 async function uploadProduct(){
 
@@ -199,11 +203,11 @@ const location =
 document.getElementById("location").value;
 
 
-// upload image to supabase storage
-
 const fileName =
 Date.now()+"_"+imageFile.name;
 
+
+// upload image
 
 const {error:uploadError} =
 await client.storage
@@ -214,11 +218,93 @@ await client.storage
 if(uploadError){
 
 alert(uploadError.message);
+
 return;
 
 }
 
 
+// get image url
+
 const image_url =
 SUPABASE_URL +
-"/storage/v1/object/pu
+"/storage/v1/object/public/products/"
++ fileName;
+
+
+// save product
+
+const {error} =
+await client
+.from("products")
+.insert([{
+
+seller_email:user.email,
+name,
+price,
+quantity:qty,
+description:desc,
+pickup_location:location,
+image_url
+
+}]);
+
+
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert("Product uploaded");
+
+}
+
+}
+
+
+
+// LOAD PRODUCTS
+
+async function loadProducts(){
+
+const {data,error} =
+await client
+.from("products")
+.select("*")
+.eq("seller_email",user.email);
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+let html="";
+
+data.forEach(p=>{
+
+html+=`
+
+<div>
+
+<img src="${p.image_url}" width="80">
+
+<p>${p.name}</p>
+
+<p>₹${p.price}</p>
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById("productList").innerHTML=html;
+
+}
