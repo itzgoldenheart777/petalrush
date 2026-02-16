@@ -1,17 +1,28 @@
+// ==========================
+// SUPABASE CONFIG
+// ==========================
 
-const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
-const client=supabase.createClient(
+// create client
+const client = supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
 
-const user=
-JSON.parse(localStorage.getItem("user"));
+// get logged user
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+window.location="index.html";
+}
 
 
+// ==========================
+// LOGOUT
+// ==========================
 
 function logout(){
 
@@ -22,22 +33,24 @@ window.location="index.html";
 }
 
 
+// ==========================
+// NAVIGATION
+// ==========================
 
 function hideAll(){
 
-document.getElementById("profile").classList.add("hidden");
-document.getElementById("bank").classList.add("hidden");
-document.getElementById("catalog").classList.add("hidden");
-document.getElementById("products").classList.add("hidden");
+document.getElementById("profile").style.display="none";
+document.getElementById("bank").style.display="none";
+document.getElementById("catalog").style.display="none";
+document.getElementById("products").style.display="none";
 
 }
-
 
 
 function showProfile(){
 
 hideAll();
-document.getElementById("profile").classList.remove("hidden");
+document.getElementById("profile").style.display="block";
 
 }
 
@@ -45,7 +58,7 @@ document.getElementById("profile").classList.remove("hidden");
 function showBank(){
 
 hideAll();
-document.getElementById("bank").classList.remove("hidden");
+document.getElementById("bank").style.display="block";
 
 }
 
@@ -53,7 +66,7 @@ document.getElementById("bank").classList.remove("hidden");
 function showCatalog(){
 
 hideAll();
-document.getElementById("catalog").classList.remove("hidden");
+document.getElementById("catalog").style.display="block";
 
 }
 
@@ -61,8 +74,7 @@ document.getElementById("catalog").classList.remove("hidden");
 function showProducts(){
 
 hideAll();
-
-document.getElementById("products").classList.remove("hidden");
+document.getElementById("products").style.display="block";
 
 loadProducts();
 
@@ -70,125 +82,143 @@ loadProducts();
 
 
 
+// ==========================
+// SAVE PROFILE
+// ==========================
+
 async function saveProfile(){
 
-await client
+const name = document.getElementById("name").value;
 
+const {error} = await client
 .from("users")
-
-.update({
-
-name:
-document.getElementById("name").value
-
-})
-
-.eq("email",user.email);
+.update({ name })
+.eq("email", user.email);
 
 
-alert("Saved");
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert("Profile saved");
+
+}
 
 }
 
 
 
+// ==========================
+// SAVE BANK
+// ==========================
+
 async function saveBank(){
 
-await client
+const bank_name =
+document.getElementById("bank_name").value;
 
+const account_number =
+document.getElementById("account_number").value;
+
+const ifsc =
+document.getElementById("ifsc").value;
+
+
+const {error} = await client
 .from("users")
-
 .update({
 
-bank_name:
-document.getElementById("bank_name").value,
-
-account_number:
-document.getElementById("account_number").value,
-
-ifsc:
-document.getElementById("ifsc").value
+bank_name,
+account_number,
+ifsc
 
 })
+.eq("email", user.email);
 
-.eq("email",user.email);
 
+if(error){
+
+alert(error.message);
+
+}else{
 
 alert("Bank saved");
 
 }
 
+}
 
+
+
+// ==========================
+// IMAGE PREVIEW
+// ==========================
+
+let imageFile=null;
+
+function previewImage(event){
+
+imageFile = event.target.files[0];
+
+const reader = new FileReader();
+
+reader.onload=function(){
+
+document.getElementById("preview").src =
+reader.result;
+
+};
+
+reader.readAsDataURL(imageFile);
+
+}
+
+
+
+// ==========================
+// UPLOAD PRODUCT IMAGE
+// ==========================
 
 async function uploadProduct(){
 
-await client
+const name =
+document.getElementById("pname").value;
 
+const price =
+document.getElementById("price").value;
+
+const qty =
+document.getElementById("qty").value;
+
+const desc =
+document.getElementById("desc").value;
+
+const location =
+document.getElementById("location").value;
+
+
+// upload image to supabase storage
+
+const fileName =
+Date.now()+"_"+imageFile.name;
+
+
+const {error:uploadError} =
+await client.storage
 .from("products")
-
-.insert([{
-
-seller_email:user.email,
-
-name:
-document.getElementById("pname").value,
-
-price:
-document.getElementById("price").value,
-
-quantity:
-document.getElementById("qty").value,
-
-description:
-document.getElementById("desc").value,
-
-image_url:
-document.getElementById("image").value,
-
-pickup_location:
-document.getElementById("location").value
-
-}]);
+.upload(fileName,imageFile);
 
 
-alert("Uploaded");
+if(uploadError){
+
+alert(uploadError.message);
+return;
 
 }
 
 
-
-async function loadProducts(){
-
-const {data}=await client
-
-.from("products")
-
-.select("*")
-
-.eq("seller_email",user.email);
-
-
-let html="";
-
-data.forEach(p=>{
-
-html+=`
-
-<div>
-
-<h4>${p.name}</h4>
-
-<p>₹${p.price}</p>
-
-<p>${p.quantity}</p>
-
-</div>
-
-`;
-
-});
-
-
-document.getElementById("productList").innerHTML=html;
-
-}
+const image_url =
+SUPABASE_URL +
+"/storage/v1/object/pu
