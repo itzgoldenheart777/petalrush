@@ -1,47 +1,67 @@
+
+// YOUR SUPABASE DETAILS
+const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+
+
+// INIT CLIENT
+const client = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+
+function hideAll(){
+
+document.getElementById("splash").style.display="none";
+document.getElementById("auth").style.display="none";
+document.getElementById("login").style.display="none";
+document.getElementById("signup").style.display="none";
+
+}
+
+
+
 function showAuth(){
 
 hideAll();
-document.getElementById("authChoice").classList.remove("hidden");
+document.getElementById("auth").style.display="block";
 
 }
+
 
 function showLogin(){
 
 hideAll();
-document.getElementById("loginScreen").classList.remove("hidden");
+document.getElementById("login").style.display="block";
 
 }
+
 
 function showSignup(){
 
 hideAll();
-document.getElementById("signupScreen").classList.remove("hidden");
+document.getElementById("signup").style.display="block";
 
 }
 
-function showForgot(){
+
+function backSplash(){
 
 hideAll();
-document.getElementById("forgotScreen").classList.remove("hidden");
+document.getElementById("splash").style.display="block";
 
 }
 
-function back(){
+
+function backAuth(){
 
 hideAll();
-document.getElementById("authChoice").classList.remove("hidden");
+document.getElementById("auth").style.display="block";
 
 }
 
-function hideAll(){
-
-document.getElementById("splash").classList.add("hidden");
-document.getElementById("authChoice").classList.add("hidden");
-document.getElementById("loginScreen").classList.add("hidden");
-document.getElementById("signupScreen").classList.add("hidden");
-document.getElementById("forgotScreen").classList.add("hidden");
-
-}
 
 
 async function signup(){
@@ -53,37 +73,44 @@ const password =
 document.getElementById("signupPassword").value;
 
 const role =
-document.getElementById("signupRole").value;
+document.getElementById("role").value;
 
 
-const { data, error } =
-await supabase.auth.signUp({
 
-email: email,
-password: password
+const {data,error} =
+await client.auth.signUp({
+
+email:email,
+password:password
 
 });
+
 
 if(error){
 
 alert(error.message);
+return;
 
-}else{
+}
 
-await supabase.from("users").insert([{
 
-email: email,
-role: role
+// save role
+await client
+.from("users")
+.insert([
+{
+email:email,
+role:role
+}
+]);
 
-}]);
 
-alert("Signup successful");
+alert("Signup success");
 
 showLogin();
 
 }
 
-}
 
 
 async function login(){
@@ -94,24 +121,28 @@ document.getElementById("loginEmail").value;
 const password =
 document.getElementById("loginPassword").value;
 
-const { data, error } =
-await supabase.auth.signInWithPassword({
 
-email: email,
-password: password
+
+const {data,error} =
+await client.auth.signInWithPassword({
+
+email:email,
+password:password
 
 });
 
+
 if(error){
 
-alert("Invalid login");
-
+alert(error.message);
 return;
 
 }
 
-const { data: userData } =
-await supabase
+
+// get role
+const {data:userData} =
+await client
 .from("users")
 .select("*")
 .eq("email",email)
@@ -138,22 +169,16 @@ window.location="seller.html";
 
 
 
-async function sendReset(){
+async function forgot(){
 
 const email =
-document.getElementById("forgotEmail").value;
+prompt("Enter your email");
 
-const { error } =
-await supabase.auth.resetPasswordForEmail(email);
 
-if(error){
+await client.auth.resetPasswordForEmail(
+email
+);
 
-alert(error.message);
-
-}else{
-
-alert("Password reset email sent");
-
-}
+alert("Reset link sent");
 
 }
