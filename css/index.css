@@ -1,106 +1,41 @@
 body{
-
-margin:0;
-font-family:Arial;
 background:black;
 color:white;
-
-}
-
-.screen{
-
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-padding:20px;
-
-}
-
-.center{
-
+font-family:Arial;
 text-align:center;
-
-}
-
-.hidden{
-
-display:none;
-
+padding-top:80px;
 }
 
 .logo{
-
-width:140px;
+width:150px;
 margin-bottom:20px;
-
 }
 
-.brand{
+button{
 
-color:#ff4081;
-font-size:32px;
+width:220px;
+padding:14px;
+margin:10px;
 
-}
+background:#ff4081;
+color:white;
+border:none;
+border-radius:8px;
 
-.tagline{
-
-color:#ccc;
-margin-bottom:30px;
-
-}
-
-.card{
-
-background:white;
-color:black;
-padding:25px;
-border-radius:12px;
-width:90%;
-max-width:350px;
-
+font-size:16px;
 }
 
 input,select{
 
-width:100%;
+width:220px;
 padding:12px;
-margin-top:10px;
-margin-bottom:10px;
-border:1px solid #ccc;
-border-radius:6px;
+margin:10px;
 
-}
-
-.btn{
-
-width:100%;
-padding:14px;
-background:#ff4081;
+border-radius:8px;
 border:none;
-color:white;
-border-radius:8px;
-font-size:16px;
 
 }
 
-.btn-outline{
-
-width:100%;
-padding:14px;
-border:2px solid #ff4081;
-background:none;
-color:#ff4081;
-border-radius:8px;
-margin-top:10px;
-
-}
-
-.link{
-
-color:#ff4081;
-margin-top:10px;
-cursor:pointer;
-
+.hidden{
+display:none;
 }
