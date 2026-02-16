@@ -1,56 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetalRush | Flower Delivery</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PetalRush</title>
+
+<link rel="stylesheet" href="css/index.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
+
 <body>
 
-    <div id="mainScreen" class="screen">
-        <div class="center">
-            <img src="logo.png" alt="PetalRush Logo" class="logo">
-            <h1 class="title">PetalRush</h1>
-            <p class="tagline">Order flowers like never before.</p>
-            <button class="btn-main" onclick="showAuthOptions()">Get Started</button>
-        </div>
-    </div>
+<!-- SPLASH SCREEN -->
 
-    <div id="authOptions" class="screen hidden">
-        <div class="center">
-            <h2>Welcome 🌸</h2>
-            <button class="btn-main" onclick="openLogin()">Login</button>
-            <button class="btn-outline" onclick="openSignup()">Create Account</button>
-            <p class="link" onclick="goBack()">Back</p>
-        </div>
-    </div>
+<div id="splash" class="screen center">
 
-    <div id="loginScreen" class="screen hidden">
-        <div class="card">
-            <h3>Login</h3>
-            <input type="email" id="loginEmail" placeholder="Email" class="input">
-            <input type="password" id="loginPassword" placeholder="Password" class="input">
-            <button class="btn-main" onclick="login()">Login</button>
-            <p class="link" onclick="goBack()">Back</p>
-        </div>
-    </div>
+<img src="logo.png" class="logo">
 
-    <div id="signupScreen" class="screen hidden">
-        <div class="card">
-            <h3>Create Account</h3>
-            <input type="email" id="signupEmail" placeholder="Email" class="input">
-            <input type="password" id="signupPassword" placeholder="Password" class="input">
-            <select id="signupRole" class="input">
-                <option value="buyer">I want to Buy Flowers</option>
-                <option value="seller">I want to Sell Flowers</option>
-            </select>
-            <button class="btn-main" onclick="signup()">Sign Up</button>
-            <p class="link" onclick="goBack()">Back</p>
-        </div>
-    </div>
+<h1 class="brand">PetalRush</h1>
 
-    <script src="js/auth.js"></script>
+<p class="tagline">Order Flowers Like Never Before</p>
+
+<button class="btn" onclick="showAuth()">Get Started</button>
+
+</div>
+
+
+<!-- AUTH CHOICE -->
+
+<div id="authChoice" class="screen center hidden">
+
+<h2>Welcome</h2>
+
+<button class="btn" onclick="showLogin()">Login</button>
+
+<button class="btn-outline" onclick="showSignup()">Create Account</button>
+
+</div>
+
+
+<!-- LOGIN -->
+
+<div id="loginScreen" class="screen center hidden">
+
+<div class="card">
+
+<h2>Login</h2>
+
+<input id="loginEmail" placeholder="Email">
+
+<input id="loginPassword" type="password" placeholder="Password">
+
+<button class="btn" onclick="login()">Login</button>
+
+<p class="link" onclick="showForgot()">Forgot Password?</p>
+
+<p class="link" onclick="back()">Back</p>
+
+</div>
+
+</div>
+
+
+<!-- SIGNUP -->
+
+<div id="signupScreen" class="screen center hidden">
+
+<div class="card">
+
+<h2>Create Account</h2>
+
+<input id="signupEmail" placeholder="Email">
+
+<input id="signupPassword" type="password" placeholder="Password">
+
+<select id="signupRole">
+
+<option value="buyer">Buyer</option>
+
+<option value="seller">Seller</option>
+
+</select>
+
+<button class="btn" onclick="signup()">Signup</button>
+
+<p class="link" onclick="back()">Back</p>
+
+</div>
+
+</div>
+
+
+<!-- FORGOT -->
+
+<div id="forgotScreen" class="screen center hidden">
+
+<div class="card">
+
+<h2>Reset Password</h2>
+
+<input id="forgotEmail" placeholder="Email">
+
+<button class="btn" onclick="sendReset()">Send Reset Email</button>
+
+<p class="link" onclick="back()">Back</p>
+
+</div>
+
+</div>
+
+
+<script src="js/supabase.js"></script>
+
+<script src="js/index.js"></script>
+
 </body>
 </html>
