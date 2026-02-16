@@ -1,26 +1,38 @@
+// WAIT UNTIL PAGE LOADS
+window.onload = function(){
+
+init();
+
+};
+
+
+function init(){
+
 // SUPABASE CONFIG
 
 const SUPABASE_URL =
 "https://lssjsgfppehhclxqulso.supabase.co";
 
 const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+"PASTE YOUR ANON KEY HERE";
 
-const client =
+window.client =
 supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
 
 
-// CHECK USER
+// GET USER
 
-const user =
+window.user =
 JSON.parse(localStorage.getItem("user"));
 
 if(!user){
 
 window.location="index.html";
+
+}
 
 }
 
@@ -30,7 +42,7 @@ window.location="index.html";
 
 function logout(){
 
-localStorage.clear();
+localStorage.removeItem("user");
 
 window.location="index.html";
 
@@ -102,7 +114,7 @@ document.getElementById("name").value;
 const {error} =
 await client
 .from("users")
-.update({name})
+.update({name:name})
 .eq("email",user.email);
 
 if(error){
@@ -111,7 +123,7 @@ alert(error.message);
 
 }else{
 
-alert("Saved");
+alert("Profile Saved");
 
 }
 
@@ -132,7 +144,6 @@ document.getElementById("account_number").value;
 const ifsc =
 document.getElementById("ifsc").value;
 
-
 const {error} =
 await client
 .from("users")
@@ -144,7 +155,6 @@ ifsc
 
 })
 .eq("email",user.email);
-
 
 if(error){
 
@@ -160,7 +170,7 @@ alert("Bank Saved");
 
 
 
-// IMAGE PREVIEW
+// IMAGE UPLOAD
 
 let imageFile;
 
@@ -187,6 +197,14 @@ reader.readAsDataURL(imageFile);
 
 async function uploadProduct(){
 
+if(!imageFile){
+
+alert("Select image");
+
+return;
+
+}
+
 const name =
 document.getElementById("pname").value;
 
@@ -203,17 +221,16 @@ const location =
 document.getElementById("location").value;
 
 
-const fileName =
+const filename =
 Date.now()+"_"+imageFile.name;
 
 
-// upload image
+// UPLOAD IMAGE
 
 const {error:uploadError} =
 await client.storage
 .from("products")
-.upload(fileName,imageFile);
-
+.upload(filename,imageFile);
 
 if(uploadError){
 
@@ -224,15 +241,13 @@ return;
 }
 
 
-// get image url
+// GET IMAGE URL
 
 const image_url =
-SUPABASE_URL +
-"/storage/v1/object/public/products/"
-+ fileName;
+"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/products/"+filename;
 
 
-// save product
+// SAVE PRODUCT
 
 const {error} =
 await client
@@ -256,7 +271,7 @@ alert(error.message);
 
 }else{
 
-alert("Product uploaded");
+alert("Product Uploaded");
 
 }
 
@@ -274,7 +289,6 @@ await client
 .select("*")
 .eq("seller_email",user.email);
 
-
 if(error){
 
 alert(error.message);
@@ -283,16 +297,15 @@ return;
 
 }
 
-
 let html="";
 
 data.forEach(p=>{
 
 html+=`
 
-<div>
+<div style="margin:10px">
 
-<img src="${p.image_url}" width="80">
+<img src="${p.image_url}" width="100">
 
 <p>${p.name}</p>
 
@@ -304,7 +317,7 @@ html+=`
 
 });
 
-
-document.getElementById("productList").innerHTML=html;
+document.getElementById("productList").innerHTML =
+html;
 
 }
