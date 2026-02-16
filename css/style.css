@@ -1,95 +1,74 @@
-body{
-margin:0;
-font-family:Arial;
-background:white;
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-
-.screen{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-padding:20px;
+.screen {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
 }
 
+.hidden { display: none !important; }
 
-.center{
-text-align:center;
+.center { text-align: center; }
+
+.logo { width: 120px; margin-bottom: 20px; }
+
+.title { color: #ff4081; font-size: 2.5rem; margin: 0; }
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
 }
 
-
-.hidden{
-display:none;
+.input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
 }
 
-
-.logo{
-width:220px;
-margin-bottom:20px;
+.btn-main {
+    width: 100%;
+    padding: 14px;
+    background: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-
-.title{
-color:#ff4081;
-font-size:32px;
-margin:0;
+.btn-outline {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: #ff4081;
+    border: 2px solid #ff4081;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-
-.tagline{
-color:#555;
-margin-bottom:30px;
-}
-
-
-.card{
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 0 15px rgba(0,0,0,0.1);
-width:100%;
-max-width:350px;
-}
-
-
-.input{
-width:100%;
-padding:14px;
-margin:10px 0;
-border-radius:8px;
-border:1px solid #ddd;
-font-size:16px;
-}
-
-
-.btn-main{
-width:100%;
-padding:14px;
-background:#ff4081;
-color:white;
-border:none;
-border-radius:8px;
-margin-top:10px;
-font-size:16px;
-}
-
-
-.btn-outline{
-width:100%;
-padding:14px;
-border:2px solid #ff4081;
-color:#ff4081;
-background:white;
-border-radius:8px;
-margin-top:10px;
-font-size:16px;
-}
-
-
-.link{
-color:#ff4081;
-margin-top:12px;
-cursor:pointer;
+.link {
+    color: #ff4081;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
 }
