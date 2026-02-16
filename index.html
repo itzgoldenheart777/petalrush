@@ -6,12 +6,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PetalRush</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff4081">
 
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
 
+if ("serviceWorker" in navigator) {
+
+navigator.serviceWorker.register("sw.js")
+
+.then(() => console.log("SW registered"));
+
+}
+
+</script>
 </head>
 
 <body>
