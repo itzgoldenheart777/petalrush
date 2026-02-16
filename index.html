@@ -7,10 +7,8 @@
 
 <title>PetalRush</title>
 
-<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
-
-<meta name="theme-color" content="#ff4081">
+<link rel="manifest" href="manifest.json">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -19,27 +17,27 @@
 <body>
 
 
-<!-- INTRO SECTION -->
+<!-- INTRO -->
 
-<div class="intro">
+<div id="intro" class="center">
 
-<img src="logo.png" class="intro-logo">
+<img src="logo.png" class="logo">
 
-<h1>PetalRush</h1>
+<h1>Welcome to PetalRush 🌸</h1>
 
 <p class="tagline">Order Flowers Like Never Before</p>
 
-<button onclick="showLogin()" class="main-btn">Login</button>
+<button class="btn-main" onclick="showLogin()">Login</button>
 
-<button onclick="showSignup()" class="main-btn-outline">Create Account</button>
+<button class="btn-outline" onclick="showSignup()">Create Account</button>
 
 </div>
 
 
 
-<!-- LOGIN SECTION -->
+<!-- LOGIN -->
 
-<div id="loginBox" class="auth-box" style="display:none">
+<div id="login" class="card hidden">
 
 <h2>Login</h2>
 
@@ -47,19 +45,19 @@
 
 <input id="loginPassword" type="password" placeholder="Password" class="input">
 
-<button onclick="login()" class="btn">Login</button>
+<button class="btn-main" onclick="login()">Login</button>
 
-<p onclick="showSignup()" class="link">Create new account</p>
+<p class="link" onclick="showSignup()">Create new account</p>
 
-<p onclick="forgotPassword()" class="link">Forgot Password?</p>
+<p class="link" onclick="showForgot()">Forgot Password?</p>
 
 </div>
 
 
 
-<!-- SIGNUP SECTION -->
+<!-- SIGNUP -->
 
-<div id="signupBox" class="auth-box" style="display:none">
+<div id="signup" class="card hidden">
 
 <h2>Create Account</h2>
 
@@ -75,9 +73,35 @@
 
 </select>
 
-<button onclick="signup()" class="btn">Signup</button>
+<button class="btn-main" onclick="signup()">Signup</button>
 
-<p onclick="showLogin()" class="link">Already have account? Login</p>
+<p class="link" onclick="showLogin()">Already have account? Login</p>
+
+</div>
+
+
+
+<!-- FORGOT PASSWORD -->
+
+<div id="forgot" class="card hidden">
+
+<h2>Reset Password</h2>
+
+<input id="resetEmail" placeholder="Enter Email" class="input">
+
+<button class="btn-main" onclick="sendOTP()">Send OTP</button>
+
+<div id="otpSection" class="hidden">
+
+<input id="otpInput" placeholder="Enter 6 digit OTP" class="input">
+
+<input id="newPassword" placeholder="New Password" class="input">
+
+<button class="btn-main" onclick="verifyOTP()">Reset Password</button>
+
+</div>
+
+<p class="link" onclick="showLogin()">Back to login</p>
 
 </div>
 
@@ -86,39 +110,6 @@
 
 
 <script src="js/auth.js"></script>
-
-
-<script>
-
-function showLogin(){
-
-document.querySelector(".intro").style.display="none";
-
-document.getElementById("loginBox").style.display="block";
-
-}
-
-function showSignup(){
-
-document.querySelector(".intro").style.display="none";
-
-document.getElementById("signupBox").style.display="block";
-
-}
-
-</script>
-
-
-<script>
-
-if ("serviceWorker" in navigator) {
-
-navigator.serviceWorker.register("sw.js");
-
-}
-
-</script>
-
 
 </body>
 </html>

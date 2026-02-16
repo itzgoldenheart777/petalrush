@@ -1,5 +1,3 @@
-
-
 const supabase = window.supabase.createClient(
 
 "https://lssjsgfppehhclxqulso.supabase.co",
@@ -9,14 +7,58 @@ const supabase = window.supabase.createClient(
 );
 
 
+// SCREEN CONTROL
+
+function hideAll(){
+
+document.getElementById("intro").classList.add("hidden");
+
+document.getElementById("login").classList.add("hidden");
+
+document.getElementById("signup").classList.add("hidden");
+
+document.getElementById("forgot").classList.add("hidden");
+
+}
+
+
+function showLogin(){
+
+hideAll();
+
+document.getElementById("login").classList.remove("hidden");
+
+}
+
+
+function showSignup(){
+
+hideAll();
+
+document.getElementById("signup").classList.remove("hidden");
+
+}
+
+
+function showForgot(){
+
+hideAll();
+
+document.getElementById("forgot").classList.remove("hidden");
+
+}
+
+
+
 // SIGNUP
+
 async function signup(){
 
-const email = document.getElementById("signupEmail").value;
+const email = signupEmail.value;
 
-const password = document.getElementById("signupPassword").value;
+const password = signupPassword.value;
 
-const role = document.getElementById("signupRole").value;
+const role = signupRole.value;
 
 
 const { error } = await supabase
@@ -26,25 +68,19 @@ const { error } = await supabase
 .insert([{ email, password, role }]);
 
 
-if(error){
-
-document.getElementById("status").innerText = error.message;
-
-}else{
-
-document.getElementById("status").innerText = "Account created. Please login.";
+status.innerText = error ? error.message : "Signup successful";
 
 }
 
-}
 
 
 // LOGIN
+
 async function login(){
 
-const email = document.getElementById("loginEmail").value;
+const email = loginEmail.value;
 
-const password = document.getElementById("loginPassword").value;
+const password = loginPassword.value;
 
 
 const { data, error } = await supabase
@@ -62,32 +98,66 @@ const { data, error } = await supabase
 
 if(error){
 
-document.getElementById("status").innerText = "Invalid login";
+status.innerText="Invalid login";
 
 return;
 
 }
 
 
-localStorage.setItem("user", JSON.stringify(data));
+localStorage.setItem("user",JSON.stringify(data));
 
 
-if(data.role === "buyer"){
+if(data.role==="buyer")
 
 window.location="buyer.html";
 
-}else{
+else
 
 window.location="seller.html";
 
 }
 
+
+
+// OTP SYSTEM
+
+let generatedOTP;
+
+
+function sendOTP(){
+
+generatedOTP=Math.floor(100000+Math.random()*900000);
+
+alert("Your OTP is: "+generatedOTP);
+
+document.getElementById("otpSection").classList.remove("hidden");
+
 }
 
 
-// FORGOT PASSWORD
-function forgotPassword(){
+async function verifyOTP(){
 
-alert("Contact support to reset password (Supabase reset coming next)");
+if(otpInput.value!=generatedOTP){
+
+alert("Wrong OTP");
+
+return;
+
+}
+
+
+await supabase
+
+.from("users")
+
+.update({ password:newPassword.value })
+
+.eq("email",resetEmail.value);
+
+
+alert("Password reset successful");
+
+showLogin();
 
 }

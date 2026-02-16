@@ -1,70 +1,37 @@
-.intro{
+body{
+
+font-family:Arial;
+
+background:#f4f4f4;
 
 text-align:center;
 
-margin-top:100px;
+margin:0;
 
 }
 
-.intro-logo{
+
+.logo{
 
 width:120px;
 
-}
-
-.tagline{
-
-color:gray;
-
-margin-bottom:20px;
+margin-top:50px;
 
 }
 
-.main-btn{
 
-background:#ff4081;
+.center{
 
-color:white;
-
-border:none;
-
-padding:15px;
-
-width:80%;
-
-margin:10px;
-
-border-radius:8px;
-
-font-size:18px;
+margin-top:50px;
 
 }
 
-.main-btn-outline{
+
+.card{
 
 background:white;
 
-color:#ff4081;
-
-border:2px solid #ff4081;
-
-padding:15px;
-
-width:80%;
-
-margin:10px;
-
-border-radius:8px;
-
-font-size:18px;
-
-}
-
-.auth-box{
-
-background:white;
-
-margin:30px;
+margin:20px;
 
 padding:20px;
 
@@ -74,10 +41,73 @@ box-shadow:0 0 10px rgba(0,0,0,0.1);
 
 }
 
+
+.input{
+
+width:90%;
+
+padding:12px;
+
+margin:10px;
+
+border-radius:6px;
+
+border:1px solid #ccc;
+
+}
+
+
+.btn-main{
+
+background:#ff4081;
+
+color:white;
+
+border:none;
+
+padding:12px;
+
+width:90%;
+
+margin:10px;
+
+border-radius:6px;
+
+font-size:16px;
+
+}
+
+
+.btn-outline{
+
+background:white;
+
+color:#ff4081;
+
+border:2px solid #ff4081;
+
+padding:12px;
+
+width:90%;
+
+margin:10px;
+
+border-radius:6px;
+
+}
+
+
 .link{
 
 color:#ff4081;
 
-margin-top:10px;
+cursor:pointer;
+
+}
+
+
+.hidden{
+
+display:none;
 
 }
