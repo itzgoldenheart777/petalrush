@@ -1,7 +1,7 @@
 body{
 margin:0;
 font-family:Arial;
-background:#f4f4f4;
+background:white;
 }
 
 
@@ -11,6 +11,7 @@ display:flex;
 justify-content:center;
 align-items:center;
 flex-direction:column;
+padding:20px;
 }
 
 
@@ -24,48 +25,52 @@ display:none;
 }
 
 
-.app-icon{
-width:120px;
-}
-
-
 .logo{
-width:200px;
+width:220px;
 margin-bottom:20px;
 }
 
 
-.brand{
+.title{
 color:#ff4081;
+font-size:32px;
+margin:0;
+}
+
+
+.tagline{
+color:#555;
+margin-bottom:30px;
 }
 
 
 .card{
 background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-width:90%;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,0.1);
+width:100%;
 max-width:350px;
 }
 
 
 .input{
 width:100%;
-padding:12px;
+padding:14px;
 margin:10px 0;
-border-radius:6px;
-border:1px solid #ccc;
+border-radius:8px;
+border:1px solid #ddd;
+font-size:16px;
 }
 
 
 .btn-main{
 width:100%;
-padding:12px;
+padding:14px;
 background:#ff4081;
 color:white;
 border:none;
-border-radius:6px;
+border-radius:8px;
 margin-top:10px;
 font-size:16px;
 }
@@ -73,17 +78,18 @@ font-size:16px;
 
 .btn-outline{
 width:100%;
-padding:12px;
+padding:14px;
 border:2px solid #ff4081;
 color:#ff4081;
 background:white;
-border-radius:6px;
+border-radius:8px;
 margin-top:10px;
+font-size:16px;
 }
 
 
 .link{
 color:#ff4081;
-margin-top:10px;
+margin-top:12px;
 cursor:pointer;
 }

@@ -4,25 +4,21 @@ const supabase = window.supabase.createClient(
 );
 
 
-// SPLASH TIMER
-
-setTimeout(()=>{
-
-document.getElementById("splash").classList.add("hidden");
-document.getElementById("welcome").classList.remove("hidden");
-
-},2000);
-
-
-
-// SCREEN CONTROL
-
 function hideAll(){
 
-document.getElementById("welcome").classList.add("hidden");
-document.getElementById("loginScreen").classList.add("hidden");
-document.getElementById("signupScreen").classList.add("hidden");
-document.getElementById("forgotScreen").classList.add("hidden");
+mainScreen.classList.add("hidden");
+authOptions.classList.add("hidden");
+loginScreen.classList.add("hidden");
+signupScreen.classList.add("hidden");
+forgotScreen.classList.add("hidden");
+
+}
+
+
+function showAuthOptions(){
+
+hideAll();
+authOptions.classList.remove("hidden");
 
 }
 
@@ -30,7 +26,7 @@ document.getElementById("forgotScreen").classList.add("hidden");
 function openLogin(){
 
 hideAll();
-document.getElementById("loginScreen").classList.remove("hidden");
+loginScreen.classList.remove("hidden");
 
 }
 
@@ -38,7 +34,7 @@ document.getElementById("loginScreen").classList.remove("hidden");
 function openSignup(){
 
 hideAll();
-document.getElementById("signupScreen").classList.remove("hidden");
+signupScreen.classList.remove("hidden");
 
 }
 
@@ -46,7 +42,15 @@ document.getElementById("signupScreen").classList.remove("hidden");
 function openForgot(){
 
 hideAll();
-document.getElementById("forgotScreen").classList.remove("hidden");
+forgotScreen.classList.remove("hidden");
+
+}
+
+
+function goBack(){
+
+hideAll();
+authOptions.classList.remove("hidden");
 
 }
 
@@ -60,12 +64,11 @@ const email=signupEmail.value;
 const password=signupPassword.value;
 const role=signupRole.value;
 
-
-const { error } = await supabase.from("users")
+const { error } = await supabase
+.from("users")
 .insert([{email,password,role}]);
 
-
-status.innerText = error ? error.message : "Signup successful";
+status.innerText = error ? error.message : "Signup success";
 
 }
 
@@ -75,15 +78,11 @@ status.innerText = error ? error.message : "Signup successful";
 
 async function login(){
 
-const email=loginEmail.value;
-const password=loginPassword.value;
-
-
-const { data,error }=await supabase
+const { data,error } = await supabase
 .from("users")
 .select("*")
-.eq("email",email)
-.eq("password",password)
+.eq("email",loginEmail.value)
+.eq("password",loginPassword.value)
 .single();
 
 
@@ -97,7 +96,6 @@ return;
 
 localStorage.setItem("user",JSON.stringify(data));
 
-
 if(data.role==="buyer")
 window.location="buyer.html";
 else
@@ -107,7 +105,7 @@ window.location="seller.html";
 
 
 
-// OTP SYSTEM
+// OTP
 
 let otp;
 
@@ -117,7 +115,7 @@ otp=Math.floor(100000+Math.random()*900000);
 
 alert("OTP: "+otp);
 
-document.getElementById("otpBox").classList.remove("hidden");
+otpBox.classList.remove("hidden");
 
 }
 
@@ -137,8 +135,7 @@ await supabase
 .update({password:newPassword.value})
 .eq("email",resetEmail.value);
 
-
-alert("Password reset successful");
+alert("Password updated");
 
 openLogin();
 
