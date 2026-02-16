@@ -8,69 +8,51 @@ SUPABASE_KEY
 );
 
 
-// Screen control
-function hideAll(){
-
-document.getElementById("mainScreen").classList.add("hidden");
-document.getElementById("authOptions").classList.add("hidden");
-document.getElementById("loginScreen").classList.add("hidden");
-document.getElementById("signupScreen").classList.add("hidden");
-document.getElementById("forgotScreen").classList.add("hidden");
-
-}
-
-
+// SHOW AUTH OPTIONS
 function showAuthOptions(){
 
-hideAll();
-document.getElementById("authOptions").classList.remove("hidden");
+document.getElementById("mainScreen").style.display="none";
+document.getElementById("authOptions").style.display="block";
 
 }
 
 
+// OPEN LOGIN
 function openLogin(){
 
-hideAll();
-document.getElementById("loginScreen").classList.remove("hidden");
+document.getElementById("authOptions").style.display="none";
+document.getElementById("loginScreen").style.display="block";
 
 }
 
 
+// OPEN SIGNUP
 function openSignup(){
 
-hideAll();
-document.getElementById("signupScreen").classList.remove("hidden");
+document.getElementById("authOptions").style.display="none";
+document.getElementById("signupScreen").style.display="block";
 
 }
 
 
-function openForgot(){
-
-hideAll();
-document.getElementById("forgotScreen").classList.remove("hidden");
-
-}
-
-
+// BACK
 function goBack(){
 
-hideAll();
-document.getElementById("mainScreen").classList.remove("hidden");
+location.reload();
 
 }
 
 
-
-// Signup
+// SIGNUP
 async function signup(){
 
 const email=document.getElementById("signupEmail").value;
 const password=document.getElementById("signupPassword").value;
 const role=document.getElementById("signupRole").value;
 
-const { error } = await supabase
-.from("users")
-.insert([{email,password,role}]);
+const {error}=await supabase.from("users").insert([
+{email,password,role}
+]);
 
 if(error){
 
@@ -86,20 +68,18 @@ openLogin();
 }
 
 
-
-// Login
+// LOGIN
 async function login(){
 
 const email=document.getElementById("loginEmail").value;
 const password=document.getElementById("loginPassword").value;
 
-const { data,error } = await supabase
+const {data,error}=await supabase
 .from("users")
 .select("*")
 .eq("email",email)
 .eq("password",password)
 .single();
-
 
 if(error){
 
@@ -108,9 +88,7 @@ return;
 
 }
 
-
 localStorage.setItem("user",JSON.stringify(data));
-
 
 if(data.role==="buyer"){
 
@@ -121,49 +99,5 @@ window.location="buyer.html";
 window.location="seller.html";
 
 }
-
-}
-
-
-
-// OTP
-let otp;
-
-function sendOTP(){
-
-otp=Math.floor(100000+Math.random()*900000);
-
-alert("Demo OTP: "+otp);
-
-document.getElementById("otpBox").classList.remove("hidden");
-
-}
-
-
-async function resetPassword(){
-
-const entered=document.getElementById("otpInput").value;
-
-if(entered!=otp){
-
-alert("Wrong OTP");
-return;
-
-}
-
-
-const email=document.getElementById("resetEmail").value;
-const pass=document.getElementById("newPassword").value;
-
-
-await supabase
-.from("users")
-.update({password:pass})
-.eq("email",email);
-
-
-alert("Password reset success");
-
-openLogin();
 
 }
