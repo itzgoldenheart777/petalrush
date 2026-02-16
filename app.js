@@ -1,48 +1,72 @@
+const supabaseUrl = "https://lssjsgfppehhclxqulso.supabase.co";
+const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+
+const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+
+// Signup
 async function signup(){
 
-const email = emailInput.value;
-const password = passwordInput.value;
-const role = roleSelect.value;
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+const role = document.getElementById("role").value;
 
-await client.from("users")
-.insert([{email,password,role}]);
+if(!email || !password){
+alert("Enter email and password");
+return;
+}
 
-alert("Signup success");
+const { error } = await client
+.from("users")
+.insert([{ email, password, role }]);
+
+if(error){
+alert(error.message);
+}else{
+alert("Signup successful. Please login.");
+}
 
 }
 
 
+// Login
 async function login(){
 
-const email = emailInput.value;
-const password = passwordInput.value;
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
 
-const { data } =
-await client.from("users")
+const { data, error } = await client
+.from("users")
 .select("*")
-.eq("email",email)
-.eq("password",password);
+.eq("email", email)
+.eq("password", password)
+.single();
 
-if(data.length > 0){
+if(error || !data){
 
-const user = data[0];
-
-localStorage.setItem("user", email);
-localStorage.setItem("role", user.role);
-
-if(user.role === "seller"){
-
-location.href="seller.html";
-
-}else{
-
-location.href="dashboard.html";
+alert("Invalid email or password");
+return;
 
 }
 
-}else{
+// Save session
+localStorage.setItem("user", data.email);
+localStorage.setItem("role", data.role);
 
-alert("Login failed");
+// Redirect based on role
+if(data.role === "buyer"){
+
+window.location.href = "buyer.html";
+
+}
+else if(data.role === "seller"){
+
+window.location.href = "seller.html";
+
+}
+else if(data.role === "admin"){
+
+window.location.href = "admin.html";
 
 }
 
