@@ -1,164 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>PetalRush</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Auth script -->
-<script src="js/auth.js"></script>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetalRush | Flower Delivery</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 
-
-<!-- MAIN WELCOME SCREEN -->
-
-<div id="mainScreen" class="screen center">
-
-<img src="logo.png" class="logo">
-
-<h1 class="title">PetalRush</h1>
-
-<p class="tagline">Order Flowers Like Never Before</p>
-
-<button onclick="showAuthOptions()" class="btn-main">
-Get Started
-</button>
-
-</div>
-
-
-
-<!-- AUTH OPTIONS -->
-
-<div id="authOptions" class="screen center hidden">
-
-<h2>Welcome 🌸</h2>
-
-<button onclick="openLogin()" class="btn-main">
-Login
-</button>
-
-<button onclick="openSignup()" class="btn-outline">
-Create Account
-</button>
-
-</div>
-
-
-
-<!-- LOGIN SCREEN -->
-
-<div id="loginScreen" class="screen center hidden">
-
-<div class="card">
-
-<h2>Login</h2>
-
-<input id="loginEmail" placeholder="Email" class="input">
-
-<input id="loginPassword" type="password" placeholder="Password" class="input">
-
-<button onclick="login()" class="btn-main">
-Login
-</button>
-
-<p onclick="openForgot()" class="link">
-Forgot Password?
-</p>
-
-<p onclick="goBack()" class="link">
-Back
-</p>
-
-</div>
-
-</div>
-
-
-
-<!-- SIGNUP SCREEN -->
-
-<div id="signupScreen" class="screen center hidden">
-
-<div class="card">
-
-<h2>Create Account</h2>
-
-<input id="signupEmail" placeholder="Email" class="input">
-
-<input id="signupPassword" type="password" placeholder="Password" class="input">
-
-<select id="signupRole" class="input">
-
-<option value="buyer">Buyer</option>
-
-<option value="seller">Seller</option>
-
-</select>
-
-<button onclick="signup()" class="btn-main">
-Signup
-</button>
-
-<p onclick="goBack()" class="link">
-Back
-</p>
-
-</div>
-
-</div>
-
-
-
-<!-- FORGOT PASSWORD -->
-
-<div id="forgotScreen" class="screen center hidden">
-
-<div class="card">
-
-<h2>Reset Password</h2>
-
-<input id="resetEmail" placeholder="Email" class="input">
-
-<button onclick="sendOTP()" class="btn-main">
-Send OTP
-</button>
-
-<div id="otpBox" class="hidden">
-
-<input id="otpInput" placeholder="Enter OTP" class="input">
-
-<input id="newPassword" placeholder="New Password" class="input">
-
-<button onclick="resetPassword()" class="btn-main">
-Reset Password
-</button>
-
-</div>
-
-<p onclick="goBack()" class="link">
-Back
-</p>
-
-</div>
-
-</div>
-
-
-<p id="status"></p>
-
-
-<script src="js/auth.js"></script>
-
+    <div id="mainScreen" class="screen">
+        <div class="center">
+            <img src="logo.png" alt="PetalRush Logo" class="logo">
+            <h1 class="title">PetalRush</h1>
+            <p class="tagline">Order flowers like never before.</p>
+            <button class="btn-main" onclick="showAuthOptions()">Get Started</button>
+        </div>
+    </div>
+
+    <div id="authOptions" class="screen hidden">
+        <div class="center">
+            <h2>Welcome 🌸</h2>
+            <button class="btn-main" onclick="openLogin()">Login</button>
+            <button class="btn-outline" onclick="openSignup()">Create Account</button>
+            <p class="link" onclick="goBack()">Back</p>
+        </div>
+    </div>
+
+    <div id="loginScreen" class="screen hidden">
+        <div class="card">
+            <h3>Login</h3>
+            <input type="email" id="loginEmail" placeholder="Email" class="input">
+            <input type="password" id="loginPassword" placeholder="Password" class="input">
+            <button class="btn-main" onclick="login()">Login</button>
+            <p class="link" onclick="goBack()">Back</p>
+        </div>
+    </div>
+
+    <div id="signupScreen" class="screen hidden">
+        <div class="card">
+            <h3>Create Account</h3>
+            <input type="email" id="signupEmail" placeholder="Email" class="input">
+            <input type="password" id="signupPassword" placeholder="Password" class="input">
+            <select id="signupRole" class="input">
+                <option value="buyer">I want to Buy Flowers</option>
+                <option value="seller">I want to Sell Flowers</option>
+            </select>
+            <button class="btn-main" onclick="signup()">Sign Up</button>
+            <p class="link" onclick="goBack()">Back</p>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
 </body>
 </html>
