@@ -17,19 +17,31 @@
 <body>
 
 
-<!-- INTRO -->
+<!-- SPLASH SCREEN -->
 
-<div id="intro" class="center">
+<div id="splash" class="screen center">
+
+<img src="icon-512.png" class="app-icon">
+
+<h1 class="brand">PetalRush</h1>
+
+<p>Order Flowers Like Never Before</p>
+
+</div>
+
+
+
+<!-- WELCOME SCREEN -->
+
+<div id="welcome" class="screen center hidden">
 
 <img src="logo.png" class="logo">
 
-<h1>Welcome to PetalRush 🌸</h1>
+<h2>Welcome to PetalRush 🌸</h2>
 
-<p class="tagline">Order Flowers Like Never Before</p>
+<button onclick="openLogin()" class="btn-main">Login</button>
 
-<button class="btn-main" onclick="showLogin()">Login</button>
-
-<button class="btn-outline" onclick="showSignup()">Create Account</button>
+<button onclick="openSignup()" class="btn-outline">Create Account</button>
 
 </div>
 
@@ -37,7 +49,9 @@
 
 <!-- LOGIN -->
 
-<div id="login" class="card hidden">
+<div id="loginScreen" class="screen hidden">
+
+<div class="card">
 
 <h2>Login</h2>
 
@@ -45,11 +59,13 @@
 
 <input id="loginPassword" type="password" placeholder="Password" class="input">
 
-<button class="btn-main" onclick="login()">Login</button>
+<button onclick="login()" class="btn-main">Login</button>
 
-<p class="link" onclick="showSignup()">Create new account</p>
+<p onclick="openForgot()" class="link">Forgot Password?</p>
 
-<p class="link" onclick="showForgot()">Forgot Password?</p>
+<p onclick="openSignup()" class="link">Create Account</p>
+
+</div>
 
 </div>
 
@@ -57,7 +73,9 @@
 
 <!-- SIGNUP -->
 
-<div id="signup" class="card hidden">
+<div id="signupScreen" class="screen hidden">
+
+<div class="card">
 
 <h2>Create Account</h2>
 
@@ -73,35 +91,41 @@
 
 </select>
 
-<button class="btn-main" onclick="signup()">Signup</button>
+<button onclick="signup()" class="btn-main">Signup</button>
 
-<p class="link" onclick="showLogin()">Already have account? Login</p>
+<p onclick="openLogin()" class="link">Already have account? Login</p>
+
+</div>
 
 </div>
 
 
 
-<!-- FORGOT PASSWORD -->
+<!-- FORGOT -->
 
-<div id="forgot" class="card hidden">
+<div id="forgotScreen" class="screen hidden">
+
+<div class="card">
 
 <h2>Reset Password</h2>
 
 <input id="resetEmail" placeholder="Enter Email" class="input">
 
-<button class="btn-main" onclick="sendOTP()">Send OTP</button>
+<button onclick="sendOTP()" class="btn-main">Send OTP</button>
 
-<div id="otpSection" class="hidden">
+<div id="otpBox" class="hidden">
 
-<input id="otpInput" placeholder="Enter 6 digit OTP" class="input">
+<input id="otpInput" placeholder="Enter OTP" class="input">
 
 <input id="newPassword" placeholder="New Password" class="input">
 
-<button class="btn-main" onclick="verifyOTP()">Reset Password</button>
+<button onclick="resetPassword()" class="btn-main">Reset Password</button>
 
 </div>
 
-<p class="link" onclick="showLogin()">Back to login</p>
+<p onclick="openLogin()" class="link">Back to Login</p>
+
+</div>
 
 </div>
 
