@@ -1,16 +1,21 @@
+// Supabase connection
+const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+
 const supabase = window.supabase.createClient(
-"https://lssjsgfppehhclxqulso.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
 
+// Screen control
 function hideAll(){
 
-mainScreen.classList.add("hidden");
-authOptions.classList.add("hidden");
-loginScreen.classList.add("hidden");
-signupScreen.classList.add("hidden");
-forgotScreen.classList.add("hidden");
+document.getElementById("mainScreen").classList.add("hidden");
+document.getElementById("authOptions").classList.add("hidden");
+document.getElementById("loginScreen").classList.add("hidden");
+document.getElementById("signupScreen").classList.add("hidden");
+document.getElementById("forgotScreen").classList.add("hidden");
 
 }
 
@@ -18,7 +23,7 @@ forgotScreen.classList.add("hidden");
 function showAuthOptions(){
 
 hideAll();
-authOptions.classList.remove("hidden");
+document.getElementById("authOptions").classList.remove("hidden");
 
 }
 
@@ -26,7 +31,7 @@ authOptions.classList.remove("hidden");
 function openLogin(){
 
 hideAll();
-loginScreen.classList.remove("hidden");
+document.getElementById("loginScreen").classList.remove("hidden");
 
 }
 
@@ -34,7 +39,7 @@ loginScreen.classList.remove("hidden");
 function openSignup(){
 
 hideAll();
-signupScreen.classList.remove("hidden");
+document.getElementById("signupScreen").classList.remove("hidden");
 
 }
 
@@ -42,7 +47,7 @@ signupScreen.classList.remove("hidden");
 function openForgot(){
 
 hideAll();
-forgotScreen.classList.remove("hidden");
+document.getElementById("forgotScreen").classList.remove("hidden");
 
 }
 
@@ -50,45 +55,55 @@ forgotScreen.classList.remove("hidden");
 function goBack(){
 
 hideAll();
-authOptions.classList.remove("hidden");
+document.getElementById("mainScreen").classList.remove("hidden");
 
 }
 
 
 
-// SIGNUP
-
+// Signup
 async function signup(){
 
-const email=signupEmail.value;
-const password=signupPassword.value;
-const role=signupRole.value;
+const email=document.getElementById("signupEmail").value;
+const password=document.getElementById("signupPassword").value;
+const role=document.getElementById("signupRole").value;
 
 const { error } = await supabase
 .from("users")
 .insert([{email,password,role}]);
 
-status.innerText = error ? error.message : "Signup success";
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert("Signup success");
+openLogin();
+
+}
 
 }
 
 
 
-// LOGIN
-
+// Login
 async function login(){
+
+const email=document.getElementById("loginEmail").value;
+const password=document.getElementById("loginPassword").value;
 
 const { data,error } = await supabase
 .from("users")
 .select("*")
-.eq("email",loginEmail.value)
-.eq("password",loginPassword.value)
+.eq("email",email)
+.eq("password",password)
 .single();
 
 
 if(error){
 
-status.innerText="Invalid login";
+alert("Invalid login");
 return;
 
 }
@@ -96,33 +111,40 @@ return;
 
 localStorage.setItem("user",JSON.stringify(data));
 
-if(data.role==="buyer")
+
+if(data.role==="buyer"){
+
 window.location="buyer.html";
-else
+
+}else{
+
 window.location="seller.html";
+
+}
 
 }
 
 
 
 // OTP
-
 let otp;
 
 function sendOTP(){
 
 otp=Math.floor(100000+Math.random()*900000);
 
-alert("OTP: "+otp);
+alert("Demo OTP: "+otp);
 
-otpBox.classList.remove("hidden");
+document.getElementById("otpBox").classList.remove("hidden");
 
 }
 
 
 async function resetPassword(){
 
-if(otpInput.value!=otp){
+const entered=document.getElementById("otpInput").value;
+
+if(entered!=otp){
 
 alert("Wrong OTP");
 return;
@@ -130,12 +152,17 @@ return;
 }
 
 
+const email=document.getElementById("resetEmail").value;
+const pass=document.getElementById("newPassword").value;
+
+
 await supabase
 .from("users")
-.update({password:newPassword.value})
-.eq("email",resetEmail.value);
+.update({password:pass})
+.eq("email",email);
 
-alert("Password updated");
+
+alert("Password reset success");
 
 openLogin();
 
