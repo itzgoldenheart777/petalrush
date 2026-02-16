@@ -1,177 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seller Dashboard - PetalRush</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="seller.css">
 
-<title>Seller Dashboard</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
+<body>
 
-<body style="background:black;color:white;">
+<header class="topbar">
+  <h2>PetalRush Seller</h2>
+  <button onclick="logout()" class="logout-btn">Logout</button>
+</header>
 
+<div class="layout">
 
-<!-- HEADER -->
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <button onclick="showSection('profile')">Profile</button>
+    <button onclick="showSection('bank')">Bank Details</button>
+    <button onclick="showSection('upload')">Upload Product</button>
+    <button onclick="showSection('products')">My Products</button>
+  </aside>
 
-<div style="
-background:#ff4081;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-">
+  <!-- Content -->
+  <main class="content">
 
-<h3>Seller Dashboard</h3>
+    <!-- PROFILE -->
+    <section id="profile" class="section">
+      <h3>Seller Profile</h3>
+      <input id="fullName" placeholder="Full Name">
+      <input id="phone" placeholder="Phone">
+      <input id="shopName" placeholder="Shop Name">
+      <textarea id="address" placeholder="Shop Address"></textarea>
+      <button onclick="saveProfile()">Save Profile</button>
+    </section>
 
-<button onclick="logout()">Logout</button>
+    <!-- BANK -->
+    <section id="bank" class="section hidden">
+      <h3>Bank Details</h3>
+      <input id="bankName" placeholder="Bank Name">
+      <input id="accountNumber" placeholder="Account Number">
+      <input id="ifsc" placeholder="IFSC Code">
+      <button onclick="saveBank()">Save Bank Details</button>
+    </section>
 
+    <!-- UPLOAD PRODUCT -->
+    <section id="upload" class="section hidden">
+      <h3>Upload Product</h3>
+
+      <input id="productName" placeholder="Product Name">
+      <input id="price" type="number" placeholder="Price">
+      <input id="quantity" type="number" placeholder="Quantity">
+      <input id="pickup" placeholder="Pickup Location">
+      <textarea id="description" placeholder="Description"></textarea>
+
+      <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+
+      <div class="image-preview">
+        <img id="previewImg">
+      </div>
+
+      <button onclick="uploadProduct()">Upload Product</button>
+    </section>
+
+    <!-- PRODUCTS LIST -->
+    <section id="products" class="section hidden">
+      <h3>My Products</h3>
+      <div id="productList" class="product-grid"></div>
+    </section>
+
+  </main>
 </div>
 
-
-
-<div style="display:flex">
-
-
-<!-- SIDEBAR -->
-
-<div style="width:200px">
-
-<button onclick="showProfile()">Profile</button>
-
-<button onclick="showBank()">Bank</button>
-
-<button onclick="showCatalog()">Upload Product</button>
-
-<button onclick="showProducts()">My Products</button>
-
-</div>
-
-
-
-<!-- CONTENT -->
-
-<div style="flex:1;padding:20px">
-
-
-<!-- PROFILE -->
-
-<div id="profile">
-
-<h3>Profile</h3>
-
-<input id="name" placeholder="Name">
-
-<br><br>
-
-<button onclick="saveProfile()">
-
-Save Profile
-
-</button>
-
-</div>
-
-
-
-<!-- BANK -->
-
-<div id="bank" style="display:none">
-
-<h3>Bank</h3>
-
-<input id="bank_name" placeholder="Bank Name">
-
-<input id="account_number" placeholder="Account Number">
-
-<input id="ifsc" placeholder="IFSC">
-
-<br><br>
-
-<button onclick="saveBank()">
-
-Save Bank
-
-</button>
-
-</div>
-
-
-
-<!-- CATALOG -->
-
-<div id="catalog" style="display:none">
-
-<h3>Upload Product</h3>
-
-<input id="pname" placeholder="Product Name">
-
-<input id="price" placeholder="Price">
-
-<input id="qty" placeholder="Quantity">
-
-<input id="desc" placeholder="Description">
-
-<input id="location" placeholder="Pickup Location">
-
-
-<input type="file"
-accept="image/*"
-onchange="previewImage(event)">
-
-
-
-<br>
-
-<img id="preview"
-width="120"
-height="120"
-style="object-fit:cover;">
-
-
-<br>
-
-<button onclick="uploadProduct()">
-
-Upload Product
-
-</button>
-
-</div>
-
-
-
-<!-- PRODUCTS -->
-
-<div id="products" style="display:none">
-
-<h3>My Products</h3>
-
-<div id="productList"></div>
-
-</div>
-
-
-
-</div>
-
-</div>
-
-
-...
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="js/seller.js"></script>
-
-</body>
-</html>
-
-
+<script src="seller.js"></script>
 </body>
 </html>
