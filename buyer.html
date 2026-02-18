@@ -2,7 +2,13 @@
 <html>
 <head>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1,
+maximum-scale=1,
+viewport-fit=cover">
 
 <title>PetalRush Buyer</title>
 
@@ -10,98 +16,139 @@
 
 <style>
 
-/* ---------- GLOBAL ---------- */
+/* ---------- RESET ---------- */
 
-:root{
-
---primary:#ff4081;
---bg:#f4f6f8;
---card:#ffffff;
---text:#222;
---muted:#777;
-
-}
-
-body{
-
+*{
+box-sizing:border-box;
 margin:0;
-font-family:system-ui,-apple-system,Segoe UI,Roboto;
-background:var(--bg);
+padding:0;
+}
 
+html,body{
+height:100%;
+width:100%;
+font-family:system-ui,-apple-system,Segoe UI,Roboto;
+background:#f4f6f8;
+overflow-x:hidden;
 }
 
 
-/* DESKTOP CENTER LAYOUT */
+/* ---------- CONTAINER ---------- */
 
 .container{
 
+width:100%;
 max-width:500px;
-margin:auto;
-background:var(--bg);
 min-height:100vh;
+
+margin:auto;
+
+background:#f4f6f8;
+
+display:flex;
+flex-direction:column;
+
 position:relative;
 
 }
 
 
-/* HEADER */
+/* DESKTOP CENTER MODE */
+
+@media(min-width:700px){
+
+.container{
+
+margin-top:20px;
+margin-bottom:20px;
+
+border-radius:14px;
+
+box-shadow:0 0 30px rgba(0,0,0,0.12);
+
+min-height:90vh;
+
+}
+
+}
+
+
+/* ---------- HEADER ---------- */
 
 .header{
 
 background:white;
-padding:16px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
+
+padding:14px clamp(12px,4vw,18px);
+
+box-shadow:0 2px 12px rgba(0,0,0,0.08);
+
+position:sticky;
+top:0;
+z-index:100;
 
 }
 
 .location{
 
-font-size:18px;
+font-size:clamp(16px,4vw,20px);
 font-weight:600;
 
 }
 
 .search{
 
-margin-top:10px;
+margin-top:8px;
 
 }
 
 .search input{
 
 width:100%;
-padding:12px;
+
+padding:clamp(10px,3vw,14px);
+
+font-size:clamp(14px,3.5vw,16px);
+
 border-radius:10px;
+
 border:1px solid #ddd;
-font-size:15px;
 
 }
 
 
-/* PRODUCTS */
+/* ---------- PRODUCTS ---------- */
 
 .products{
 
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:12px;
-padding:12px;
+
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+
+gap:clamp(10px,3vw,16px);
+
+padding:clamp(12px,3vw,16px);
+
+padding-bottom:90px;
 
 }
 
 .card{
 
 background:white;
+
 border-radius:12px;
+
 padding:10px;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
+
+box-shadow:0 3px 12px rgba(0,0,0,0.08);
 
 }
 
 .card img{
 
 width:100%;
-height:140px;
+aspect-ratio:1/1;
 object-fit:cover;
 border-radius:10px;
 
@@ -109,45 +156,46 @@ border-radius:10px;
 
 .card h3{
 
-font-size:16px;
-margin:6px 0;
+font-size:clamp(14px,3.5vw,17px);
+margin-top:6px;
 
 }
 
 .price{
 
-color:var(--primary);
+color:#ff4081;
 font-weight:bold;
 
 }
 
 .btn{
 
-background:var(--primary);
+width:100%;
+padding:12px;
+background:#ff4081;
 color:white;
 border:none;
-padding:10px;
-width:100%;
-border-radius:8px;
+border-radius:10px;
+font-size:15px;
 margin-top:6px;
-cursor:pointer;
 
 }
 
 
-/* PROFILE */
+/* ---------- PROFILE ---------- */
 
 .profile{
 
 display:none;
-padding:12px;
+padding:14px;
+padding-bottom:90px;
 
 }
 
 .profile-card{
 
 background:white;
-padding:15px;
+padding:18px;
 border-radius:12px;
 text-align:center;
 
@@ -155,44 +203,10 @@ text-align:center;
 
 .avatar{
 
-width:80px;
-height:80px;
+width:90px;
+height:90px;
 border-radius:50%;
 object-fit:cover;
-
-}
-
-.edit{
-
-font-size:14px;
-color:var(--primary);
-cursor:pointer;
-
-}
-
-.menu{
-
-background:white;
-margin-top:10px;
-border-radius:12px;
-
-}
-
-.menu-item{
-
-padding:14px;
-border-bottom:1px solid #eee;
-cursor:pointer;
-
-}
-
-
-/* ADDRESS */
-
-.address{
-
-display:none;
-padding:12px;
 
 }
 
@@ -200,76 +214,92 @@ padding:12px;
 
 width:100%;
 padding:12px;
-margin-bottom:10px;
-border-radius:8px;
+border-radius:10px;
 border:1px solid #ddd;
+margin-top:8px;
+
+}
+
+.menu{
+
+margin-top:12px;
+background:white;
+border-radius:12px;
+
+}
+
+.menu-item{
+
+padding:16px;
+border-bottom:1px solid #eee;
 
 }
 
 
-/* HELP */
+/* ---------- ADDRESS ---------- */
+
+.address{
+
+display:none;
+padding:14px;
+
+}
+
+
+/* ---------- HELP ---------- */
 
 .help{
 
 display:none;
-padding:12px;
+padding:14px;
 
 }
 
 .help-card{
 
 background:white;
-padding:15px;
+padding:18px;
 border-radius:12px;
 
 }
 
 
-/* CART */
+/* ---------- CART ---------- */
 
 .cart{
 
 display:none;
-padding:12px;
+padding:14px;
 
 }
 
 
-/* BOTTOM NAV */
+/* ---------- BOTTOM NAV ---------- */
 
 .bottom{
 
 position:fixed;
+
 bottom:0;
+
 width:100%;
 max-width:500px;
+
 background:white;
+
 display:flex;
 justify-content:space-around;
-padding:10px;
-box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+
+padding:12px;
+
+box-shadow:0 -3px 15px rgba(0,0,0,0.08);
 
 }
 
 .nav{
 
+font-size:15px;
 cursor:pointer;
-font-size:14px;
-
-}
-
-
-/* DESKTOP MODE */
-
-@media(min-width:700px){
-
-.container{
-
-margin-top:20px;
-border-radius:12px;
-box-shadow:0 0 20px rgba(0,0,0,0.1);
-
-}
 
 }
 
@@ -279,6 +309,7 @@ box-shadow:0 0 20px rgba(0,0,0,0.1);
 
 <body>
 
+
 <div class="container">
 
 
@@ -286,7 +317,7 @@ box-shadow:0 0 20px rgba(0,0,0,0.1);
 
 <div class="header">
 
-<div class="location" id="locationText">
+<div class="location">
 Mumbai
 </div>
 
@@ -311,19 +342,20 @@ Mumbai
 <div class="profile-card">
 
 <img id="avatar" class="avatar"
-src="https://via.placeholder.com/80">
+src="https://via.placeholder.com/90">
 
 <br><br>
 
 <input type="file" onchange="uploadAvatar(event)">
 
-<h3 id="username">User</h3>
+<h3 id="username"></h3>
 
 <input id="nameInput"
 class="input"
 placeholder="Edit name">
 
-<button class="btn" onclick="saveProfile()">
+<button class="btn"
+onclick="saveProfile()">
 Save Profile
 </button>
 
@@ -332,15 +364,18 @@ Save Profile
 
 <div class="menu">
 
-<div class="menu-item" onclick="openAddress()">
+<div class="menu-item"
+onclick="openAddress()">
 My Address
 </div>
 
-<div class="menu-item" onclick="openHelp()">
+<div class="menu-item"
+onclick="openHelp()">
 Help & Support
 </div>
 
-<div class="menu-item" onclick="logout()">
+<div class="menu-item"
+onclick="logout()">
 Logout
 </div>
 
@@ -360,11 +395,13 @@ Logout
 class="input"
 placeholder="Enter address">
 
-<button class="btn" onclick="getGPS()">
-Use GPS Location
+<button class="btn"
+onclick="getGPS()">
+Use GPS
 </button>
 
-<button class="btn" onclick="saveAddress()">
+<button class="btn"
+onclick="saveAddress()">
 Save Address
 </button>
 
@@ -380,13 +417,9 @@ Save Address
 
 <h3>Support</h3>
 
-<p id="supportEmail">
-Loading...
-</p>
+<p id="supportEmail"></p>
 
-<p id="supportPhone">
-Loading...
-</p>
+<p id="supportPhone"></p>
 
 </div>
 
@@ -408,15 +441,18 @@ Loading...
 
 <div class="bottom">
 
-<div class="nav" onclick="showHome()">
+<div class="nav"
+onclick="showHome()">
 Home
 </div>
 
-<div class="nav" onclick="showProfile()">
+<div class="nav"
+onclick="showProfile()">
 Profile
 </div>
 
-<div class="nav" onclick="showCart()">
+<div class="nav"
+onclick="showCart()">
 Cart
 </div>
 
@@ -430,8 +466,6 @@ Cart
 <script>
 
 
-// SUPABASE CONFIG
-
 const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
 
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
@@ -442,9 +476,8 @@ SUPABASE_KEY
 );
 
 
-// USER
-
-const user=JSON.parse(localStorage.getItem("user"));
+const user=
+JSON.parse(localStorage.getItem("user"));
 
 if(!user){
 
@@ -452,11 +485,9 @@ location="index.html";
 
 }
 
-document.getElementById("username").innerText=user.email;
+username.innerText=user.email;
 
 
-
-// LOAD PRODUCTS
 
 async function loadProducts(){
 
@@ -464,11 +495,11 @@ const {data}=await client
 .from("products")
 .select("*");
 
-const div=document.getElementById("home");
+home.innerHTML="";
 
 data.forEach(p=>{
 
-div.innerHTML+=`
+home.innerHTML+=`
 
 <div class="card">
 
@@ -478,9 +509,7 @@ div.innerHTML+=`
 
 <div class="price">₹${p.price}</div>
 
-<button class="btn">
-Add
-</button>
+<button class="btn">Add</button>
 
 </div>
 
@@ -494,23 +523,20 @@ loadProducts();
 
 
 
-// PROFILE SAVE
-
 async function saveProfile(){
 
-const name=document.getElementById("nameInput").value;
+const name=nameInput.value;
 
-await client.from("users")
+await client
+.from("users")
 .update({name})
 .eq("email",user.email);
 
-alert("Profile saved");
+alert("Saved");
 
 }
 
 
-
-// AVATAR
 
 async function uploadAvatar(e){
 
@@ -520,45 +546,39 @@ await client.storage
 .from("avatars")
 .upload(user.email,file,{upsert:true});
 
-const url=
+avatar.src=
 SUPABASE_URL+
 "/storage/v1/object/public/avatars/"+user.email;
-
-document.getElementById("avatar").src=url;
 
 }
 
 
-
-// ADDRESS SAVE
 
 async function saveAddress(){
 
 const address=
-document.getElementById("addressInput").value;
+addressInput.value;
 
-await client.from("users")
+await client
+.from("users")
 .update({address})
 .eq("email",user.email);
 
-alert("Address saved");
+alert("Address Saved");
 
 }
 
 
-
-// GPS
 
 function getGPS(){
 
 navigator.geolocation.getCurrentPosition(pos=>{
 
-const lat=pos.coords.latitude;
-
-const lon=pos.coords.longitude;
-
-document.getElementById("addressInput").value=
-`https://maps.google.com/?q=${lat},${lon}`;
+addressInput.value=
+"https://maps.google.com/?q="+
+pos.coords.latitude+
+","+
+pos.coords.longitude;
 
 });
 
@@ -566,28 +586,24 @@ document.getElementById("addressInput").value=
 
 
 
-// HELP LOAD
-
 async function openHelp(){
 
 hideAll();
 
-document.getElementById("help").style.display="block";
+help.style.display="block";
 
 const {data}=await client
 .from("admin")
 .select("*")
 .single();
 
-document.getElementById("supportEmail").innerText=data.email;
+supportEmail.innerText=data.email;
 
-document.getElementById("supportPhone").innerText=data.phone;
+supportPhone.innerText=data.phone;
 
 }
 
 
-
-// NAVIGATION
 
 function hideAll(){
 
@@ -599,37 +615,47 @@ help.style.display="none";
 
 }
 
+
+
 function showHome(){
 
 hideAll();
+
 home.style.display="grid";
 
 }
 
+
+
 function showProfile(){
 
 hideAll();
+
 profile.style.display="block";
 
 }
 
+
+
 function showCart(){
 
 hideAll();
+
 cart.style.display="block";
 
 }
 
+
+
 function openAddress(){
 
 hideAll();
+
 address.style.display="block";
 
 }
 
 
-
-// LOGOUT
 
 function logout(){
 
@@ -641,6 +667,7 @@ location="index.html";
 
 
 </script>
+
 
 </body>
 </html>
