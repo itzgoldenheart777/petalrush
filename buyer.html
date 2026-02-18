@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PetalRush Buyer</title>
 
@@ -9,139 +10,267 @@
 
 <style>
 
+/* ---------- GLOBAL ---------- */
+
+:root{
+
+--primary:#ff4081;
+--bg:#f4f6f8;
+--card:#ffffff;
+--text:#222;
+--muted:#777;
+
+}
+
 body{
+
 margin:0;
-font-family:Arial;
-background:#f4f4f4;
+font-family:system-ui,-apple-system,Segoe UI,Roboto;
+background:var(--bg);
+
+}
+
+
+/* DESKTOP CENTER LAYOUT */
+
+.container{
+
+max-width:500px;
+margin:auto;
+background:var(--bg);
+min-height:100vh;
+position:relative;
+
 }
 
 
 /* HEADER */
 
 .header{
+
 background:white;
-padding:15px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
+padding:16px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+
 }
 
 .location{
+
 font-size:18px;
-font-weight:bold;
+font-weight:600;
+
 }
 
 .search{
+
 margin-top:10px;
+
 }
 
 .search input{
+
 width:100%;
 padding:12px;
 border-radius:10px;
-border:1px solid #ccc;
+border:1px solid #ddd;
+font-size:15px;
+
 }
 
 
-
-/* PRODUCT GRID */
+/* PRODUCTS */
 
 .products{
-padding:10px;
+
 display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:12px;
+padding:12px;
+
 }
 
 .card{
+
 background:white;
-padding:10px;
 border-radius:12px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
+padding:10px;
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
+
 }
 
 .card img{
+
 width:100%;
 height:140px;
 object-fit:cover;
 border-radius:10px;
+
 }
 
 .card h3{
-margin:5px 0;
+
+font-size:16px;
+margin:6px 0;
+
 }
 
 .price{
-color:#ff4081;
+
+color:var(--primary);
 font-weight:bold;
+
 }
 
-.add{
-background:#ff4081;
+.btn{
+
+background:var(--primary);
 color:white;
 border:none;
-padding:8px;
-border-radius:8px;
+padding:10px;
 width:100%;
-}
+border-radius:8px;
+margin-top:6px;
+cursor:pointer;
 
+}
 
 
 /* PROFILE */
 
 .profile{
-padding:15px;
+
 display:none;
+padding:12px;
+
 }
 
 .profile-card{
+
 background:white;
 padding:15px;
 border-radius:12px;
+text-align:center;
+
+}
+
+.avatar{
+
+width:80px;
+height:80px;
+border-radius:50%;
+object-fit:cover;
+
+}
+
+.edit{
+
+font-size:14px;
+color:var(--primary);
+cursor:pointer;
+
+}
+
+.menu{
+
+background:white;
+margin-top:10px;
+border-radius:12px;
+
 }
 
 .menu-item{
-padding:15px;
+
+padding:14px;
 border-bottom:1px solid #eee;
 cursor:pointer;
+
+}
+
+
+/* ADDRESS */
+
+.address{
+
+display:none;
+padding:12px;
+
+}
+
+.input{
+
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #ddd;
+
+}
+
+
+/* HELP */
+
+.help{
+
+display:none;
+padding:12px;
+
+}
+
+.help-card{
+
+background:white;
+padding:15px;
+border-radius:12px;
+
 }
 
 
 /* CART */
 
 .cart{
-padding:15px;
+
 display:none;
-}
+padding:12px;
 
-.cart-item{
-background:white;
-padding:10px;
-margin-bottom:10px;
-border-radius:10px;
 }
-
 
 
 /* BOTTOM NAV */
 
 .bottom{
+
 position:fixed;
 bottom:0;
 width:100%;
+max-width:500px;
 background:white;
 display:flex;
 justify-content:space-around;
 padding:10px;
 box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+
 }
 
-.nav-btn{
-text-align:center;
+.nav{
+
 cursor:pointer;
+font-size:14px;
+
 }
 
-.active{
-color:#ff4081;
-font-weight:bold;
+
+/* DESKTOP MODE */
+
+@media(min-width:700px){
+
+.container{
+
+margin-top:20px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,0,0,0.1);
+
+}
+
 }
 
 </style>
@@ -150,21 +279,19 @@ font-weight:bold;
 
 <body>
 
+<div class="container">
+
 
 <!-- HEADER -->
 
 <div class="header">
 
-<div class="location">
-
-📍 Mumbai 400072
-
+<div class="location" id="locationText">
+Mumbai
 </div>
 
 <div class="search">
-
-<input placeholder="Search flowers...">
-
+<input placeholder="Search flowers">
 </div>
 
 </div>
@@ -183,22 +310,85 @@ font-weight:bold;
 
 <div class="profile-card">
 
-<h2 id="username">User</h2>
+<img id="avatar" class="avatar"
+src="https://via.placeholder.com/80">
 
-<p id="useremail">email</p>
+<br><br>
+
+<input type="file" onchange="uploadAvatar(event)">
+
+<h3 id="username">User</h3>
+
+<input id="nameInput"
+class="input"
+placeholder="Edit name">
+
+<button class="btn" onclick="saveProfile()">
+Save Profile
+</button>
 
 </div>
 
 
-<div class="menu-item">My Orders</div>
+<div class="menu">
 
-<div class="menu-item">Addresses</div>
+<div class="menu-item" onclick="openAddress()">
+My Address
+</div>
 
-<div class="menu-item">Wallet</div>
+<div class="menu-item" onclick="openHelp()">
+Help & Support
+</div>
 
-<div class="menu-item">Help</div>
+<div class="menu-item" onclick="logout()">
+Logout
+</div>
 
-<div class="menu-item" onclick="logout()">Logout</div>
+</div>
+
+</div>
+
+
+
+<!-- ADDRESS -->
+
+<div id="address" class="address">
+
+<h3>Save Address</h3>
+
+<input id="addressInput"
+class="input"
+placeholder="Enter address">
+
+<button class="btn" onclick="getGPS()">
+Use GPS Location
+</button>
+
+<button class="btn" onclick="saveAddress()">
+Save Address
+</button>
+
+</div>
+
+
+
+<!-- HELP -->
+
+<div id="help" class="help">
+
+<div class="help-card">
+
+<h3>Support</h3>
+
+<p id="supportEmail">
+Loading...
+</p>
+
+<p id="supportPhone">
+Loading...
+</p>
+
+</div>
 
 </div>
 
@@ -208,43 +398,39 @@ font-weight:bold;
 
 <div id="cart" class="cart">
 
-<h2>My Cart</h2>
-
-<div id="cartItems"></div>
-
-<button onclick="checkout()" class="add">
-Checkout
-</button>
+<h3>Cart coming soon</h3>
 
 </div>
 
 
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 
 <div class="bottom">
 
-<div onclick="showHome()" class="nav-btn active">
+<div class="nav" onclick="showHome()">
 Home
 </div>
 
-<div onclick="showProfile()" class="nav-btn">
+<div class="nav" onclick="showProfile()">
 Profile
 </div>
 
-<div onclick="showCart()" class="nav-btn">
+<div class="nav" onclick="showCart()">
 Cart
 </div>
 
 </div>
 
 
+</div>
+
 
 
 <script>
 
 
-// SUPABASE
+// SUPABASE CONFIG
 
 const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
 
@@ -254,7 +440,6 @@ const client=supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
-
 
 
 // USER
@@ -269,8 +454,6 @@ location="index.html";
 
 document.getElementById("username").innerText=user.email;
 
-document.getElementById("useremail").innerText=user.email;
-
 
 
 // LOAD PRODUCTS
@@ -281,10 +464,7 @@ const {data}=await client
 .from("products")
 .select("*");
 
-
 const div=document.getElementById("home");
-
-div.innerHTML="";
 
 data.forEach(p=>{
 
@@ -298,11 +478,8 @@ div.innerHTML+=`
 
 <div class="price">₹${p.price}</div>
 
-<button onclick='addCart(${JSON.stringify(p)})'
-class="add">
-
+<button class="btn">
 Add
-
 </button>
 
 </div>
@@ -313,53 +490,75 @@ Add
 
 }
 
-
 loadProducts();
 
 
 
-// CART
+// PROFILE SAVE
 
-let cart=[];
+async function saveProfile(){
 
-function addCart(p){
+const name=document.getElementById("nameInput").value;
 
-cart.push(p);
+await client.from("users")
+.update({name})
+.eq("email",user.email);
 
-alert("Added to cart");
+alert("Profile saved");
+
+}
+
+
+
+// AVATAR
+
+async function uploadAvatar(e){
+
+const file=e.target.files[0];
+
+await client.storage
+.from("avatars")
+.upload(user.email,file,{upsert:true});
+
+const url=
+SUPABASE_URL+
+"/storage/v1/object/public/avatars/"+user.email;
+
+document.getElementById("avatar").src=url;
 
 }
 
 
 
-function showCart(){
+// ADDRESS SAVE
 
-hideAll();
+async function saveAddress(){
 
-document.getElementById("cart").style.display="block";
+const address=
+document.getElementById("addressInput").value;
 
-renderCart();
+await client.from("users")
+.update({address})
+.eq("email",user.email);
+
+alert("Address saved");
 
 }
 
 
-function renderCart(){
 
-const div=document.getElementById("cartItems");
+// GPS
 
-div.innerHTML="";
+function getGPS(){
 
-cart.forEach(p=>{
+navigator.geolocation.getCurrentPosition(pos=>{
 
-div.innerHTML+=`
+const lat=pos.coords.latitude;
 
-<div class="cart-item">
+const lon=pos.coords.longitude;
 
-${p.name} ₹${p.price}
-
-</div>
-
-`;
+document.getElementById("addressInput").value=
+`https://maps.google.com/?q=${lat},${lon}`;
 
 });
 
@@ -367,13 +566,22 @@ ${p.name} ₹${p.price}
 
 
 
-function checkout(){
+// HELP LOAD
 
-alert("Order placed");
+async function openHelp(){
 
-cart=[];
+hideAll();
 
-renderCart();
+document.getElementById("help").style.display="block";
+
+const {data}=await client
+.from("admin")
+.select("*")
+.single();
+
+document.getElementById("supportEmail").innerText=data.email;
+
+document.getElementById("supportPhone").innerText=data.phone;
 
 }
 
@@ -381,31 +589,41 @@ renderCart();
 
 // NAVIGATION
 
-function showHome(){
+function hideAll(){
 
-hideAll();
-
-document.getElementById("home").style.display="grid";
+home.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+address.style.display="none";
+help.style.display="none";
 
 }
 
+function showHome(){
+
+hideAll();
+home.style.display="grid";
+
+}
 
 function showProfile(){
 
 hideAll();
-
-document.getElementById("profile").style.display="block";
+profile.style.display="block";
 
 }
 
+function showCart(){
 
-function hideAll(){
+hideAll();
+cart.style.display="block";
 
-document.getElementById("home").style.display="none";
+}
 
-document.getElementById("profile").style.display="none";
+function openAddress(){
 
-document.getElementById("cart").style.display="none";
+hideAll();
+address.style.display="block";
 
 }
 
