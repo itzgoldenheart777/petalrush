@@ -1,22 +1,428 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Buyer Dashboard</title>
-
-<link rel="stylesheet" href="css/buyer.css">
+<title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f4f4;
+}
+
+
+/* HEADER */
+
+.header{
+background:white;
+padding:15px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.location{
+font-size:18px;
+font-weight:bold;
+}
+
+.search{
+margin-top:10px;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+
+
+/* PRODUCT GRID */
+
+.products{
+padding:10px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.card{
+background:white;
+padding:10px;
+border-radius:12px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card img{
+width:100%;
+height:140px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.card h3{
+margin:5px 0;
+}
+
+.price{
+color:#ff4081;
+font-weight:bold;
+}
+
+.add{
+background:#ff4081;
+color:white;
+border:none;
+padding:8px;
+border-radius:8px;
+width:100%;
+}
+
+
+
+/* PROFILE */
+
+.profile{
+padding:15px;
+display:none;
+}
+
+.profile-card{
+background:white;
+padding:15px;
+border-radius:12px;
+}
+
+.menu-item{
+padding:15px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+}
+
+
+/* CART */
+
+.cart{
+padding:15px;
+display:none;
+}
+
+.cart-item{
+background:white;
+padding:10px;
+margin-bottom:10px;
+border-radius:10px;
+}
+
+
+
+/* BOTTOM NAV */
+
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+display:flex;
+justify-content:space-around;
+padding:10px;
+box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.nav-btn{
+text-align:center;
+cursor:pointer;
+}
+
+.active{
+color:#ff4081;
+font-weight:bold;
+}
+
+</style>
 
 </head>
 
 <body>
 
-<h2>Flower Shop</h2>
 
-<div id="products"></div>
+<!-- HEADER -->
 
-<script src="js/buyer.js"></script>
+<div class="header">
+
+<div class="location">
+
+📍 Mumbai 400072
+
+</div>
+
+<div class="search">
+
+<input placeholder="Search flowers...">
+
+</div>
+
+</div>
+
+
+
+<!-- PRODUCTS -->
+
+<div id="home" class="products"></div>
+
+
+
+<!-- PROFILE -->
+
+<div id="profile" class="profile">
+
+<div class="profile-card">
+
+<h2 id="username">User</h2>
+
+<p id="useremail">email</p>
+
+</div>
+
+
+<div class="menu-item">My Orders</div>
+
+<div class="menu-item">Addresses</div>
+
+<div class="menu-item">Wallet</div>
+
+<div class="menu-item">Help</div>
+
+<div class="menu-item" onclick="logout()">Logout</div>
+
+</div>
+
+
+
+<!-- CART -->
+
+<div id="cart" class="cart">
+
+<h2>My Cart</h2>
+
+<div id="cartItems"></div>
+
+<button onclick="checkout()" class="add">
+Checkout
+</button>
+
+</div>
+
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom">
+
+<div onclick="showHome()" class="nav-btn active">
+Home
+</div>
+
+<div onclick="showProfile()" class="nav-btn">
+Profile
+</div>
+
+<div onclick="showCart()" class="nav-btn">
+Cart
+</div>
+
+</div>
+
+
+
+
+<script>
+
+
+// SUPABASE
+
+const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+
+const client=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+
+// USER
+
+const user=JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+
+location="index.html";
+
+}
+
+document.getElementById("username").innerText=user.email;
+
+document.getElementById("useremail").innerText=user.email;
+
+
+
+// LOAD PRODUCTS
+
+async function loadProducts(){
+
+const {data}=await client
+.from("products")
+.select("*");
+
+
+const div=document.getElementById("home");
+
+div.innerHTML="";
+
+data.forEach(p=>{
+
+div.innerHTML+=`
+
+<div class="card">
+
+<img src="${p.image_url}">
+
+<h3>${p.name}</h3>
+
+<div class="price">₹${p.price}</div>
+
+<button onclick='addCart(${JSON.stringify(p)})'
+class="add">
+
+Add
+
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+loadProducts();
+
+
+
+// CART
+
+let cart=[];
+
+function addCart(p){
+
+cart.push(p);
+
+alert("Added to cart");
+
+}
+
+
+
+function showCart(){
+
+hideAll();
+
+document.getElementById("cart").style.display="block";
+
+renderCart();
+
+}
+
+
+function renderCart(){
+
+const div=document.getElementById("cartItems");
+
+div.innerHTML="";
+
+cart.forEach(p=>{
+
+div.innerHTML+=`
+
+<div class="cart-item">
+
+${p.name} ₹${p.price}
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+function checkout(){
+
+alert("Order placed");
+
+cart=[];
+
+renderCart();
+
+}
+
+
+
+// NAVIGATION
+
+function showHome(){
+
+hideAll();
+
+document.getElementById("home").style.display="grid";
+
+}
+
+
+function showProfile(){
+
+hideAll();
+
+document.getElementById("profile").style.display="block";
+
+}
+
+
+function hideAll(){
+
+document.getElementById("home").style.display="none";
+
+document.getElementById("profile").style.display="none";
+
+document.getElementById("cart").style.display="none";
+
+}
+
+
+
+// LOGOUT
+
+function logout(){
+
+localStorage.removeItem("user");
+
+location="index.html";
+
+}
+
+
+</script>
 
 </body>
 </html>
