@@ -722,38 +722,63 @@ alert("Sent");
 
 function hideAll(){
 
-home.style.display="none";
-profile.style.display="none";
-cart.style.display="none";
-address.style.display="none";
-help.style.display="none";
+document.getElementById("home").style.display="none";
+
+document.getElementById("profile").style.display="none";
+
+document.getElementById("cart").style.display="none";
+
+document.getElementById("address").style.display="none";
+
+document.getElementById("help").style.display="none";
 
 }
+
 
 function showHome(){
 
 hideAll();
-home.style.display="grid";
+
+document.getElementById("home").style.display="grid";
 
 }
+
 
 function showProfile(){
 
 hideAll();
-profile.style.display="block";
+
+document.getElementById("profile").style.display="block";
 
 }
 
 
-// LOGOUT
+function showCart(){
 
-function logout(){
+hideAll();
 
-localStorage.removeItem("user");
-
-location="index.html";
+document.getElementById("cart").style.display="block";
 
 }
+
+
+function openAddress(){
+
+hideAll();
+
+document.getElementById("address").style.display="block";
+
+}
+
+
+function openHelp(){
+
+hideAll();
+
+document.getElementById("help").style.display="block";
+
+}
+
 
 </script>
 
