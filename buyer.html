@@ -1,784 +1,453 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
-/* ================= GLOBAL ================= */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
+/* RESET */
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
 font-family:system-ui,-apple-system,Segoe UI,Roboto;
 background:#f4f6f8;
-color:#222;
 }
 
-:root{
---primary:#ff4081;
---card:#ffffff;
---shadow:0 4px 14px rgba(0,0,0,0.08);
-}
-
-
-/* ================= CONTAINER ================= */
-
+/* CONTAINER */
 .container{
-width:100%;
-max-width:500px;
+max-width:520px;
 margin:auto;
-min-height:100vh;
 background:#f4f6f8;
+min-height:100vh;
 position:relative;
-padding-bottom:80px;
+display:flex;
+flex-direction:column;
 }
 
 @media(min-width:700px){
-
 .container{
 margin-top:20px;
-margin-bottom:20px;
-border-radius:14px;
-box-shadow:0 0 40px rgba(0,0,0,0.12);
+border-radius:16px;
+box-shadow:0 0 30px rgba(0,0,0,0.15);
+}
 }
 
-}
-
-
-/* ================= HEADER ================= */
-
+/* HEADER */
 .header{
-
+background:white;
+padding:12px 16px;
+box-shadow:0 2px 12px rgba(0,0,0,0.08);
 position:sticky;
 top:0;
 z-index:100;
-
-background:white;
-
-padding:12px;
-
-box-shadow:var(--shadow);
-
-display:flex;
-align-items:center;
-gap:10px;
-
 }
 
 .logo{
-
-height:34px;
-
+height:36px;
 }
 
 .search{
-
-flex:1;
-
+margin-top:10px;
 }
 
 .search input{
-
 width:100%;
-padding:10px;
+padding:12px;
 border-radius:10px;
 border:1px solid #ddd;
-
+font-size:15px;
 }
 
-
-/* ================= PRODUCTS ================= */
-
+/* PRODUCTS */
 .products{
-
 display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 gap:12px;
-
 padding:12px;
-
+padding-bottom:90px;
 }
 
 .card{
-
 background:white;
 border-radius:12px;
 padding:10px;
-box-shadow:var(--shadow);
-
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 .card img{
-
 width:100%;
 aspect-ratio:1/1;
 object-fit:cover;
 border-radius:10px;
-
 }
 
 .card h3{
-
 font-size:15px;
-margin-top:5px;
-
+margin-top:6px;
 }
 
 .price{
-
-color:var(--primary);
+color:#ff4081;
 font-weight:bold;
-
 }
 
 .btn{
-
-width:100%;
-padding:9px;
-margin-top:6px;
-background:var(--primary);
+background:#ff4081;
 color:white;
 border:none;
+padding:10px;
+width:100%;
 border-radius:8px;
+margin-top:6px;
 cursor:pointer;
-
 }
 
-
-/* ================= PROFILE ================= */
-
-.profile{
-
+/* PROFILE */
+.section{
 display:none;
-padding:12px;
-
+padding:14px;
+padding-bottom:90px;
 }
 
 .profile-card{
-
 background:white;
-padding:14px;
+padding:15px;
 border-radius:12px;
-box-shadow:var(--shadow);
 text-align:center;
-
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 .avatar{
-
 width:90px;
 height:90px;
 border-radius:50%;
 object-fit:cover;
-
-}
-
-.menu{
-
-background:white;
-margin-top:12px;
-border-radius:12px;
-box-shadow:var(--shadow);
-
-}
-
-.menu-item{
-
-padding:14px;
-border-bottom:1px solid #eee;
-cursor:pointer;
-
-}
-
-
-/* ================= ADDRESS ================= */
-
-.address{
-
-display:none;
-padding:12px;
-
+margin-bottom:8px;
 }
 
 .input{
-
 width:100%;
-padding:10px;
+padding:12px;
+margin-top:8px;
 border-radius:8px;
 border:1px solid #ddd;
-margin-bottom:10px;
-
 }
 
-
-/* ================= HELP ================= */
-
-.help{
-
-display:none;
-padding:12px;
-
+.menu{
+background:white;
+margin-top:12px;
+border-radius:12px;
+overflow:hidden;
 }
 
-.help-card{
+.menu-item{
+padding:14px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+}
 
+/* CART */
+.bill{
 background:white;
 padding:14px;
 border-radius:12px;
-box-shadow:var(--shadow);
-
+margin-top:10px;
 }
 
-
-/* ================= CART ================= */
-
-.cart{
-
-display:none;
-padding:12px;
-
-}
-
-.cart-item{
-
-background:white;
-padding:10px;
-margin-bottom:10px;
-border-radius:10px;
-box-shadow:var(--shadow);
-
-}
-
-.bill{
-
-background:white;
-padding:12px;
-border-radius:12px;
-box-shadow:var(--shadow);
-
-}
-
-
-/* ================= FOOTER ================= */
-
+/* NAV */
 .bottom{
-
 position:fixed;
 bottom:0;
 width:100%;
-max-width:500px;
-
+max-width:520px;
 background:white;
-
 display:flex;
 justify-content:space-around;
-
-padding:10px;
-
-box-shadow:0 -3px 14px rgba(0,0,0,0.12);
-
+padding:12px 0;
+box-shadow:0 -3px 15px rgba(0,0,0,0.08);
 }
 
 .nav{
-
 cursor:pointer;
+font-size:14px;
+}
 
+.active{
+color:#ff4081;
+font-weight:bold;
 }
 
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
 
-
 <!-- HEADER -->
-
 <div class="header">
-
 <img src="logoHeader.png" class="logo">
-
 <div class="search">
-
-<input placeholder="Search flowers"
-oninput="searchProduct(this.value)">
-
+<input id="searchInput" placeholder="Search flowers">
+</div>
 </div>
 
-</div>
-
-
-<!-- PRODUCTS -->
-
+<!-- HOME -->
 <div id="home" class="products"></div>
 
-
 <!-- PROFILE -->
-
-<div id="profile" class="profile">
+<div id="profile" class="section">
 
 <div class="profile-card">
 
-<img id="avatar"
-class="avatar"
-src="https://via.placeholder.com/90">
+<img id="avatar" class="avatar" src="https://via.placeholder.com/90">
 
-<br><br>
+<input type="file" onchange="uploadAvatar(event)">
 
-<input type="file"
-onchange="uploadAvatar(event)">
+<h3 id="userEmail"></h3>
 
-<h3 id="username"></h3>
+<input id="nameInput" class="input" placeholder="Enter name">
 
-<input id="nameInput"
-class="input"
-placeholder="Edit name">
-
-<input id="phoneInput"
-class="input"
-placeholder="Phone">
-
-<button class="btn"
-onclick="saveProfile()">
-
+<button id="profileBtn" class="btn" onclick="saveProfile()">
 Save Profile
-
 </button>
 
 </div>
-
 
 <div class="menu">
-
-<div class="menu-item"
-onclick="openAddress()">
-
-My Address
-
-</div>
-
-<div class="menu-item"
-onclick="openOrders()">
-
-Orders
-
-</div>
-
-<div class="menu-item"
-onclick="openHelp()">
-
-Help & Support
-
-</div>
-
-<div class="menu-item"
-onclick="logout()">
-
-Logout
-
+<div class="menu-item" onclick="openAddress()">My Address</div>
+<div class="menu-item" onclick="openHelp()">Help & Support</div>
+<div class="menu-item" onclick="logout()">Logout</div>
 </div>
 
 </div>
-
-</div>
-
 
 <!-- ADDRESS -->
-
-<div id="address" class="address">
-
-<h3>Address</h3>
-
-<input id="addressInput"
-class="input"
-placeholder="Enter address">
-
-<button class="btn"
-onclick="useGPS()">
-
-Use GPS
-
-</button>
-
-<button class="btn"
-onclick="saveAddress()">
-
-Save Address
-
-</button>
-
+<div id="address" class="section">
+<h3>Save Address</h3>
+<input id="addressInput" class="input" placeholder="Enter address">
+<button class="btn" onclick="getGPS()">Use GPS</button>
+<button class="btn" onclick="saveAddress()">Save Address</button>
+<div id="savedAddress" style="margin-top:10px;color:green"></div>
 </div>
-
 
 <!-- HELP -->
-
-<div id="help" class="help">
-
-<div class="help-card">
-
+<div id="help" class="section">
+<div class="bill">
 <h3>Support</h3>
-
 <p id="supportEmail"></p>
-
 <p id="supportPhone"></p>
-
-<textarea id="helpMsg"
-class="input"
-placeholder="Message"></textarea>
-
-<button class="btn"
-onclick="sendHelp()">
-
-Send
-
-</button>
-
 </div>
-
 </div>
-
 
 <!-- CART -->
+<div id="cart" class="section">
+<h3>Cart</h3>
+<div id="cartItems"></div>
+<div class="bill">
+<p>Subtotal: ₹<span id="subTotal">0</span></p>
+<p>GST (5%): ₹<span id="gst">0</span></p>
+<p>Delivery: ₹<span id="delivery">30</span></p>
+<hr>
+<h3>Total: ₹<span id="total">0</span></h3>
+</div>
+</div>
 
-<div id="cart" class="cart"></div>
-
-
-<!-- FOOTER -->
-
+<!-- NAV -->
 <div class="bottom">
-
-<div class="nav"
-onclick="showHome()">Home</div>
-
-<div class="nav"
-onclick="showProfile()">Profile</div>
-
-<div class="nav"
-onclick="showCart()">Cart</div>
-
+<div class="nav active" onclick="showHome()">Home</div>
+<div class="nav" onclick="showProfile()">Profile</div>
+<div class="nav" onclick="showCart()">Cart</div>
 </div>
 
-
 </div>
-
-
 
 <script>
 
+/* SUPABASE */
+const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// SUPABASE
-
-const url="https://lssjsgfppehhclxqulso.supabase.co";
-
-const key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
-
-const client=supabase.createClient(url,key);
-
-
-// USER
-
+/* USER */
 const user=JSON.parse(localStorage.getItem("user"));
+if(!user){location="index.html";}
+document.getElementById("userEmail").innerText=user.email;
 
-document.getElementById("username").innerText=user.email;
-
-
-// LOAD PRODUCTS
-
-let allProducts=[];
-
-async function loadProducts(){
-
-const {data}=await client
-.from("products")
-.select("*");
-
-allProducts=data;
-
-showProducts(data);
-
-}
-
-function showProducts(data){
-
-const div=document.getElementById("home");
-
-div.innerHTML="";
-
-data.forEach(p=>{
-
-div.innerHTML+=`
-
-<div class="card">
-
-<img src="${p.image_url}">
-
-<h3>${p.name}</h3>
-
-<div class="price">₹${p.price}</div>
-
-<button class="btn"
-onclick="addCart('${p.id}')">
-
-Add
-
-</button>
-
-</div>
-
-`;
-
-});
-
-}
-
-loadProducts();
-
-
-// SEARCH
-
-function searchProduct(q){
-
-const filtered=allProducts.filter(p=>
-p.name.toLowerCase().includes(q.toLowerCase())
-);
-
-showProducts(filtered);
-
-}
-
-
-// CART
-
-let cart=[];
-
-function addCart(id){
-
-const p=allProducts.find(x=>x.id==id);
-
-cart.push(p);
-
-alert("Added");
-
-}
-
-function showCart(){
-
-hideAll();
-
-cartDiv=document.getElementById("cart");
-
-cartDiv.style.display="block";
-
-let total=0;
-
-cartDiv.innerHTML="";
-
-cart.forEach(p=>{
-
-total+=p.price;
-
-cartDiv.innerHTML+=`
-
-<div class="cart-item">
-
-${p.name} ₹${p.price}
-
-</div>
-
-`;
-
-});
-
-let gst=total*0.05;
-
-let delivery=40;
-
-let grand=total+gst+delivery;
-
-cartDiv.innerHTML+=`
-
-<div class="bill">
-
-Total ₹${total}<br>
-
-GST ₹${gst}<br>
-
-Delivery ₹${delivery}<br>
-
-<b>Grand ₹${grand}</b>
-
-</div>
-
-`;
-
-}
-
-
-// PROFILE
-
-async function saveProfile(){
-
-await client.from("users")
-.update({
-
-name:nameInput.value,
-phone:phoneInput.value
-
-})
-.eq("email",user.email);
-
-alert("Saved");
-
-}
-
-
-// AVATAR
-
-async function uploadAvatar(e){
-
-const file=e.target.files[0];
-
-await client.storage
-.from("avatars")
-.upload(user.email,file,{upsert:true});
-
-avatar.src=url+
-"/storage/v1/object/public/avatars/"+user.email;
-
-}
-
-
-// ADDRESS
-
-function useGPS(){
-
-navigator.geolocation.getCurrentPosition(pos=>{
-
-addressInput.value=
-`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-
-});
-
-}
-
-async function saveAddress(){
-
-await client.from("users")
-.update({address:addressInput.value})
-.eq("email",user.email);
-
-alert("Saved");
-
-}
-
-
-// HELP
-
-async function openHelp(){
-
-hideAll();
-
-help.style.display="block";
-
-const {data}=await client
-.from("admin")
-.select("*")
-.single();
-
-supportEmail.innerText=data.email;
-supportPhone.innerText=data.phone;
-
-}
-
-async function sendHelp(){
-
-await client.from("help")
-.insert({
-
-email:user.email,
-message:helpMsg.value
-
-});
-
-alert("Sent");
-
-}
-
-
-// NAV
-
+/* NAVIGATION */
 function hideAll(){
-
-document.getElementById("home").style.display="none";
-
-document.getElementById("profile").style.display="none";
-
-document.getElementById("cart").style.display="none";
-
-document.getElementById("address").style.display="none";
-
-document.getElementById("help").style.display="none";
-
+home.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+address.style.display="none";
+help.style.display="none";
 }
-
 
 function showHome(){
-
 hideAll();
-
-document.getElementById("home").style.display="grid";
-
+home.style.display="grid";
 }
-
 
 function showProfile(){
-
 hideAll();
-
-document.getElementById("profile").style.display="block";
-
+profile.style.display="block";
+loadProfile();
 }
-
 
 function showCart(){
-
 hideAll();
-
-document.getElementById("cart").style.display="block";
-
+cart.style.display="block";
+updateBill();
 }
-
 
 function openAddress(){
-
 hideAll();
-
-document.getElementById("address").style.display="block";
-
+address.style.display="block";
+loadAddress();
 }
-
 
 function openHelp(){
-
 hideAll();
-
-document.getElementById("help").style.display="block";
-
+help.style.display="block";
+loadSupport();
 }
 
+/* PRODUCTS */
+async function loadProducts(){
+const {data}=await client.from("products").select("*");
+const div=document.getElementById("home");
+div.innerHTML="";
+data.forEach(p=>{
+div.innerHTML+=`
+<div class="card">
+<img src="${p.image_url}">
+<h3>${p.name}</h3>
+<div class="price">₹${p.price}</div>
+<button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add</button>
+</div>
+`;
+});
+}
+loadProducts();
+
+/* SEARCH */
+searchInput.addEventListener("input",async function(){
+const val=this.value;
+const {data}=await client.from("products")
+.select("*")
+.ilike("name",`%${val}%`);
+home.innerHTML="";
+data.forEach(p=>{
+home.innerHTML+=`
+<div class="card">
+<img src="${p.image_url}">
+<h3>${p.name}</h3>
+<div class="price">₹${p.price}</div>
+<button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add</button>
+</div>`;
+});
+});
+
+/* PROFILE */
+async function loadProfile(){
+const {data}=await client.from("users")
+.select("*").eq("email",user.email).single();
+if(data){
+if(data.name) nameInput.value=data.name;
+if(data.avatar_url) avatar.src=data.avatar_url;
+profileBtn.innerText="Update Profile";
+}
+}
+
+async function saveProfile(){
+const name=nameInput.value;
+const avatarUrl=avatar.src;
+await client.from("users")
+.upsert({email:user.email,name:name,avatar_url:avatarUrl});
+alert("Profile Saved");
+profileBtn.innerText="Update Profile";
+}
+
+async function uploadAvatar(e){
+const file=e.target.files[0];
+const fileName=user.email+".png";
+await client.storage.from("avatars")
+.upload(fileName,file,{upsert:true});
+const url=SUPABASE_URL+
+"/storage/v1/object/public/avatars/"+fileName+
+"?t="+new Date().getTime();
+avatar.src=url;
+}
+
+/* ADDRESS */
+async function saveAddress(){
+const addr=addressInput.value;
+await client.from("users")
+.update({address:addr})
+.eq("email",user.email);
+alert("Address saved");
+loadAddress();
+}
+
+async function loadAddress(){
+const {data}=await client.from("users")
+.select("address")
+.eq("email",user.email)
+.single();
+if(data && data.address){
+savedAddress.innerText="Saved: "+data.address;
+}
+}
+
+function getGPS(){
+navigator.geolocation.getCurrentPosition(pos=>{
+addressInput.value=
+`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+});
+}
+
+/* SUPPORT */
+async function loadSupport(){
+const {data}=await client.from("admin").select("*").single();
+supportEmail.innerText="Email: "+data.email;
+supportPhone.innerText="Phone: "+data.phone;
+}
+
+/* CART */
+let cartData=[];
+
+function addToCart(p){
+cartData.push(p);
+alert("Added to cart");
+}
+
+function updateBill(){
+let sub=0;
+cartItems.innerHTML="";
+cartData.forEach(p=>{
+sub+=Number(p.price);
+cartItems.innerHTML+=`
+<p>${p.name} - ₹${p.price}</p>
+`;
+});
+let gst=sub*0.05;
+let delivery=30;
+let total=sub+gst+delivery;
+subTotal.innerText=sub.toFixed(2);
+gst.innerText=gst.toFixed(2);
+total.innerText=total.toFixed(2);
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.removeItem("user");
+location="index.html";
+}
+
+showHome();
 
 </script>
 
