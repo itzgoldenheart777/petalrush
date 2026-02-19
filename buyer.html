@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -9,174 +10,141 @@
 <style>
 
 body{
-    margin:0;
-    background:#0f1115;
-    color:white;
-    font-family:system-ui;
+margin:0;
+background:#0f1115;
+color:white;
+font-family:system-ui;
 }
 
 .container{
-    max-width:500px;
-    margin:auto;
-    min-height:100vh;
-    padding-bottom: 70px; /* Space for bottom nav */
+max-width:500px;
+margin:auto;
+min-height:100vh;
+padding-bottom:70px;
 }
 
-/* HEADER */
-
 .header{
-    background:#111;
-    padding:15px;
-    text-align:center;
+background:#111;
+padding:15px;
+text-align:center;
 }
 
 .logo{
-    height:50px;
+height:50px;
 }
-
-/* FILTER BAR (UPDATED FOR AUTO FIT) */
 
 .filter-bar{
-    padding:10px;
-    background:#111;
-    display: flex; /* aligns items in a row */
-    gap: 10px;     /* space between search and select */
-    position: sticky;
-    top: 0;
-    z-index: 10;
+padding:10px;
+background:#111;
+display:flex;
+gap:10px;
+position:sticky;
+top:0;
 }
 
-.search {
-    flex: 1; /* Takes up remaining space */
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    background:#222;
-    color:white;
-    width: 100%; /* Ensures it fills flex space */
-    box-sizing: border-box;
+.search{
+flex:1;
+padding:10px;
+border-radius:8px;
+border:none;
+background:#222;
+color:white;
 }
 
 select{
-    width: auto; /* Fits content */
-    flex: 0 0 auto; /* Doesn't shrink */
-    padding:10px;
-    background:#222;
-    color:white;
-    border:none;
-    border-radius:8px;
-    cursor: pointer;
+padding:10px;
+background:#222;
+color:white;
+border:none;
+border-radius:8px;
 }
 
-/* PRODUCTS */
-
 .products{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:12px;
-    padding:12px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:12px;
+padding:12px;
 }
 
 .card{
-    background:#171a21;
-    padding:10px;
-    border-radius:12px;
-    cursor:pointer;
+background:#171a21;
+padding:10px;
+border-radius:12px;
+cursor:pointer;
 }
 
 .card img{
-    width:100%;
-    height:130px;
-    object-fit:cover;
-    border-radius:8px;
+width:100%;
+height:130px;
+object-fit:cover;
+border-radius:8px;
 }
 
 .price{
-    color:#ff4081;
-    font-weight:bold;
-    margin-top: 5px;
+color:#ff4081;
+font-weight:bold;
 }
-
-/* SECTION */
 
 .section{
-    display:none;
-    padding:12px;
+display:none;
+padding:12px;
 }
-
-/* BUTTON */
 
 .btn{
-    background:#ff4081;
-    border:none;
-    padding:12px;
-    width:100%;
-    border-radius:8px;
-    color:white;
-    margin-top:10px;
-    cursor:pointer;
+background:#ff4081;
+border:none;
+padding:12px;
+width:100%;
+border-radius:8px;
+color:white;
+margin-top:10px;
+cursor:pointer;
 }
 
-/* NAV */
-
 .bottom{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    max-width:500px;
-    display:flex;
-    background:#111;
-    border-top: 1px solid #222;
-    z-index: 100;
+position:fixed;
+bottom:0;
+width:100%;
+max-width:500px;
+display:flex;
+background:#111;
 }
 
 .bottom div{
-    flex:1;
-    text-align:center;
-    padding:15px;
-    cursor:pointer;
+flex:1;
+text-align:center;
+padding:15px;
+cursor:pointer;
 }
-
-/* PROFILE */
 
 .avatar{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    object-fit: cover;
+width:100px;
+height:100px;
+border-radius:50%;
+object-fit:cover;
 }
 
-/* CART */
-
 .cart-item{
-    background:#171a21;
-    padding:10px;
-    margin-top:10px;
-    border-radius:8px;
-    display:flex;
-    justify-content:space-between;
+background:#171a21;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
 }
 
 .qty-box{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    margin: 10px 0;
+display:flex;
+gap:10px;
+margin:10px 0;
 }
 
 .qty-btn{
-    padding:5px 10px;
-    background:#333;
-    border:none;
-    color:white;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.menu{
-    float:right;
-    cursor:pointer;
-    font-size: 24px;
+background:#333;
+border:none;
+color:white;
+padding:5px 10px;
+cursor:pointer;
 }
 
 </style>
@@ -186,374 +154,509 @@ select{
 
 <div class="container">
 
-    <div class="header">
-        <img src="Headerlogo.png" class="logo" alt="PetalRush">
-    </div>
+<div class="header">
+<img src="Headerlogo.png" class="logo">
+</div>
 
-    <div id="filterSection" class="filter-bar">
-        <input id="search" class="search" placeholder="Search flowers" oninput="searchProducts()">
-        <select onchange="applyFilter(this.value)">
-            <option value="new">Newest</option>
-            <option value="low">Price Low → High</option>
-            <option value="high">Price High → Low</option>
-        </select>
-    </div>
 
-    <div id="home" class="products"></div>
+<div id="filterSection" class="filter-bar">
 
-    <div id="detail" class="section"></div>
+<input id="search"
+class="search"
+placeholder="Search"
+oninput="searchProducts()">
 
-    <div id="profile" class="section">
-        <span class="menu" onclick="toggleProfileMenu()">⋮</span>
-        <h2>My Profile</h2>
-        <center>
-            <img id="avatar" class="avatar" src="default-avatar.png">
-            <br><br>
-            <input type="file" onchange="uploadAvatar(event)">
-        </center>
-        <div id="profileInfo"></div>
-        
-        <h3>Delivery Address</h3>
-        <input id="addressInput" class="search" placeholder="Enter delivery address" style="margin-bottom:10px;">
-        <button class="btn" onclick="saveAddress()">Save Address with GPS</button>
-        <div id="addressList" style="margin-top:10px;"></div>
-
-        <h3>My Orders</h3>
-        <div id="ordersList"></div>
-
-        <h3>Help & Support</h3>
-        <div>Email: support@petalrush.com</div>
-        <div>Phone: +91 9876543210</div>
-        <button class="btn" onclick="logout()" style="background:#333; margin-top:20px;">Logout</button>
-    </div>
-
-    <div id="cart" class="section">
-        <h2>Cart</h2>
-        <div id="cartItems"></div>
-        <h3 id="total">Total ₹0</h3>
-        <button class="btn" onclick="placeOrder()">Place Order</button>
-    </div>
-
-    <div class="bottom">
-        <div onclick="showHome()">Home</div>
-        <div onclick="showProfile()">Profile</div>
-        <div onclick="showCart()">Cart</div>
-    </div>
+<select onchange="applyFilter(this.value)">
+<option value="new">Newest</option>
+<option value="low">Low → High</option>
+<option value="high">High → Low</option>
+</select>
 
 </div>
 
+
+<div id="home" class="products"></div>
+
+<div id="detail" class="section"></div>
+
+
+<div id="profile" class="section">
+
+<h2>My Profile</h2>
+
+<center>
+
+<img id="avatar"
+class="avatar"
+src="default-avatar.png">
+
+<br><br>
+
+<input type="file"
+onchange="uploadAvatar(event)">
+
+</center>
+
+<div id="profileInfo"></div>
+
+
+<h3>Delivery Address</h3>
+
+<input id="addressInput"
+class="search"
+placeholder="Enter address">
+
+<button class="btn"
+onclick="saveAddress()">
+Save Address
+</button>
+
+<div id="addressList"></div>
+
+
+<h3>My Orders</h3>
+
+<div id="ordersList"></div>
+
+
+<button class="btn"
+onclick="logout()"
+style="background:#333">
+Logout
+</button>
+
+</div>
+
+
+
+<div id="cart" class="section">
+
+<h2>Cart</h2>
+
+<div id="cartItems"></div>
+
+<h3 id="total">Total ₹0</h3>
+
+<button class="btn"
+onclick="placeOrder()">
+Place Order
+</button>
+
+</div>
+
+
+
+<div class="bottom">
+
+<div onclick="showHome()">Home</div>
+
+<div onclick="showProfile()">Profile</div>
+
+<div onclick="showCart()">Cart</div>
+
+</div>
+
+</div>
+
+
 <script>
 
-const supabaseClient = window.supabase.createClient(
-    "https://lssjsgfppehhclxqulso.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
+
+const supabaseClient =
+supabase.createClient(
+"https://lssjsgfppehhclxqulso.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-let user = JSON.parse(localStorage.getItem("user"));
-// Simple redirect check if no user
-if(!user && !location.href.includes('index.html')){
-   // Optional: location="index.html"; 
-}
 
-let currentProduct = null;
-let currentQty = 1;
+let user =
+JSON.parse(localStorage.getItem("user"));
 
-/* UTIL */
+let currentProduct=null;
+let currentQty=1;
+
+
 
 function hideAll(){
-    document.getElementById("home").style.display="none";
-    document.getElementById("filterSection").style.display="none"; // Hide filter bar
-    document.getElementById("detail").style.display="none";
-    document.getElementById("profile").style.display="none";
-    document.getElementById("cart").style.display="none";
+
+home.style.display="none";
+detail.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+filterSection.style.display="none";
+
 }
 
-/* HOME */
+
 
 async function showHome(){
-    hideAll();
-    document.getElementById("home").style.display="grid";
-    document.getElementById("filterSection").style.display="flex"; // Show filter bar as Flex
 
-    // Only fetch if empty to save bandwidth, or fetch every time if updates needed
-    const {data} = await supabaseClient
-        .from("products")
-        .select("*");
+hideAll();
 
-    renderProducts(data);
+home.style.display="grid";
+filterSection.style.display="flex";
+
+const {data} =
+await supabaseClient
+.from("products")
+.select("*");
+
+renderProducts(data);
+
 }
+
+
 
 function renderProducts(data){
-    const home = document.getElementById("home");
-    home.innerHTML="";
-    
-    if(data){
-        data.forEach(p=>{
-            home.innerHTML+=`
-            <div class="card" onclick="showDetail('${p.id}')">
-                <img src="${p.image_url || 'https://via.placeholder.com/150'}">
-                <div style="margin-top:8px;">${p.name}</div>
-                <div class="price">₹${p.price}</div>
-            </div>`;
-        });
-    }
+
+home.innerHTML="";
+
+data.forEach(p=>{
+
+home.innerHTML+=`
+<div class="card"
+onclick="showDetail('${p.id}')">
+
+<img src="${p.image_url}">
+
+<div>${p.name}</div>
+
+<div class="price">
+₹${p.price}
+</div>
+
+</div>
+`;
+
+});
+
 }
 
-/* FILTER */
 
-async function applyFilter(type){
-    let query = supabaseClient.from("products").select("*");
-
-    if(type=="low") query = query.order("price",{ascending:true});
-    if(type=="high") query = query.order("price",{ascending:false});
-    if(type=="new") query = query.order("created_at",{ascending:false}); // Assuming created_at exists
-
-    const {data} = await query;
-    renderProducts(data);
-}
-   
-/* SEARCH */
-async function searchProducts() {
-    const text = document.getElementById("search").value;
-
-    const { data } = await supabaseClient
-        .from("products")
-        .select("*")
-        .ilike("name", "%" + text + "%");
-
-    renderProducts(data);
-}
-
-/* DETAIL */
 
 async function showDetail(id){
-    hideAll();
-    detail.style.display="block";
 
-    const {data} = await supabaseClient
-        .from("products")
-        .select("*")
-        .eq("id",id)
-        .single();
+hideAll();
 
-    currentProduct = data;
-    currentQty = 1;
+detail.style.display="block";
 
-    detail.innerHTML=`
-        <img src="${data.image_url}" width="100%" style="border-radius:12px">
-        <h2>${data.name}</h2>
-        <div class="price" style="font-size:20px">₹<span id="priceDisplay">${data.price}</span></div>
-        <p>Stock: ${data.quantity}</p>
+const {data}=
+await supabaseClient
+.from("products")
+.select("*")
+.eq("id",id)
+.single();
 
-        <div class="qty-box">
-            <button class="qty-btn" onclick="changeQty(-1)">-</button>
-            <span id="qty">1</span>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
-        </div>
+currentProduct=data;
+currentQty=1;
 
-        <button class="btn" onclick="addCart()">Add to Cart</button>
-        <button class="btn" style="background:#333; margin-top:5px" onclick="showHome()">Back</button>
-    `;
+detail.innerHTML=`
+
+<img src="${data.image_url}" width="100%">
+
+<h2>${data.name}</h2>
+
+<div class="price">
+₹<span id="priceDisplay">${data.price}</span>
+</div>
+
+Stock: ${data.quantity}
+
+<div class="qty-box">
+
+<button class="qty-btn"
+onclick="changeQty(-1)">-</button>
+
+<span id="qty">1</span>
+
+<button class="qty-btn"
+onclick="changeQty(1)">+</button>
+
+</div>
+
+<button class="btn"
+onclick="addCart()">
+Add to Cart
+</button>
+
+<button class="btn"
+onclick="showHome()"
+style="background:#333">
+Back
+</button>
+
+`;
+
 }
 
-/* QTY */
+
 
 function changeQty(v){
-    if(!currentProduct) return;
-    currentQty += v;
-    if(currentQty < 1) currentQty = 1;
-    if(currentQty > currentProduct.quantity){
-        alert("Not enough stock");
-        currentQty = currentProduct.quantity;
-    }
-    document.getElementById("qty").innerText = currentQty;
-    document.getElementById("priceDisplay").innerText = currentProduct.price * currentQty;
+
+currentQty+=v;
+
+if(currentQty<1) currentQty=1;
+
+if(currentQty>currentProduct.quantity){
+
+alert("Not enough stock");
+
+currentQty=currentProduct.quantity;
+
 }
 
-/* ADD CART */
+qty.innerText=currentQty;
+
+priceDisplay.innerText=
+currentProduct.price*currentQty;
+
+}
+
+
 
 async function addCart(){
-    if(!user) { alert("Please login first"); return; }
 
-    await supabaseClient.from("cart").insert({
-        user_email: user.email,
-        product_id: currentProduct.id,
-        qty: currentQty
-    });
+await supabaseClient
+.from("cart")
+.insert({
 
-    alert("Added to cart");
-    showHome();
+user_email:user.email,
+product_id:currentProduct.id,
+qty:currentQty
+
+});
+
+alert("Added to cart");
+
 }
 
-/* CART */
+
 
 async function showCart(){
-    hideAll();
-    cart.style.display="block";
 
-    const {data} = await supabaseClient
-        .from("cart")
-        .select("qty,products(name,price)")
-        .eq("user_email", user.email);
+hideAll();
 
-    let totalVal = 0;
-    cartItems.innerHTML = "";
+cart.style.display="block";
 
-    if(data && data.length > 0){
-        data.forEach(item=>{
-            if(item.products){
-                let price = item.products.price * item.qty;
-                totalVal += price;
-                cartItems.innerHTML += `
-                <div class="cart-item">
-                    <span>${item.products.name} (x${item.qty})</span>
-                    <span>₹${price}</span>
-                </div>`;
-            }
-        });
-    } else {
-        cartItems.innerHTML = "<p>Cart is empty</p>";
-    }
+const {data} =
+await supabaseClient
+.from("cart")
+.select("*,products(*)")
+.eq("user_email",user.email);
 
-    document.getElementById("total").innerText = "Total ₹" + totalVal;
+cartItems.innerHTML="";
+
+let total=0;
+
+data.forEach(item=>{
+
+let price=
+item.products.price*item.qty;
+
+total+=price;
+
+cartItems.innerHTML+=`
+
+<div class="cart-item">
+
+<span>
+${item.products.name}
+(x${item.qty})
+</span>
+
+<span>
+₹${price}
+</span>
+
+</div>
+`;
+
+});
+
+total.innerText="Total ₹"+total;
+
 }
 
-/* PROFILE */
+
+
+async function placeOrder(){
+
+const {data} =
+await supabaseClient
+.from("cart")
+.select("*,products(*)")
+.eq("user_email",user.email);
+
+
+for(const item of data){
+
+await supabaseClient
+.from("orders")
+.insert({
+
+user_email:user.email,
+flower_name:item.products.name,
+price:item.products.price*item.qty,
+status:"Placed"
+
+});
+
+}
+
+
+await supabaseClient
+.from("cart")
+.delete()
+.eq("user_email",user.email);
+
+
+alert("Order placed");
+
+showProfile();
+
+}
+
+
 
 async function showProfile(){
-    hideAll();
-    profile.style.display="block";
 
-    const {data} = await supabaseClient
-        .from("users")
-        .select("*")
-        .eq("email", user.email)
-        .single();
+hideAll();
 
-    if(data && data.avatar_url)
-        avatar.src = data.avatar_url;
+profile.style.display="block";
 
-    if(data){
-        profileInfo.innerHTML = `
-            <div style="background:#222; padding:10px; border-radius:8px; margin-top:10px;">
-                Name: <b>${data.name || "N/A"}</b><br>
-                Phone: ${data.phone || "N/A"}
-            </div>
-        `;
-    }
+const {data} =
+await supabaseClient
+.from("users")
+.select("*")
+.eq("email",user.email)
+.single();
 
-    loadOrders();
-    loadAddresses();
+if(data.avatar_url)
+avatar.src=data.avatar_url;
+
+
+profileInfo.innerHTML=`
+Name: ${data.name||""}
+<br>
+Phone: ${data.phone||""}
+`;
+
+loadOrders();
+loadAddresses();
+
 }
 
-/* ADDRESS GPS */
 
-function saveAddress(){
-    if(!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(async(pos)=>{
-        let gps = pos.coords.latitude + "," + pos.coords.longitude;
-        let addrText = document.getElementById("addressInput").value;
-        
-        if(!addrText) { alert("Please enter address text"); return; }
-
-        let fullAddr = addrText + " | GPS:" + gps;
-
-        await supabaseClient.from("addresses").insert({
-            user_email: user.email,
-            address: fullAddr
-        });
-
-        alert("Address saved");
-        loadAddresses();
-    }, (err) => {
-        alert("Error getting GPS: " + err.message);
-    });
-}
-
-/* LOAD ADDRESS */
-
-async function loadAddresses(){
-    const {data} = await supabaseClient
-        .from("addresses")
-        .select("*")
-        .eq("user_email", user.email);
-
-    addressList.innerHTML = "";
-    if(data){
-        data.forEach(a=>{
-            addressList.innerHTML += `<div style="padding:5px; border-bottom:1px solid #333">${a.address}</div>`;
-        });
-    }
-}
-
-/* ORDERS */
 
 async function loadOrders(){
-    const {data} = await supabaseClient
-        .from("orders")
-        .select("*")
-        .eq("user_email", user.email);
 
-    ordersList.innerHTML = "";
-    if(data){
-        data.forEach(o=>{
-            ordersList.innerHTML += `
-            <div class="cart-item">
-                ${o.flower_name} <br> 
-                <span style="color:#aaa; font-size:12px">${o.status}</span>
-                <span>₹${o.price}</span>
-            </div>`;
-        });
-    }
+const {data} =
+await supabaseClient
+.from("orders")
+.select("*")
+.eq("user_email",user.email);
+
+ordersList.innerHTML="";
+
+data.forEach(o=>{
+
+ordersList.innerHTML+=`
+<div class="cart-item">
+
+${o.flower_name}
+
+<span>
+₹${o.price}
+</span>
+
+</div>
+`;
+
+});
+
 }
 
-/* AVATAR */
+
+
+async function saveAddress(){
+
+await supabaseClient
+.from("addresses")
+.insert({
+
+user_email:user.email,
+address:addressInput.value
+
+});
+
+loadAddresses();
+
+}
+
+
+
+async function loadAddresses(){
+
+const {data} =
+await supabaseClient
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+addressList.innerHTML="";
+
+data.forEach(a=>{
+
+addressList.innerHTML+=`
+<div>${a.address}</div>
+`;
+
+});
+
+}
+
+
 
 async function uploadAvatar(e){
-    let file = e.target.files[0];
-    if(!file) return;
 
-    let name = user.email.replace(/[^a-zA-Z0-9]/g, '') + ".png"; // Sanitize filename
+const file=e.target.files[0];
 
-    await supabaseClient.storage
-        .from("avatars")
-        .upload(name, file, {upsert:true});
+const name=user.email+".png";
 
-    // Note: Ensure your Supabase bucket is set to Public for this URL to work
-    let url = "https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/" + name;
+await supabaseClient
+.storage
+.from("avatars")
+.upload(name,file,{upsert:true});
 
-    document.getElementById("avatar").src = url;
+const url=
+"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+name;
 
-    await supabaseClient.from("users").upsert({
-        email: user.email,
-        avatar_url: url
-    });
+avatar.src=url;
+
+await supabaseClient
+.from("users")
+.upsert({
+
+email:user.email,
+avatar_url:url
+
+});
+
 }
 
-/* ORDER */
 
-function placeOrder(){
-    alert("Order system ready");
-}
-
-/* LOGOUT */
 
 function logout(){
-    localStorage.removeItem("user");
-    location.reload(); // Safer than hardcoding index.html
+
+localStorage.removeItem("user");
+
+location="index.html";
+
 }
 
-// Init
-if(user) {
-    showHome();
-} else {
-    // Handle not logged in state if necessary
-    // location = "index.html";
-}
+
+
+showHome();
 
 </script>
 
