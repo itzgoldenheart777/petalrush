@@ -171,25 +171,22 @@ border-radius:50%;
 
 <div id="profile" class="section">
 
-<h2>My Profile</h2>
+    <h2>My Profile</h2>
+    <center>
+        <img id="avatar" class="avatar" src="https://ui-avatars.com/api/?name=Buyer&background=random">
+        <input type="file" accept="image/*" onchange="uploadAvatar(event)">
+    </center>
 
-<center>
-<img id="avatar" class="avatar" src="default-avatar.png"><br><br>
-<input type="file" onchange="uploadAvatar(event)">
-</center>
+    <input id="name" placeholder="Name">
+    <input id="phone" placeholder="Phone">
+    <button class="btn" onclick="saveProfile()">Save Profile</button>
 
-<div id="profileInfo"></div>
+    <h3 style="margin-top: 30px;">My Address</h3>
+    <input id="addressInput" placeholder="Enter delivery address">
+    <button class="btn" onclick="saveAddress()">Save Address</button>
+    <div id="addressList" style="margin-top: 15px; color:#aaa;"></div>
 
-<h3>Addresses</h3>
-<input id="addressInput" class="search" placeholder="Enter address">
-<button class="btn" onclick="saveAddress()">Save Address</button>
-
-<div id="addressList"></div>
-
-<h3>Orders</h3>
-<div id="ordersList"></div>
-
-<button class="btn" onclick="logout()" style="background:#333;">Logout</button>
+    <button class="btn" style="background:#444; margin-top: 30px;" onclick="logout()">Logout</button>
 
 </div>
 
