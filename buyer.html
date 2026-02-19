@@ -4,13 +4,21 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>PetalRush</title>
+<title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
-/* ---------- GLOBAL ---------- */
+/* ================= GLOBAL ================= */
+
+:root{
+--primary:#ff4081;
+--bg:#0f1115;
+--card:#171a21;
+--text:#ffffff;
+--muted:#999;
+}
 
 *{
 box-sizing:border-box;
@@ -20,43 +28,44 @@ padding:0;
 
 body{
 font-family:system-ui;
-background:#f2f3f7;
+background:var(--bg);
+color:var(--text);
 }
 
-/* CONTAINER */
+/* ================= CONTAINER ================= */
 
 .container{
-
-max-width:480px;
+max-width:500px;
 margin:auto;
-background:white;
 min-height:100vh;
+background:var(--bg);
 position:relative;
-
 }
+
+/* Desktop mode */
 
 @media(min-width:700px){
 
 .container{
 margin-top:20px;
 margin-bottom:20px;
-border-radius:12px;
-box-shadow:0 0 25px rgba(0,0,0,0.15);
+border-radius:16px;
+box-shadow:0 0 40px rgba(0,0,0,0.5);
 }
 
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 
 .header{
-
-background:white;
-padding:12px;
 display:flex;
 align-items:center;
 gap:10px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
-
+padding:12px;
+background:#111;
+position:sticky;
+top:0;
+z-index:10;
 }
 
 .logo{
@@ -68,143 +77,167 @@ flex:1;
 }
 
 .search input{
-
 width:100%;
 padding:10px;
 border-radius:10px;
-border:1px solid #ddd;
-
+border:none;
+background:#222;
+color:white;
 }
 
-/* PRODUCTS */
+/* ================= FILTER ================= */
+
+.filter{
+display:flex;
+gap:8px;
+padding:10px;
+}
+
+.filter select{
+flex:1;
+padding:8px;
+border-radius:8px;
+background:#222;
+color:white;
+border:none;
+}
+
+/* ================= PRODUCTS ================= */
 
 .products{
-
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:10px;
-padding:10px;
-padding-bottom:80px;
-
+gap:12px;
+padding:12px;
+padding-bottom:90px;
 }
 
 .card{
-
-background:white;
+background:var(--card);
 border-radius:12px;
 padding:10px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
-
+cursor:pointer;
 }
 
 .card img{
-
 width:100%;
-aspect-ratio:1/1;
+height:130px;
 object-fit:cover;
 border-radius:10px;
+}
 
+.card h3{
+font-size:15px;
+margin-top:6px;
 }
 
 .price{
-
-color:#ff4081;
+color:var(--primary);
 font-weight:bold;
-
 }
 
-/* PROFILE */
+/* ================= PROFILE ================= */
 
-.section{
+.profile{
 display:none;
-padding:15px;
-padding-bottom:80px;
-}
-
-.profile-card{
-
-background:white;
-padding:15px;
-border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
-text-align:center;
-
+padding:12px;
+padding-bottom:90px;
 }
 
 .avatar{
-
-width:90px;
-height:90px;
+width:100px;
+height:100px;
 border-radius:50%;
 object-fit:cover;
-margin-bottom:10px;
-
+margin:auto;
+display:block;
 }
 
 .input{
-
 width:100%;
 padding:10px;
+margin-top:8px;
 border-radius:8px;
-border:1px solid #ddd;
-margin-top:10px;
-
+border:none;
+background:#222;
+color:white;
 }
 
 .btn{
-
-background:#ff4081;
-color:white;
-border:none;
-padding:10px;
 width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
 border-radius:8px;
-margin-top:10px;
+background:var(--primary);
+color:white;
 cursor:pointer;
-
 }
 
-.menu{
+/* ================= ADDRESS ================= */
 
-margin-top:10px;
-background:white;
-border-radius:12px;
-
+.address{
+display:none;
+padding:12px;
+padding-bottom:90px;
 }
-
-.menu-item{
-
-padding:15px;
-border-bottom:1px solid #eee;
-cursor:pointer;
-
-}
-
-/* ADDRESS */
 
 .address-card{
-
-background:white;
-padding:12px;
+background:var(--card);
+padding:10px;
 border-radius:10px;
-margin-top:10px;
-
+margin-bottom:10px;
 }
 
-/* NAV */
+/* ================= CART ================= */
+
+.cart{
+display:none;
+padding:12px;
+padding-bottom:90px;
+}
+
+.cart-item{
+display:flex;
+gap:10px;
+margin-bottom:10px;
+background:var(--card);
+padding:10px;
+border-radius:10px;
+}
+
+/* ================= PRODUCT DETAIL ================= */
+
+.detail{
+display:none;
+padding:12px;
+padding-bottom:90px;
+}
+
+.detail img{
+width:100%;
+border-radius:12px;
+}
+
+.detail h2{
+margin-top:10px;
+}
+
+.detail .price{
+font-size:20px;
+}
+
+/* ================= BOTTOM NAV ================= */
 
 .bottom{
-
 position:fixed;
 bottom:0;
 width:100%;
-max-width:480px;
-background:white;
+max-width:500px;
+background:#111;
 display:flex;
 justify-content:space-around;
-padding:10px;
-box-shadow:0 -2px 10px rgba(0,0,0,0.1);
-
+padding:12px;
 }
 
 .nav{
@@ -219,235 +252,157 @@ cursor:pointer;
 
 <div class="container">
 
+<!-- HEADER -->
+
 <div class="header">
 
 <img src="logoHeader.png" class="logo">
 
 <div class="search">
-<input placeholder="Search flowers"
-oninput="searchProducts(this.value)">
+<input id="searchInput" placeholder="Search flowers">
 </div>
 
 </div>
 
+<!-- FILTER -->
+
+<div class="filter">
+
+<select id="priceFilter">
+<option value="">Sort Price</option>
+<option value="low">Low to High</option>
+<option value="high">High to Low</option>
+</select>
+
+</div>
 
 <!-- HOME -->
 
 <div id="home" class="products"></div>
 
+<!-- PRODUCT DETAIL -->
+
+<div id="detail" class="detail"></div>
 
 <!-- PROFILE -->
 
-<div id="profile" class="section">
+<div id="profile" class="profile">
 
-<div class="profile-card">
-
-<img id="avatar"
-class="avatar"
+<img id="avatar" class="avatar"
 src="https://via.placeholder.com/100">
 
-<input type="file"
-onchange="uploadAvatar(event)">
+<input type="file" onchange="uploadAvatar(event)">
 
-<input id="nameInput"
-class="input"
-placeholder="Enter name">
+<input id="nameInput" class="input" placeholder="Name">
 
-<input id="phoneInput"
-class="input"
-placeholder="Enter phone">
+<input id="phoneInput" class="input" placeholder="Phone">
 
-<button class="btn"
-onclick="saveProfile()">
+<button class="btn" onclick="saveProfile()">
 Save Profile
 </button>
 
-</div>
+<br><br>
 
-<div class="menu">
-
-<div class="menu-item"
-onclick="showAddress()">
-My Address
-</div>
-
-<div class="menu-item"
-onclick="showOrders()">
-My Orders
-</div>
-
-<div class="menu-item"
-onclick="showHelp()">
-Help & Support
-</div>
-
-<div class="menu-item"
-onclick="logout()">
-Logout
-</div>
+<div onclick="openAddress()">My Address</div>
+<div onclick="openOrders()">My Orders</div>
+<div onclick="openHelp()">Help & Support</div>
+<div onclick="logout()">Logout</div>
 
 </div>
-
-</div>
-
 
 <!-- ADDRESS -->
 
-<div id="address" class="section">
+<div id="address" class="address">
 
 <h3>My Address</h3>
 
 <div id="addressList"></div>
 
-<input id="addressInput"
-class="input"
+<input id="addressInput" class="input"
 placeholder="Enter address">
 
-<button class="btn"
-onclick="getGPS()">
-Use GPS
-</button>
-
-<button class="btn"
-onclick="saveAddress()">
+<button class="btn" onclick="saveAddress()">
 Save Address
 </button>
 
 </div>
 
+<!-- CART -->
 
-<!-- ORDERS -->
+<div id="cart" class="cart">
 
-<div id="orders" class="section">
+<h3>Cart</h3>
 
-<h3>My Orders</h3>
+<div id="cartList"></div>
 
-<div id="orderList"></div>
-
-</div>
-
-
-<!-- HELP -->
-
-<div id="help" class="section">
-
-<h3>Help</h3>
-
-<p id="adminEmail"></p>
-
-<p id="adminPhone"></p>
+<button class="btn" onclick="placeOrder()">
+Place Order
+</button>
 
 </div>
 
-
-<!-- NAV -->
+<!-- BOTTOM NAV -->
 
 <div class="bottom">
 
-<div class="nav"
-onclick="showHome()">Home</div>
-
-<div class="nav"
-onclick="showProfile()">Profile</div>
-
-<div class="nav"
-onclick="showOrders()">Orders</div>
+<div class="nav" onclick="showHome()">Home</div>
+<div class="nav" onclick="showProfile()">Profile</div>
+<div class="nav" onclick="showCart()">Cart</div>
 
 </div>
-
 
 </div>
 
 <script>
 
-const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+/* ================= SUPABASE ================= */
 
-const client=supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
+const supabase = window.supabase.createClient(
+"https://lssjsgfppehhclxqulso.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-const user=JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user"));
 
-if(!user){
-location="index.html";
-}
+if(!user) location="index.html";
 
-/* SHOW SECTIONS */
-
-function hideAll(){
-
-home.style.display="none";
-profile.style.display="none";
-address.style.display="none";
-orders.style.display="none";
-help.style.display="none";
-
-}
-
-function showHome(){
-
-hideAll();
-home.style.display="grid";
-
-}
-
-function showProfile(){
-
-hideAll();
-profile.style.display="block";
-loadProfile();
-
-}
-
-function showAddress(){
-
-hideAll();
-address.style.display="block";
-loadAddress();
-
-}
-
-function showOrders(){
-
-hideAll();
-orders.style.display="block";
-loadOrders();
-
-}
-
-function showHelp(){
-
-hideAll();
-help.style.display="block";
-loadAdmin();
-
-}
-
-/* PRODUCTS */
+/* ================= LOAD PRODUCTS ================= */
 
 async function loadProducts(){
 
-const {data}=await client
-.from("products")
-.select("*");
+let query = supabase.from("products").select("*");
 
-home.innerHTML="";
+const search=document.getElementById("searchInput").value;
+
+if(search)
+query=query.ilike("name","%"+search+"%");
+
+const filter=document.getElementById("priceFilter").value;
+
+if(filter=="low")
+query=query.order("price",{ascending:true});
+
+if(filter=="high")
+query=query.order("price",{ascending:false});
+
+const {data}=await query;
+
+const div=document.getElementById("home");
+
+div.innerHTML="";
 
 data.forEach(p=>{
 
-home.innerHTML+=`
+div.innerHTML+=`
 
-<div class="card">
+<div class="card"
+onclick="openDetail('${p.id}')">
 
 <img src="${p.image_url}">
 
-<div>${p.name}</div>
+<h3>${p.name}</h3>
 
-<div class="price">
-₹${p.price}
-</div>
+<div class="price">₹${p.price}</div>
 
 </div>
 
@@ -459,183 +414,189 @@ home.innerHTML+=`
 
 loadProducts();
 
-function searchProducts(text){
+/* ================= PRODUCT DETAIL ================= */
 
-const cards=document.querySelectorAll(".card");
+async function openDetail(id){
 
-cards.forEach(c=>{
+hideAll();
 
-c.style.display=
-c.innerText.toLowerCase().includes(text.toLowerCase())
-?"block":"none";
+detail.style.display="block";
 
-});
-
-}
-
-/* PROFILE */
-
-async function loadProfile(){
-
-const {data}=await client
-.from("users")
+const {data}=await supabase
+.from("products")
 .select("*")
-.eq("email",user.email)
+.eq("id",id)
 .single();
 
-if(data){
+detail.innerHTML=`
 
-nameInput.value=data.name||"";
-phoneInput.value=data.phone||"";
+<img src="${data.image_url}">
 
-if(data.avatar_url){
-avatar.src=data.avatar_url;
+<h2>${data.name}</h2>
+
+<div class="price">₹${data.price}</div>
+
+<p>${data.description||""}</p>
+
+<button class="btn"
+onclick="addToCart('${data.id}')">
+Add to Cart
+</button>
+
+`;
+
+}
+
+/* ================= CART ================= */
+
+function addToCart(id){
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+cart.push(id);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+alert("Added to cart");
+
+}
+
+async function showCart(){
+
+hideAll();
+
+cart.style.display="block";
+
+const ids=JSON.parse(localStorage.getItem("cart"))||[];
+
+cartList.innerHTML="";
+
+for(let id of ids){
+
+const {data}=await supabase
+.from("products")
+.select("*")
+.eq("id",id)
+.single();
+
+cartList.innerHTML+=`
+
+<div class="cart-item">
+
+<img src="${data.image_url}"
+width="60">
+
+<div>
+${data.name}
+<br>
+₹${data.price}
+</div>
+
+</div>
+
+`;
+
 }
 
 }
 
-}
+/* ================= PROFILE ================= */
 
 async function saveProfile(){
 
-const name=nameInput.value;
-const phone=phoneInput.value;
-
-await client
+await supabase
 .from("users")
-.update({name,phone})
+.update({
+name:nameInput.value,
+phone:phoneInput.value
+})
 .eq("email",user.email);
 
 alert("Saved");
 
 }
 
+/* ================= AVATAR ================= */
+
 async function uploadAvatar(e){
 
 const file=e.target.files[0];
 
-await client.storage
+await supabase.storage
 .from("avatars")
 .upload(user.email,file,{upsert:true});
 
 const url=
-SUPABASE_URL+
-"/storage/v1/object/public/avatars/"+user.email;
+"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
 
 avatar.src=url;
 
-await client
-.from("users")
-.update({avatar_url:url})
-.eq("email",user.email);
-
 }
 
-/* ADDRESS */
+/* ================= ADDRESS ================= */
 
 async function saveAddress(){
 
-await client.from("addresses")
+await supabase.from("address")
 .insert({
-user_email:user.email,
+email:user.email,
 address:addressInput.value
 });
 
-loadAddress();
+alert("Saved");
 
 }
 
-async function loadAddress(){
+/* ================= NAV ================= */
 
-const {data}=await client
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
+function hideAll(){
 
-addressList.innerHTML="";
-
-data.forEach(a=>{
-
-addressList.innerHTML+=`
-
-<div class="address-card">
-
-${a.address}
-
-</div>
-
-`;
-
-});
+home.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+detail.style.display="none";
+address.style.display="none";
 
 }
 
-function getGPS(){
+function showHome(){
 
-navigator.geolocation.getCurrentPosition(pos=>{
+hideAll();
 
-addressInput.value=
-"https://maps.google.com/?q="+
-pos.coords.latitude+
-","+pos.coords.longitude;
+home.style.display="grid";
 
-});
+loadProducts();
 
 }
 
-/* ORDERS */
+function showProfile(){
 
-async function loadOrders(){
+hideAll();
 
-const {data}=await client
-.from("orders")
-.select("*")
-.eq("user_email",user.email);
-
-orderList.innerHTML="";
-
-data.forEach(o=>{
-
-orderList.innerHTML+=`
-
-<div class="address-card">
-
-₹${o.total} — ${o.status}
-
-</div>
-
-`;
-
-});
+profile.style.display="block";
 
 }
 
-/* ADMIN */
+function openAddress(){
 
-async function loadAdmin(){
+hideAll();
 
-const {data}=await client
-.from("admin")
-.select("*")
-.single();
-
-adminEmail.innerText=data.email;
-adminPhone.innerText=data.phone;
+address.style.display="block";
 
 }
-
-/* LOGOUT */
 
 function logout(){
 
 localStorage.removeItem("user");
+
 location="index.html";
 
 }
 
-/* START */
+/* ================= SEARCH ================= */
 
-showHome();
+searchInput.oninput=loadProducts;
+priceFilter.onchange=loadProducts;
 
 </script>
 
