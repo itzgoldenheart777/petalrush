@@ -2,11 +2,13 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PetalRush</title>
+
+<title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
 margin:0;
 background:#0f1115;
@@ -45,7 +47,7 @@ color:white;
 
 .products{
 display:grid;
-grid-template-columns:repeat(2,1fr);
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 gap:12px;
 padding:12px;
 padding-bottom:90px;
@@ -89,7 +91,7 @@ padding:12px;
 .btn{
 background:#ff4081;
 border:none;
-padding:10px;
+padding:12px;
 width:100%;
 border-radius:8px;
 color:white;
@@ -106,6 +108,14 @@ border:none;
 background:#222;
 color:white;
 }
+
+.avatar{
+width:100px;
+height:100px;
+border-radius:50%;
+object-fit:cover;
+}
+
 </style>
 </head>
 
@@ -114,208 +124,580 @@ color:white;
 <div class="container">
 
 <!-- HEADER -->
+
 <div class="header">
+
 <img src="logoHeader.png" class="logo">
-<input id="search" class="search" placeholder="Search flowers">
+
+<input id="search" class="search" placeholder="Search flowers" oninput="searchProducts()">
+
 </div>
 
+
 <!-- HOME -->
+
 <div id="home" class="products"></div>
 
+
 <!-- DETAIL -->
+
 <div id="detail" class="section"></div>
 
-<!-- PROFILE -->
-<div id="profile" class="section">
-<h3>My Profile</h3>
 
-<img id="avatar" src="default-avatar.png" width="100">
+<!-- PROFILE -->
+
+<div id="profile" class="section">
+
+<h2>My Profile</h2>
+
+<img id="avatar" class="avatar" src="default-avatar.png">
 
 <input type="file" onchange="uploadAvatar(event)">
 
 <input id="name" placeholder="Name">
+
 <input id="phone" placeholder="Phone">
 
 <button class="btn" onclick="saveProfile()">Save Profile</button>
 
+
 <h3>My Address</h3>
+
 <input id="addressInput" placeholder="Enter address">
+
 <button class="btn" onclick="saveAddress()">Save Address</button>
 
+<div id="addressList"></div>
+
+
 <button class="btn" onclick="logout()">Logout</button>
+
 </div>
+
 
 <!-- CART -->
+
 <div id="cart" class="section">
-<h3>Cart</h3>
+
+<h2>Cart</h2>
+
 <div id="cartItems"></div>
+
 <h3 id="total">Total ₹0</h3>
+
 <button class="btn" onclick="placeOrder()">Place Order</button>
+
 </div>
+
 
 <!-- NAV -->
+
 <div class="bottom">
+
 <div onclick="showHome()">Home</div>
+
 <div onclick="showProfile()">Profile</div>
+
 <div onclick="showCart()">Cart</div>
-</div>
 
 </div>
+
+
+</div>
+
+
 
 <script>
 
+
+const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
+
+
 const supabase = window.supabase.createClient(
-"https://lssjsgfppehhclxqulso.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
+
 const user = JSON.parse(localStorage.getItem("user"));
-if(!user) location="index.html";
 
-/* ---------------- HOME ---------------- */
+if(!user){
 
-async function showHome(){
-hideAll();
-document.getElementById("home").style.display="grid";
+location="index.html";
 
-const {data} = await supabase
-.from("products")
-.select("*");
-
-const home = document.getElementById("home");
-home.innerHTML="";
-
-if(!data) return;
-
-data.forEach(p=>{
-home.innerHTML+=`
-<div class="card" onclick="showDetail('${p.id}')">
-<img src="${p.image_url}">
-${p.name}
-<div class="price">₹${p.price}</div>
-</div>
-`;
-});
 }
 
-/* ---------------- DETAIL ---------------- */
-
-async function showDetail(id){
-hideAll();
-document.getElementById("detail").style.display="block";
-
-const {data} = await supabase
-.from("products")
-.select("*")
-.eq("id",id)
-.single();
-
-document.getElementById("detail").innerHTML=`
-<img src="${data.image_url}" width="100%">
-<h2>${data.name}</h2>
-₹${data.price}
-<p>${data.description || ""}</p>
-<button class="btn" onclick="addCart('${data.id}')">Add to Cart</button>
-`;
-}
-
-/* ---------------- CART ---------------- */
-
-async function addCart(id){
-await supabase.from("cart").insert({
-user_email:user.email,
-product_id:id,
-qty:1
-});
-alert("Added to cart");
-}
-
-async function showCart(){
-hideAll();
-document.getElementById("cart").style.display="block";
-
-const {data} = await supabase
-.from("cart")
-.select("*,products(*)")
-.eq("user_email",user.email);
-
-const cartDiv = document.getElementById("cartItems");
-cartDiv.innerHTML="";
-let total=0;
-
-if(!data) return;
-
-data.forEach(item=>{
-total += item.products.price * item.qty;
-
-cartDiv.innerHTML+=`
-<div>
-${item.products.name} x ${item.qty}
-₹${item.products.price}
-</div>
-`;
-});
-
-document.getElementById("total").innerText="Total ₹"+total;
-}
-
-/* ---------------- PROFILE ---------------- */
-
-function showProfile(){
-hideAll();
-document.getElementById("profile").style.display="block";
-}
-
-async function saveProfile(){
-await supabase.from("users").upsert({
-email:user.email,
-name:document.getElementById("name").value,
-phone:document.getElementById("phone").value
-});
-alert("Profile saved");
-}
-
-async function saveAddress(){
-await supabase.from("addresses").insert({
-user_email:user.email,
-address:document.getElementById("addressInput").value
-});
-alert("Address saved");
-}
-
-async function uploadAvatar(e){
-const file=e.target.files[0];
-
-await supabase.storage
-.from("avatars")
-.upload(user.email,file,{upsert:true});
-
-document.getElementById("avatar").src=
-"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
-}
-
-/* ---------------- ORDER ---------------- */
-
-async function placeOrder(){
-alert("Order placed (Next step: implement order_items)");
-}
 
 /* ---------------- UTIL ---------------- */
 
+
 function hideAll(){
+
 document.getElementById("home").style.display="none";
+
 document.getElementById("detail").style.display="none";
+
 document.getElementById("profile").style.display="none";
+
 document.getElementById("cart").style.display="none";
+
 }
 
-function logout(){
-localStorage.removeItem("user");
-location="index.html";
+
+/* ---------------- HOME ---------------- */
+
+
+async function showHome(){
+
+hideAll();
+
+const home=document.getElementById("home");
+
+home.style.display="grid";
+
+
+const {data,error}=await supabase
+
+.from("products")
+
+.select("*")
+
+.order("created_at",{ascending:false});
+
+
+if(error){
+
+console.log(error);
+
+return;
+
 }
+
+
+home.innerHTML="";
+
+
+data.forEach(p=>{
+
+home.innerHTML+=`
+
+<div class="card" onclick="showDetail('${p.id}')">
+
+<img src="${p.image_url || 'default-avatar.png'}">
+
+<h3>${p.name}</h3>
+
+<div class="price">₹${p.price}</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+/* SEARCH */
+
+
+async function searchProducts(){
+
+const text=document.getElementById("search").value;
+
+
+const {data}=await supabase
+
+.from("products")
+
+.select("*")
+
+.ilike("name","%"+text+"%");
+
+
+const home=document.getElementById("home");
+
+home.innerHTML="";
+
+
+data.forEach(p=>{
+
+home.innerHTML+=`
+
+<div class="card" onclick="showDetail('${p.id}')">
+
+<img src="${p.image_url}">
+
+${p.name}
+
+<div class="price">₹${p.price}</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+/* ---------------- DETAIL ---------------- */
+
+
+async function showDetail(id){
+
+hideAll();
+
+const detail=document.getElementById("detail");
+
+detail.style.display="block";
+
+
+const {data}=await supabase
+
+.from("products")
+
+.select("*")
+
+.eq("id",id)
+
+.single();
+
+
+detail.innerHTML=`
+
+<img src="${data.image_url}" width="100%">
+
+<h2>${data.name}</h2>
+
+<h3>₹${data.price}</h3>
+
+<p>${data.description || ""}</p>
+
+<button class="btn" onclick="addCart('${data.id}')">
+
+Add to Cart
+
+</button>
+
+`;
+
+}
+
+
+
+/* ---------------- CART ---------------- */
+
+
+async function addCart(product_id){
+
+const {error}=await supabase
+
+.from("cart")
+
+.insert({
+
+user_email:user.email,
+
+product_id:product_id,
+
+qty:1
+
+});
+
+
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert("Added to cart");
+
+}
+
+}
+
+
+
+async function showCart(){
+
+hideAll();
+
+document.getElementById("cart").style.display="block";
+
+
+const {data,error}=await supabase
+
+.from("cart")
+
+.select(`
+
+qty,
+
+products(
+
+name,
+
+price,
+
+image_url
+
+)
+
+`)
+
+.eq("user_email",user.email);
+
+
+const cartDiv=document.getElementById("cartItems");
+
+cartDiv.innerHTML="";
+
+
+let total=0;
+
+
+if(data){
+
+data.forEach(item=>{
+
+total+=item.products.price * item.qty;
+
+
+cartDiv.innerHTML+=`
+
+<div>
+
+${item.products.name}
+
+₹${item.products.price}
+
+</div>
+
+`;
+
+});
+
+}
+
+
+document.getElementById("total").innerText="Total ₹"+total;
+
+}
+
+
+
+/* ---------------- PROFILE ---------------- */
+
+
+async function showProfile(){
+
+hideAll();
+
+document.getElementById("profile").style.display="block";
+
+
+const {data}=await supabase
+
+.from("users")
+
+.select("*")
+
+.eq("email",user.email)
+
+.single();
+
+
+if(data){
+
+document.getElementById("name").value=data.name || "";
+
+document.getElementById("phone").value=data.phone || "";
+
+if(data.avatar_url){
+
+document.getElementById("avatar").src=data.avatar_url;
+
+}
+
+}
+
+
+loadAddresses();
+
+}
+
+
+
+async function saveProfile(){
+
+const name=document.getElementById("name").value;
+
+const phone=document.getElementById("phone").value;
+
+
+await supabase
+
+.from("users")
+
+.upsert({
+
+email:user.email,
+
+name:name,
+
+phone:phone
+
+});
+
+
+alert("Profile saved");
+
+}
+
+
+
+/* ADDRESS */
+
+
+async function saveAddress(){
+
+const address=document.getElementById("addressInput").value;
+
+
+await supabase
+
+.from("addresses")
+
+.insert({
+
+user_email:user.email,
+
+address:address
+
+});
+
+
+alert("Address saved");
+
+loadAddresses();
+
+}
+
+
+
+async function loadAddresses(){
+
+const {data}=await supabase
+
+.from("addresses")
+
+.select("*")
+
+.eq("user_email",user.email);
+
+
+const div=document.getElementById("addressList");
+
+div.innerHTML="";
+
+
+if(data){
+
+data.forEach(a=>{
+
+div.innerHTML+=`
+
+<div>${a.address}</div>
+
+`;
+
+});
+
+}
+
+}
+
+
+
+/* AVATAR */
+
+
+async function uploadAvatar(e){
+
+const file=e.target.files[0];
+
+
+await supabase.storage
+
+.from("avatars")
+
+.upload(user.email,file,{upsert:true});
+
+
+const url=
+
+SUPABASE_URL+
+
+"/storage/v1/object/public/avatars/"+user.email;
+
+
+document.getElementById("avatar").src=url;
+
+
+await supabase
+
+.from("users")
+
+.upsert({
+
+email:user.email,
+
+avatar_url:url
+
+});
+
+}
+
+
+
+/* ORDER */
+
+
+function placeOrder(){
+
+alert("Order system ready (Next step implement orders)");
+
+}
+
+
+
+/* LOGOUT */
+
+
+function logout(){
+
+localStorage.removeItem("user");
+
+location="index.html";
+
+}
+
+
+
+/* START */
+
 
 showHome();
 
+
 </script>
+
+
 </body>
 </html>
