@@ -7,6 +7,7 @@ const supabaseClient = window.supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
+
 let user = JSON.parse(localStorage.getItem("user"));
 
 if (!user) {
@@ -14,18 +15,16 @@ if (!user) {
   location = "index.html";
 }
 
-/* =========================
-   GLOBAL STATE
-========================= */
+/* ============================= */
+/* GLOBALS */
+/* ============================= */
 
-let currentProduct = null;
-let currentQty = 1;
 let cartData = [];
 let discountAmount = 0;
 
-/* =========================
-   UTIL
-========================= */
+/* ============================= */
+/* NAVIGATION */
+/* ============================= */
 
 function hideAll() {
   document.getElementById("home").style.display = "none";
@@ -35,141 +34,40 @@ function hideAll() {
   document.getElementById("filterSection").style.display = "none";
 }
 
-/* =========================
-   HOME
-========================= */
+/* ============================= */
+/* PROFILE */
+/* ============================= */
 
-async function showHome() {
+async function showProfile() {
   hideAll();
-  home.style.display = "grid";
-  filterSection.style.display = "flex";
+  document.getElementById("profile").style.display = "block";
 
   const { data } = await supabaseClient
-    .from("products")
-    .select("*");
-
-  renderProducts(data);
-}
-
-function renderProducts(data) {
-  home.innerHTML = "";
-
-  data.forEach(p => {
-    home.innerHTML += `
-      <div class="card" onclick="showDetail('${p.id}')">
-        <img src="${p.image_url}">
-        <div>${p.name}</div>
-        <div class="price">₹${p.price}</div>
-      </div>
-    `;
-  });
-}
-
-/* =========================
-   PRODUCT DETAIL
-========================= */
-
-async function showDetail(id) {
-  hideAll();
-  detail.style.display = "block";
-
-  const { data } = await supabaseClient
-    .from("products")
+    .from("users")
     .select("*")
-    .eq("id", id)
+    .eq("email", user.email)
     .single();
 
-  currentProduct = data;
-  currentQty = 1;
-
-  detail.innerHTML = `
-    <img src="${data.image_url}" width="100%">
-    <h2>${data.name}</h2>
-    <div class="price">
-      ₹<span id="price">${data.price}</span>
-    </div>
-    Stock: ${data.quantity}
-    <br><br>
-    <button onclick="changeQty(-1)">-</button>
-    <span id="qty">1</span>
-    <button onclick="changeQty(1)">+</button>
-    <button class="btn" onclick="addCart()">Add to Cart</button>
-    <button class="btn" onclick="showHome()" style="background:#333">Back</button>
-  `;
+  if (data) {
+    document.getElementById("nameInput").value = data.name || "";
+    document.getElementById("phoneInput").value = data.phone || "";
+  }
 }
 
-function changeQty(val) {
-  currentQty += val;
-
-  if (currentQty < 1) currentQty = 1;
-
-  if (currentQty > currentProduct.quantity) {
-    alert("Not enough stock");
-    currentQty = currentProduct.quantity;
-  }
-
-  document.getElementById("qty").innerText = currentQty;
-  document.getElementById("price").innerText =
-    currentProduct.price * currentQty;
-}
-
-/* =========================
-   ADD TO CART
-========================= */
-
-async function addCart() {
-
-  const { data: product } = await supabaseClient
-    .from("products")
-    .select("quantity")
-    .eq("id", currentProduct.id)
-    .single();
-
-  if (currentQty > product.quantity) {
-    alert("Stock not available");
-    return;
-  }
-
-  const { data: cartItem } = await supabaseClient
-    .from("cart")
-    .select("*")
-    .eq("user_email", user.email)
-    .eq("product_id", currentProduct.id)
-    .single();
-
-  if (cartItem) {
-    await supabaseClient
-      .from("cart")
-      .update({ qty: cartItem.qty + currentQty })
-      .eq("id", cartItem.id);
-  } else {
-    await supabaseClient
-      .from("cart")
-      .insert({
-        user_email: user.email,
-        product_id: currentProduct.id,
-        qty: currentQty
-      });
-  }
-
-  alert("Added to cart");
-}
-
-/* =========================
-   SHOW CART
-========================= */
+/* ============================= */
+/* CART */
+/* ============================= */
 
 async function showCart() {
-
   hideAll();
-  cart.style.display = "block";
+  document.getElementById("cart").style.display = "block";
 
   const { data, error } = await supabaseClient
     .from("cart")
     .select(`
       id,
       qty,
-      products(id,name,price)
+      products(id,name,price,quantity)
     `)
     .eq("user_email", user.email);
 
@@ -181,20 +79,21 @@ async function showCart() {
   cartData = data;
   let subtotal = 0;
 
-  cartItems.innerHTML = "";
+  const cartItemsDiv = document.getElementById("cartItems");
+  cartItemsDiv.innerHTML = "";
 
   data.forEach(item => {
-
     let price = item.products.price * item.qty;
     subtotal += price;
 
-    cartItems.innerHTML += `
+    cartItemsDiv.innerHTML += `
       <div class="cart-item">
         <span>${item.products.name} x ${item.qty}</span>
         <div>
-          <span>₹${price}</span>
+          ₹${price}
           <button onclick="removeCart('${item.id}')" 
-          style="margin-left:10px;background:red;border:none;color:white;padding:5px;">X</button>
+          style="margin-left:10px;background:red;border:none;color:white;padding:5px;">
+          X</button>
         </div>
       </div>
     `;
@@ -204,22 +103,11 @@ async function showCart() {
   loadAddressDropdown();
 }
 
-async function removeCart(id) {
-  await supabaseClient.from("cart").delete().eq("id", id);
-  showCart();
-}
-
-/* =========================
-   TOTAL CALCULATION
-========================= */
-
 function calculateTotals(subtotal) {
 
   let delivery = subtotal < 500 ? 50 : subtotal * 0.05;
   let gst = subtotal * 0.05;
-
-  let grandTotal =
-    subtotal + delivery + gst - discountAmount;
+  let grandTotal = subtotal + delivery + gst - discountAmount;
 
   document.getElementById("subtotal").innerText = subtotal.toFixed(2);
   document.getElementById("delivery").innerText = delivery.toFixed(2);
@@ -228,39 +116,109 @@ function calculateTotals(subtotal) {
   document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
 }
 
-/* =========================
-   COUPON
-========================= */
+async function removeCart(id) {
+  await supabaseClient.from("cart").delete().eq("id", id);
+  showCart();
+}
+
+/* ============================= */
+/* COUPON */
+/* ============================= */
 
 async function applyCoupon() {
 
-  const code =
-    document.getElementById("couponInput").value.trim();
+  const code = document.getElementById("couponInput").value.trim();
 
   if (!code) {
     alert("Enter coupon");
     return;
   }
 
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("coupons")
     .select("*")
     .eq("code", code)
-    .single();
+    .maybeSingle();  // FIXED
 
-  if (!data) {
+  if (error || !data) {
     alert("Invalid coupon");
     return;
   }
 
+  if (data.usage_limit && data.used_count >= data.usage_limit) {
+    alert("Coupon limit reached");
+    return;
+  }
+
   discountAmount = data.discount;
+
+  await supabaseClient
+    .from("coupons")
+    .update({ used_count: data.used_count + 1 })
+    .eq("code", code);
+
   alert("Coupon applied");
   showCart();
 }
 
-/* =========================
-   ADDRESS
-========================= */
+/* ============================= */
+/* PLACE ORDER */
+/* ============================= */
+
+async function placeOrder() {
+
+  if (cartData.length === 0) {
+    alert("Cart empty");
+    return;
+  }
+
+  const orderId = "ORD-" + Date.now();
+  let subtotal = 0;
+
+  for (const item of cartData) {
+
+    if (item.qty > item.products.quantity) {
+      alert("Stock not available for " + item.products.name);
+      return;
+    }
+
+    let itemTotal = item.qty * item.products.price;
+    subtotal += itemTotal;
+
+    await supabaseClient.from("order_items").insert({
+      order_id: orderId,
+      product_id: item.products.id,
+      qty: item.qty,
+      price: itemTotal
+    });
+
+    await supabaseClient
+      .from("products")
+      .update({
+        quantity: item.products.quantity - item.qty
+      })
+      .eq("id", item.products.id);
+  }
+
+  await supabaseClient.from("orders").insert({
+    id: orderId,
+    user_email: user.email,
+    price: subtotal - discountAmount,
+    status: "Placed"
+  });
+
+  await supabaseClient.from("cart")
+    .delete()
+    .eq("user_email", user.email);
+
+  alert("Order placed successfully\nOrder ID: " + orderId);
+  discountAmount = 0;
+  showCart();
+}
+
+/* ============================= */
+/* ADDRESS */
+/* ============================= */
 
 async function loadAddressDropdown() {
 
@@ -269,16 +227,20 @@ async function loadAddressDropdown() {
     .select("*")
     .eq("user_email", user.email);
 
-  addressSelect.innerHTML = "";
+  const select = document.getElementById("addressSelect");
+  select.innerHTML = "";
 
   data.forEach(a => {
-    addressSelect.innerHTML +=
-      `<option value="${a.address}">${a.address}</option>`;
+    select.innerHTML += `
+      <option value="${a.address}">
+        ${a.address}
+      </option>
+    `;
   });
 }
 
-/* =========================
-   START
-========================= */
+/* ============================= */
+/* START */
+/* ============================= */
 
-showHome();
+showCart();
