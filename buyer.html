@@ -40,13 +40,14 @@ position:sticky;
 top:0;
 }
 
-.search{
+.search,input{
 flex:1;
 padding:10px;
 border-radius:8px;
 border:none;
 background:#222;
 color:white;
+margin-top:5px;
 }
 
 select{
@@ -129,20 +130,6 @@ border-radius:8px;
 display:flex;
 justify-content:space-between;
 }
-
-.qty-box{
-display:flex;
-gap:10px;
-margin:10px 0;
-}
-
-.qty-btn{
-background:#333;
-border:none;
-color:white;
-padding:5px 10px;
-cursor:pointer;
-}
 </style>
 </head>
 
@@ -155,7 +142,7 @@ cursor:pointer;
 </div>
 
 <div id="filterSection" class="filter-bar">
-<input id="search" class="search" placeholder="Search flowers" oninput="searchProducts()">
+<input id="search" placeholder="Search flowers" oninput="searchProducts()">
 <select onchange="applyFilter(this.value)">
 <option value="new">Newest</option>
 <option value="low">Low → High</option>
@@ -176,13 +163,22 @@ cursor:pointer;
 <input type="file" onchange="uploadAvatar(event)">
 </center>
 
+<input id="nameInput" placeholder="Enter your name">
+<input id="phoneInput" placeholder="Enter phone number">
+
+<button class="btn" onclick="saveProfile()">
+Save Profile
+</button>
+
 <div id="profileInfo"></div>
 
 <h3>Delivery Address</h3>
 
-<input id="addressInput" class="search" placeholder="Enter address">
+<input id="addressInput" placeholder="Enter address">
 
-<button class="btn" onclick="saveAddress()">Save Location</button>
+<button class="btn" onclick="saveAddress()">
+Save Location
+</button>
 
 <div id="addressList"></div>
 
@@ -213,9 +209,7 @@ Place Order
 <div class="bottom">
 
 <div onclick="showHome()">Home</div>
-
 <div onclick="showProfile()">Profile</div>
-
 <div onclick="showCart()">Cart</div>
 
 </div>
@@ -234,7 +228,6 @@ let user = JSON.parse(localStorage.getItem("user"));
 if(!user){
 
 alert("Login required");
-
 location="index.html";
 
 }
@@ -246,11 +239,11 @@ let currentQty=1;
 
 function hideAll(){
 
-document.getElementById("home").style.display="none";
-document.getElementById("detail").style.display="none";
-document.getElementById("profile").style.display="none";
-document.getElementById("cart").style.display="none";
-document.getElementById("filterSection").style.display="none";
+home.style.display="none";
+detail.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+filterSection.style.display="none";
 
 }
 
@@ -260,10 +253,11 @@ async function showHome(){
 
 hideAll();
 
-document.getElementById("home").style.display="grid";
-document.getElementById("filterSection").style.display="flex";
+home.style.display="grid";
+filterSection.style.display="flex";
 
-const {data} = await supabaseClient
+const {data} =
+await supabaseClient
 .from("products")
 .select("*");
 
@@ -273,14 +267,13 @@ renderProducts(data);
 
 function renderProducts(data){
 
-const home=document.getElementById("home");
-
 home.innerHTML="";
 
 data.forEach(p=>{
 
 home.innerHTML+=`
-<div class="card" onclick="showDetail('${p.id}')">
+<div class="card"
+onclick="showDetail('${p.id}')">
 
 <img src="${p.image_url}">
 
@@ -301,11 +294,10 @@ async function showDetail(id){
 
 hideAll();
 
-const detail=document.getElementById("detail");
-
 detail.style.display="block";
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("products")
 .select("*")
 .eq("id",id)
@@ -326,19 +318,22 @@ detail.innerHTML=`
 
 Stock: ${data.quantity}
 
-<div class="qty-box">
+<br><br>
 
-<button class="qty-btn" onclick="changeQty(-1)">-</button>
+<button onclick="changeQty(-1)">-</button>
 
 <span id="qty">1</span>
 
-<button class="qty-btn" onclick="changeQty(1)">+</button>
+<button onclick="changeQty(1)">+</button>
 
-</div>
+<button class="btn"
+onclick="addCart()">
+Add to Cart
+</button>
 
-<button class="btn" onclick="addCart()">Add to Cart</button>
-
-<button class="btn" onclick="showHome()" style="background:#333">
+<button class="btn"
+onclick="showHome()"
+style="background:#333">
 Back
 </button>
 
@@ -352,26 +347,49 @@ function changeQty(val){
 
 currentQty+=val;
 
-if(currentQty<1) currentQty=1;
+if(currentQty<1)
+currentQty=1;
 
-if(currentQty>currentProduct.quantity){
+if(currentQty>
+currentProduct.quantity){
 
 alert("Not enough stock");
 
-currentQty=currentProduct.quantity;
+currentQty=
+currentProduct.quantity;
 
 }
 
-document.getElementById("qty").innerText=currentQty;
+qty.innerText=currentQty;
 
-document.getElementById("price").innerText=
-currentProduct.price*currentQty;
+price.innerText=
+currentProduct.price*
+currentQty;
 
 }
 
-/* ADD CART */
+/* FIXED ADD CART */
 
 async function addCart(){
+
+const {data} =
+await supabaseClient
+.from("cart")
+.select("*")
+.eq("user_email",user.email)
+.eq("product_id",currentProduct.id)
+.single();
+
+if(data){
+
+await supabaseClient
+.from("cart")
+.update({
+qty:data.qty+currentQty
+})
+.eq("id",data.id);
+
+}else{
 
 await supabaseClient
 .from("cart")
@@ -383,65 +401,76 @@ qty:currentQty
 
 });
 
+}
+
 alert("Added to cart");
 
 }
 
-/* SHOW CART */
+/* FIXED SHOW CART */
 
 async function showCart(){
 
 hideAll();
 
-document.getElementById("cart").style.display="block";
+cart.style.display="block";
 
-const {data}=await supabaseClient
+const {data,error} =
+await supabaseClient
 .from("cart")
 .select(`
+id,
 qty,
-products(name,price)
+products(
+id,
+name,
+price
+)
 `)
 .eq("user_email",user.email);
 
-const cartItems=document.getElementById("cartItems");
+if(error){
 
-cartItems.innerHTML="";
+alert(error.message);
+return;
+
+}
 
 let total=0;
 
-if(!data || data.length==0){
+cartItems.innerHTML="";
+
+if(!data.length){
 
 cartItems.innerHTML="Cart empty";
-
 return;
 
 }
 
 data.forEach(item=>{
 
-const price=item.products.price*item.qty;
+let price=
+item.products.price*
+item.qty;
 
 total+=price;
 
 cartItems.innerHTML+=`
-
 <div class="cart-item">
-
 <span>
-${item.products.name} x ${item.qty}
+${item.products.name}
+x ${item.qty}
 </span>
 
 <span>
 ₹${price}
 </span>
-
 </div>
-
 `;
 
 });
 
-document.getElementById("total").innerText="Total ₹"+total;
+total.innerText="Total ₹"+total;
 
 }
 
@@ -449,21 +478,14 @@ document.getElementById("total").innerText="Total ₹"+total;
 
 async function placeOrder(){
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("cart")
 .select(`
 qty,
 products(name,price)
 `)
 .eq("user_email",user.email);
-
-if(!data || data.length==0){
-
-alert("Cart empty");
-
-return;
-
-}
 
 for(const item of data){
 
@@ -472,11 +494,9 @@ await supabaseClient
 .insert({
 
 user_email:user.email,
-
 flower_name:item.products.name,
-
-price:item.products.price*item.qty,
-
+price:item.products.price*
+item.qty,
 status:"Placed"
 
 });
@@ -494,15 +514,42 @@ showProfile();
 
 }
 
-/* PROFILE */
+/* SAVE PROFILE */
+
+async function saveProfile(){
+
+const name=
+nameInput.value;
+
+const phone=
+phoneInput.value;
+
+await supabaseClient
+.from("users")
+.upsert({
+
+email:user.email,
+name:name,
+phone:phone
+
+});
+
+alert("Profile saved");
+
+showProfile();
+
+}
+
+/* SHOW PROFILE */
 
 async function showProfile(){
 
 hideAll();
 
-document.getElementById("profile").style.display="block";
+profile.style.display="block";
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("users")
 .select("*")
 .eq("email",user.email)
@@ -510,50 +557,20 @@ const {data}=await supabaseClient
 
 if(data){
 
-if(data.avatar_url)
-document.getElementById("avatar").src=data.avatar_url;
+nameInput.value=data.name||"";
+phoneInput.value=data.phone||"";
 
-document.getElementById("profileInfo").innerHTML=
-
-"Name: "+(data.name||"")+"<br>"+
-"Phone: "+(data.phone||"");
+profileInfo.innerHTML=
+`
+Name: ${data.name||""}
+<br>
+Phone: ${data.phone||""}
+`;
 
 }
 
 loadOrders();
-
 loadAddresses();
-
-}
-
-/* ORDERS */
-
-async function loadOrders(){
-
-const {data}=await supabaseClient
-.from("orders")
-.select("*")
-.eq("user_email",user.email);
-
-const div=document.getElementById("ordersList");
-
-div.innerHTML="";
-
-data.forEach(o=>{
-
-div.innerHTML+=`
-
-<div class="cart-item">
-
-<span>${o.flower_name}</span>
-
-<span>₹${o.price}</span>
-
-</div>
-
-`;
-
-});
 
 }
 
@@ -561,17 +578,21 @@ div.innerHTML+=`
 
 async function saveAddress(){
 
-navigator.geolocation.getCurrentPosition(async(pos)=>{
+navigator.geolocation
+.getCurrentPosition(async(pos)=>{
 
-let gps=pos.coords.latitude+","+pos.coords.longitude;
+let gps=
+pos.coords.latitude+
+","+pos.coords.longitude;
 
-let addr=document.getElementById("addressInput").value;
-
-await supabaseClient.from("addresses").insert({
+await supabaseClient
+.from("addresses")
+.insert({
 
 user_email:user.email,
-
-address:addr+" GPS:"+gps
+address:
+addressInput.value+
+" GPS:"+gps
 
 });
 
@@ -583,44 +604,50 @@ loadAddresses();
 
 async function loadAddresses(){
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("addresses")
 .select("*")
 .eq("user_email",user.email);
 
-const div=document.getElementById("addressList");
-
-div.innerHTML="";
+addressList.innerHTML="";
 
 data.forEach(a=>{
 
-div.innerHTML+="<div>"+a.address+"</div>";
+addressList.innerHTML+=
+"<div>"+a.address+"</div>";
 
 });
 
 }
 
-/* AVATAR */
+/* ORDERS */
 
-async function uploadAvatar(e){
+async function loadOrders(){
 
-const file=e.target.files[0];
+const {data} =
+await supabaseClient
+.from("orders")
+.select("*")
+.eq("user_email",user.email);
 
-const name=user.email+".png";
+ordersList.innerHTML="";
 
-await supabaseClient.storage
-.from("avatars")
-.upload(name,file,{upsert:true});
+data.forEach(o=>{
 
-const url=
-"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+name;
+ordersList.innerHTML+=`
+<div class="cart-item">
 
-document.getElementById("avatar").src=url;
+<span>
+${o.flower_name}
+</span>
 
-await supabaseClient.from("users").upsert({
+<span>
+₹${o.price}
+</span>
 
-email:user.email,
-avatar_url:url
+</div>
+`;
 
 });
 
@@ -636,30 +663,40 @@ location="index.html";
 
 }
 
-/* FILTER + SEARCH */
+/* SEARCH */
 
-async function applyFilter(type){
+async function searchProducts(){
 
-let query=supabaseClient.from("products").select("*");
-
-if(type=="low") query=query.order("price",{ascending:true});
-if(type=="high") query=query.order("price",{ascending:false});
-if(type=="new") query=query.order("created_at",{ascending:false});
-
-const {data}=await query;
+const {data} =
+await supabaseClient
+.from("products")
+.select("*")
+.ilike("name",
+"%"+search.value+"%");
 
 renderProducts(data);
 
 }
 
-async function searchProducts(){
+/* FILTER */
 
-let text=document.getElementById("search").value;
+async function applyFilter(type){
 
-const {data}=await supabaseClient
+let query=
+supabaseClient
 .from("products")
-.select("*")
-.ilike("name","%"+text+"%");
+.select("*");
+
+if(type=="low")
+query=query.order("price",{ascending:true});
+
+if(type=="high")
+query=query.order("price",{ascending:false});
+
+if(type=="new")
+query=query.order("created_at",{ascending:false});
+
+const {data}=await query;
 
 renderProducts(data);
 
