@@ -172,13 +172,15 @@ border-radius:50%;
 <div id="profile" class="section">
 
  <span class="menu" onclick="toggleProfileMenu()">⋮</span>
-        <h2>My Profile</h2>
-        <center>
-            <img id="avatar" class="avatar" src="default-avatar.png">
-            <br><br>
-            <input type="file" onchange="uploadAvatar(event)">
-        </center>
-        <div id="profileInfo"></div>
+         <h2>My Profile</h2>
+    <center>
+        <img id="avatar" class="avatar" src="https://ui-avatars.com/api/?name=Buyer&background=random">
+        <input type="file" accept="image/*" onchange="uploadAvatar(event)">
+    </center>
+
+    <input id="name" placeholder="Name">
+    <input id="phone" placeholder="Phone">
+    <button class="btn" onclick="saveProfile()">Save Profile</button>
         
         <h3>Delivery Address</h3>
         <input id="addressInput" class="search" placeholder="Enter delivery address" style="margin-bottom:10px;">
