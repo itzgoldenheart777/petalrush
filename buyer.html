@@ -21,6 +21,7 @@ font-family:system-ui;
 max-width:500px;
 margin:auto;
 min-height:100vh;
+padding-bottom:70px;
 }
 
 .header{
@@ -92,7 +93,6 @@ margin-top:10px;
 .section{
 display:none;
 padding:10px;
-padding-bottom:80px;
 }
 
 </style>
@@ -103,35 +103,29 @@ padding-bottom:80px;
 
 <div class="container">
 
-<!-- HEADER -->
-
 <div class="header">
 
 <img src="logoHeader.png" class="logo">
 
 <input id="search"
 class="search"
-placeholder="Search flowers">
+placeholder="Search flowers"
+oninput="showHome()">
 
 </div>
 
-<!-- HOME -->
-
 <div id="home" class="products"></div>
 
-<!-- DETAIL -->
-
 <div id="detail" class="section"></div>
-
-<!-- PROFILE -->
 
 <div id="profile" class="section">
 
 <img id="avatar"
-src="default-avatar.png"
+src="logoHeader.png"
 width="100">
 
-<input type="file" onchange="uploadAvatar(event)">
+<input type="file"
+onchange="uploadAvatar(event)">
 
 <input id="name"
 placeholder="Name">
@@ -146,21 +140,11 @@ Save Profile
 
 </div>
 
-<!-- CART -->
-
 <div id="cart" class="section">
 
 <h3>Cart</h3>
 
 <div id="cartItems"></div>
-
-<input id="coupon"
-placeholder="Coupon">
-
-<button class="btn"
-onclick="applyCoupon()">
-Apply Coupon
-</button>
 
 <h3 id="total">Total ₹0</h3>
 
@@ -170,8 +154,6 @@ Place Order
 </button>
 
 </div>
-
-<!-- BOTTOM -->
 
 <div class="bottom">
 
@@ -187,14 +169,25 @@ Place Order
 
 <script>
 
-const supabase = window.supabase.createClient(
+const client = window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user =
+JSON.parse(localStorage.getItem("user"));
 
-if(!user) location="index.html";
+if(!user)
+location="index.html";
+
+function hideAll(){
+
+document.getElementById("home").style.display="none";
+document.getElementById("detail").style.display="none";
+document.getElementById("profile").style.display="none";
+document.getElementById("cart").style.display="none";
+
+}
 
 /* HOME */
 
@@ -202,23 +195,35 @@ async function showHome(){
 
 hideAll();
 
+const home =
+document.getElementById("home");
+
 home.style.display="grid";
 
+const search =
+document.getElementById("search").value.toLowerCase();
+
 const {data} =
-await supabase
-.from("products")
-.select("*");
+await client.from("products").select("*");
 
 home.innerHTML="";
 
 data.forEach(p=>{
+
+if(!p.name.toLowerCase().includes(search))
+return;
+
+const img =
+(p.images && p.images.length)
+? p.images[0]
+: "logoHeader.png";
 
 home.innerHTML+=`
 
 <div class="card"
 onclick="showDetail('${p.id}')">
 
-<img src="${p.images[0]}">
+<img src="${img}">
 
 ${p.name}
 
@@ -240,18 +245,26 @@ async function showDetail(id){
 
 hideAll();
 
+const detail =
+document.getElementById("detail");
+
 detail.style.display="block";
 
-const {data}=
-await supabase
+const {data} =
+await client
 .from("products")
 .select("*")
 .eq("id",id)
 .single();
 
+const img =
+(data.images && data.images.length)
+? data.images[0]
+: "logoHeader.png";
+
 detail.innerHTML=`
 
-<img src="${data.images[0]}" width="100%">
+<img src="${img}" width="100%">
 
 <h2>${data.name}</h2>
 
@@ -274,15 +287,21 @@ async function showCart(){
 
 hideAll();
 
+const cart =
+document.getElementById("cart");
+
 cart.style.display="block";
 
 const {data} =
-await supabase
+await client
 .from("cart")
 .select("*,products(*)")
 .eq("email",user.email);
 
 let total=0;
+
+const cartItems =
+document.getElementById("cartItems");
 
 cartItems.innerHTML="";
 
@@ -301,7 +320,8 @@ ${c.products.name}
 
 });
 
-totalEl.innerText="Total ₹"+total;
+document.getElementById("total").innerText =
+"Total ₹"+total;
 
 }
 
@@ -309,22 +329,14 @@ totalEl.innerText="Total ₹"+total;
 
 async function addCart(id){
 
-await supabase
+await client
 .from("cart")
 .insert({
 email:user.email,
 product_id:id
 });
 
-alert("Added");
-
-}
-
-/* ORDER */
-
-async function placeOrder(){
-
-alert("Order placed");
+alert("Added to cart");
 
 }
 
@@ -334,18 +346,26 @@ function showProfile(){
 
 hideAll();
 
-profile.style.display="block";
+document.getElementById("profile")
+.style.display="block";
 
 }
 
+/* SAVE PROFILE */
+
 async function saveProfile(){
 
-await supabase
+await client
 .from("users")
 .upsert({
+
 email:user.email,
-name:name.value,
-phone:phone.value
+name:
+document.getElementById("name").value,
+
+phone:
+document.getElementById("phone").value
+
 });
 
 alert("Saved");
@@ -358,25 +378,26 @@ async function uploadAvatar(e){
 
 const file=e.target.files[0];
 
-await supabase.storage
+await client.storage
 .from("avatars")
 .upload(user.email,file,{upsert:true});
 
-avatar.src=
-"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
+document.getElementById("avatar").src=
+
+"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"
++user.email;
 
 }
 
-/* UTIL */
+/* ORDER */
 
-function hideAll(){
+function placeOrder(){
 
-home.style.display="none";
-detail.style.display="none";
-profile.style.display="none";
-cart.style.display="none";
+alert("Order placed");
 
 }
+
+/* START */
 
 showHome();
 
