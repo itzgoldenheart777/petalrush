@@ -4,68 +4,30 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>PetalRush Buyer</title>
+<title>PetalRush</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
-/* ================= GLOBAL ================= */
-
-:root{
---primary:#ff4081;
---bg:#0f1115;
---card:#171a21;
---text:#ffffff;
---muted:#999;
-}
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
 body{
+margin:0;
+background:#0f1115;
+color:white;
 font-family:system-ui;
-background:var(--bg);
-color:var(--text);
 }
-
-/* ================= CONTAINER ================= */
 
 .container{
 max-width:500px;
 margin:auto;
 min-height:100vh;
-background:var(--bg);
-position:relative;
 }
-
-/* Desktop mode */
-
-@media(min-width:700px){
-
-.container{
-margin-top:20px;
-margin-bottom:20px;
-border-radius:16px;
-box-shadow:0 0 40px rgba(0,0,0,0.5);
-}
-
-}
-
-/* ================= HEADER ================= */
 
 .header{
 display:flex;
-align-items:center;
 gap:10px;
-padding:12px;
+padding:10px;
 background:#111;
-position:sticky;
-top:0;
-z-index:10;
 }
 
 .logo{
@@ -74,174 +36,63 @@ height:40px;
 
 .search{
 flex:1;
-}
-
-.search input{
-width:100%;
 padding:10px;
-border-radius:10px;
-border:none;
-background:#222;
-color:white;
-}
-
-/* ================= FILTER ================= */
-
-.filter{
-display:flex;
-gap:8px;
-padding:10px;
-}
-
-.filter select{
-flex:1;
-padding:8px;
 border-radius:8px;
+border:none;
 background:#222;
 color:white;
-border:none;
 }
-
-/* ================= PRODUCTS ================= */
 
 .products{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:12px;
-padding:12px;
-padding-bottom:90px;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
 }
 
 .card{
-background:var(--card);
-border-radius:12px;
+background:#171a21;
 padding:10px;
+border-radius:10px;
 cursor:pointer;
 }
 
 .card img{
 width:100%;
-height:130px;
+height:120px;
 object-fit:cover;
-border-radius:10px;
-}
-
-.card h3{
-font-size:15px;
-margin-top:6px;
+border-radius:8px;
 }
 
 .price{
-color:var(--primary);
-font-weight:bold;
+color:#ff4081;
 }
-
-/* ================= PROFILE ================= */
-
-.profile{
-display:none;
-padding:12px;
-padding-bottom:90px;
-}
-
-.avatar{
-width:100px;
-height:100px;
-border-radius:50%;
-object-fit:cover;
-margin:auto;
-display:block;
-}
-
-.input{
-width:100%;
-padding:10px;
-margin-top:8px;
-border-radius:8px;
-border:none;
-background:#222;
-color:white;
-}
-
-.btn{
-width:100%;
-padding:10px;
-margin-top:10px;
-border:none;
-border-radius:8px;
-background:var(--primary);
-color:white;
-cursor:pointer;
-}
-
-/* ================= ADDRESS ================= */
-
-.address{
-display:none;
-padding:12px;
-padding-bottom:90px;
-}
-
-.address-card{
-background:var(--card);
-padding:10px;
-border-radius:10px;
-margin-bottom:10px;
-}
-
-/* ================= CART ================= */
-
-.cart{
-display:none;
-padding:12px;
-padding-bottom:90px;
-}
-
-.cart-item{
-display:flex;
-gap:10px;
-margin-bottom:10px;
-background:var(--card);
-padding:10px;
-border-radius:10px;
-}
-
-/* ================= PRODUCT DETAIL ================= */
-
-.detail{
-display:none;
-padding:12px;
-padding-bottom:90px;
-}
-
-.detail img{
-width:100%;
-border-radius:12px;
-}
-
-.detail h2{
-margin-top:10px;
-}
-
-.detail .price{
-font-size:20px;
-}
-
-/* ================= BOTTOM NAV ================= */
 
 .bottom{
 position:fixed;
 bottom:0;
 width:100%;
 max-width:500px;
-background:#111;
 display:flex;
 justify-content:space-around;
-padding:12px;
+background:#111;
+padding:10px;
 }
 
-.nav{
-cursor:pointer;
+.btn{
+background:#ff4081;
+border:none;
+padding:10px;
+width:100%;
+border-radius:8px;
+color:white;
+margin-top:10px;
+}
+
+.section{
+display:none;
+padding:10px;
+padding-bottom:80px;
 }
 
 </style>
@@ -258,21 +109,9 @@ cursor:pointer;
 
 <img src="logoHeader.png" class="logo">
 
-<div class="search">
-<input id="searchInput" placeholder="Search flowers">
-</div>
-
-</div>
-
-<!-- FILTER -->
-
-<div class="filter">
-
-<select id="priceFilter">
-<option value="">Sort Price</option>
-<option value="low">Low to High</option>
-<option value="high">High to Low</option>
-</select>
+<input id="search"
+class="search"
+placeholder="Search flowers">
 
 </div>
 
@@ -280,82 +119,73 @@ cursor:pointer;
 
 <div id="home" class="products"></div>
 
-<!-- PRODUCT DETAIL -->
+<!-- DETAIL -->
 
-<div id="detail" class="detail"></div>
+<div id="detail" class="section"></div>
 
 <!-- PROFILE -->
 
-<div id="profile" class="profile">
+<div id="profile" class="section">
 
-<img id="avatar" class="avatar"
-src="https://via.placeholder.com/100">
+<img id="avatar"
+src="https://via.placeholder.com/100"
+width="100">
 
 <input type="file" onchange="uploadAvatar(event)">
 
-<input id="nameInput" class="input" placeholder="Name">
+<input id="name"
+placeholder="Name">
 
-<input id="phoneInput" class="input" placeholder="Phone">
+<input id="phone"
+placeholder="Phone">
 
-<button class="btn" onclick="saveProfile()">
+<button class="btn"
+onclick="saveProfile()">
 Save Profile
-</button>
-
-<br><br>
-
-<div onclick="openAddress()">My Address</div>
-<div onclick="openOrders()">My Orders</div>
-<div onclick="openHelp()">Help & Support</div>
-<div onclick="logout()">Logout</div>
-
-</div>
-
-<!-- ADDRESS -->
-
-<div id="address" class="address">
-
-<h3>My Address</h3>
-
-<div id="addressList"></div>
-
-<input id="addressInput" class="input"
-placeholder="Enter address">
-
-<button class="btn" onclick="saveAddress()">
-Save Address
 </button>
 
 </div>
 
 <!-- CART -->
 
-<div id="cart" class="cart">
+<div id="cart" class="section">
 
 <h3>Cart</h3>
 
-<div id="cartList"></div>
+<div id="cartItems"></div>
 
-<button class="btn" onclick="placeOrder()">
+<input id="coupon"
+placeholder="Coupon">
+
+<button class="btn"
+onclick="applyCoupon()">
+Apply Coupon
+</button>
+
+<h3 id="total">Total ₹0</h3>
+
+<button class="btn"
+onclick="placeOrder()">
 Place Order
 </button>
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM -->
 
 <div class="bottom">
 
-<div class="nav" onclick="showHome()">Home</div>
-<div class="nav" onclick="showProfile()">Profile</div>
-<div class="nav" onclick="showCart()">Cart</div>
+<div onclick="showHome()">Home</div>
+
+<div onclick="showProfile()">Profile</div>
+
+<div onclick="showCart()">Cart</div>
 
 </div>
 
 </div>
 
 <script>
-
-/* ================= SUPABASE ================= */
 
 const supabase = window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
@@ -366,43 +196,35 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 if(!user) location="index.html";
 
-/* ================= LOAD PRODUCTS ================= */
+/* HOME */
 
-async function loadProducts(){
+async function showHome(){
 
-let query = supabase.from("products").select("*");
+hideAll();
 
-const search=document.getElementById("searchInput").value;
+home.style.display="grid";
 
-if(search)
-query=query.ilike("name","%"+search+"%");
+const {data} =
+await supabase
+.from("products")
+.select("*");
 
-const filter=document.getElementById("priceFilter").value;
-
-if(filter=="low")
-query=query.order("price",{ascending:true});
-
-if(filter=="high")
-query=query.order("price",{ascending:false});
-
-const {data}=await query;
-
-const div=document.getElementById("home");
-
-div.innerHTML="";
+home.innerHTML="";
 
 data.forEach(p=>{
 
-div.innerHTML+=`
+home.innerHTML+=`
 
 <div class="card"
-onclick="openDetail('${p.id}')">
+onclick="showDetail('${p.id}')">
 
-<img src="${p.image_url}">
+<img src="${p.images[0]}">
 
-<h3>${p.name}</h3>
+${p.name}
 
-<div class="price">₹${p.price}</div>
+<div class="price">
+₹${p.price}
+</div>
 
 </div>
 
@@ -412,17 +234,16 @@ onclick="openDetail('${p.id}')">
 
 }
 
-loadProducts();
+/* DETAIL */
 
-/* ================= PRODUCT DETAIL ================= */
-
-async function openDetail(id){
+async function showDetail(id){
 
 hideAll();
 
 detail.style.display="block";
 
-const {data}=await supabase
+const {data}=
+await supabase
 .from("products")
 .select("*")
 .eq("id",id)
@@ -430,36 +251,24 @@ const {data}=await supabase
 
 detail.innerHTML=`
 
-<img src="${data.image_url}">
+<img src="${data.images[0]}" width="100%">
 
 <h2>${data.name}</h2>
 
-<div class="price">₹${data.price}</div>
+₹${data.price}
 
-<p>${data.description||""}</p>
+<p>${data.description}</p>
 
 <button class="btn"
-onclick="addToCart('${data.id}')">
-Add to Cart
+onclick="addCart('${data.id}')">
+Add to cart
 </button>
 
 `;
 
 }
 
-/* ================= CART ================= */
-
-function addToCart(id){
-
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-
-cart.push(id);
-
-localStorage.setItem("cart",JSON.stringify(cart));
-
-alert("Added to cart");
-
-}
+/* CART */
 
 async function showCart(){
 
@@ -467,107 +276,59 @@ hideAll();
 
 cart.style.display="block";
 
-const ids=JSON.parse(localStorage.getItem("cart"))||[];
+const {data} =
+await supabase
+.from("cart")
+.select("*,products(*)")
+.eq("email",user.email);
 
-cartList.innerHTML="";
+let total=0;
 
-for(let id of ids){
+cartItems.innerHTML="";
 
-const {data}=await supabase
-.from("products")
-.select("*")
-.eq("id",id)
-.single();
+data.forEach(c=>{
 
-cartList.innerHTML+=`
+total+=c.products.price;
 
-<div class="cart-item">
-
-<img src="${data.image_url}"
-width="60">
+cartItems.innerHTML+=`
 
 <div>
-${data.name}
-<br>
-₹${data.price}
-</div>
-
+${c.products.name}
+₹${c.products.price}
 </div>
 
 `;
 
-}
-
-}
-
-/* ================= PROFILE ================= */
-
-async function saveProfile(){
-
-await supabase
-.from("users")
-.update({
-name:nameInput.value,
-phone:phoneInput.value
-})
-.eq("email",user.email);
-
-alert("Saved");
-
-}
-
-/* ================= AVATAR ================= */
-
-async function uploadAvatar(e){
-
-const file=e.target.files[0];
-
-await supabase.storage
-.from("avatars")
-.upload(user.email,file,{upsert:true});
-
-const url=
-"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
-
-avatar.src=url;
-
-}
-
-/* ================= ADDRESS ================= */
-
-async function saveAddress(){
-
-await supabase.from("address")
-.insert({
-email:user.email,
-address:addressInput.value
 });
 
-alert("Saved");
+totalEl.innerText="Total ₹"+total;
 
 }
 
-/* ================= NAV ================= */
+/* ADD CART */
 
-function hideAll(){
+async function addCart(id){
 
-home.style.display="none";
-profile.style.display="none";
-cart.style.display="none";
-detail.style.display="none";
-address.style.display="none";
+await supabase
+.from("cart")
+.insert({
+email:user.email,
+product_id:id
+});
+
+alert("Added");
+
+}
+
+/* ORDER */
+
+async function placeOrder(){
+
+alert("Order placed");
 
 }
 
-function showHome(){
-
-hideAll();
-
-home.style.display="grid";
-
-loadProducts();
-
-}
+/* PROFILE */
 
 function showProfile(){
 
@@ -577,26 +338,47 @@ profile.style.display="block";
 
 }
 
-function openAddress(){
+async function saveProfile(){
 
-hideAll();
+await supabase
+.from("users")
+.upsert({
+email:user.email,
+name:name.value,
+phone:phone.value
+});
 
-address.style.display="block";
-
-}
-
-function logout(){
-
-localStorage.removeItem("user");
-
-location="index.html";
+alert("Saved");
 
 }
 
-/* ================= SEARCH ================= */
+/* AVATAR */
 
-searchInput.oninput=loadProducts;
-priceFilter.onchange=loadProducts;
+async function uploadAvatar(e){
+
+const file=e.target.files[0];
+
+await supabase.storage
+.from("avatars")
+.upload(user.email,file,{upsert:true});
+
+avatar.src=
+"https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
+
+}
+
+/* UTIL */
+
+function hideAll(){
+
+home.style.display="none";
+detail.style.display="none";
+profile.style.display="none";
+cart.style.display="none";
+
+}
+
+showHome();
 
 </script>
 
