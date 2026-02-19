@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,6 +36,8 @@ padding:10px;
 background:#111;
 display:flex;
 gap:10px;
+position:sticky;
+top:0;
 }
 
 .search,input{
@@ -45,6 +47,15 @@ border-radius:8px;
 border:none;
 background:#222;
 color:white;
+margin-top:5px;
+}
+
+select{
+padding:10px;
+background:#222;
+color:white;
+border:none;
+border-radius:8px;
 }
 
 .products{
@@ -131,24 +142,76 @@ justify-content:space-between;
 </div>
 
 <div id="filterSection" class="filter-bar">
-<input id="search" placeholder="Search" oninput="searchProducts()">
+<input id="search" placeholder="Search flowers" oninput="searchProducts()">
+<select onchange="applyFilter(this.value)">
+<option value="new">Newest</option>
+<option value="low">Low → High</option>
+<option value="high">High → Low</option>
+</select>
 </div>
 
 <div id="home" class="products"></div>
+
 <div id="detail" class="section"></div>
-<div id="profile" class="section"></div>
+
+<div id="profile" class="section">
+
+<h2>My Profile</h2>
+
+<center>
+<img id="avatar" class="avatar" src="default-avatar.png">
+<input type="file" onchange="uploadAvatar(event)">
+</center>
+
+<input id="nameInput" placeholder="Enter your name">
+<input id="phoneInput" placeholder="Enter phone number">
+
+<button class="btn" onclick="saveProfile()">
+Save Profile
+</button>
+
+<div id="profileInfo"></div>
+
+<h3>Delivery Address</h3>
+
+<input id="addressInput" placeholder="Enter address">
+
+<button class="btn" onclick="saveAddress()">
+Save Location
+</button>
+
+<div id="addressList"></div>
+
+<h3>My Orders</h3>
+
+<div id="ordersList"></div>
+
+<button class="btn" onclick="logout()" style="background:#333">
+Logout
+</button>
+
+</div>
 
 <div id="cart" class="section">
+
 <h2>Cart</h2>
+
 <div id="cartItems"></div>
+
 <h3 id="total">Total ₹0</h3>
-<button class="btn" onclick="placeOrder()">Place Order</button>
+
+<button class="btn" onclick="placeOrder()">
+Place Order
+</button>
+
 </div>
 
 <div class="bottom">
+
 <div onclick="showHome()">Home</div>
 <div onclick="showProfile()">Profile</div>
 <div onclick="showCart()">Cart</div>
+
 </div>
 
 </div>
@@ -162,15 +225,26 @@ const supabaseClient = window.supabase.createClient(
 
 let user = JSON.parse(localStorage.getItem("user"));
 
+if(!user){
+
+alert("Login required");
+location="index.html";
+
+}
+
 let currentProduct=null;
 let currentQty=1;
 
+/* UTIL */
+
 function hideAll(){
+
 home.style.display="none";
 detail.style.display="none";
 profile.style.display="none";
 cart.style.display="none";
 filterSection.style.display="none";
+
 }
 
 /* HOME */
@@ -182,9 +256,16 @@ hideAll();
 home.style.display="grid";
 filterSection.style.display="flex";
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("products")
 .select("*");
+
+renderProducts(data);
+
+}
+
+function renderProducts(data){
 
 home.innerHTML="";
 
@@ -195,13 +276,16 @@ home.innerHTML+=`
 onclick="showDetail('${p.id}')">
 
 <img src="${p.image_url}">
+
 <div>${p.name}</div>
+
 <div class="price">₹${p.price}</div>
 
 </div>
 `;
 
 });
+
 }
 
 /* DETAIL */
@@ -212,7 +296,8 @@ hideAll();
 
 detail.style.display="block";
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("products")
 .select("*")
 .eq("id",id)
@@ -236,38 +321,64 @@ Stock: ${data.quantity}
 <br><br>
 
 <button onclick="changeQty(-1)">-</button>
+
 <span id="qty">1</span>
+
 <button onclick="changeQty(1)">+</button>
 
-<button class="btn" onclick="addCart()">Add to Cart</button>
-<button class="btn" onclick="showHome()" style="background:#333">Back</button>
+<button class="btn"
+onclick="addCart()">
+Add to Cart
+</button>
+
+<button class="btn"
+onclick="showHome()"
+style="background:#333">
+Back
+</button>
 
 `;
 
 }
 
+/* QTY */
+
 function changeQty(val){
 
 currentQty+=val;
 
-if(currentQty<1) currentQty=1;
-if(currentQty>currentProduct.quantity) currentQty=currentProduct.quantity;
+if(currentQty<1)
+currentQty=1;
 
-qty.innerText=currentQty;
-price.innerText=currentProduct.price*currentQty;
+if(currentQty>
+currentProduct.quantity){
+
+alert("Not enough stock");
+
+currentQty=
+currentProduct.quantity;
 
 }
 
-/* FIXED CART ADD */
+qty.innerText=currentQty;
+
+price.innerText=
+currentProduct.price*
+currentQty;
+
+}
+
+/* FIXED ADD CART */
 
 async function addCart(){
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("cart")
 .select("*")
 .eq("user_email",user.email)
 .eq("product_id",currentProduct.id)
-.maybeSingle();
+.single();
 
 if(data){
 
@@ -283,9 +394,11 @@ qty:data.qty+currentQty
 await supabaseClient
 .from("cart")
 .insert({
+
 user_email:user.email,
 product_id:currentProduct.id,
 qty:currentQty
+
 });
 
 }
@@ -294,7 +407,7 @@ alert("Added to cart");
 
 }
 
-/* SHOW CART */
+/* FIXED SHOW CART */
 
 async function showCart(){
 
@@ -302,12 +415,14 @@ hideAll();
 
 cart.style.display="block";
 
-const {data,error}=await supabaseClient
+const {data,error} =
+await supabaseClient
 .from("cart")
 .select(`
 id,
 qty,
-products (
+products(
+id,
 name,
 price
 )
@@ -321,27 +436,41 @@ return;
 
 }
 
+let total=0;
+
 cartItems.innerHTML="";
 
-let totalPrice=0;
+if(!data.length){
+
+cartItems.innerHTML="Cart empty";
+return;
+
+}
 
 data.forEach(item=>{
 
-let price=item.products.price*item.qty;
-totalPrice+=price;
+let price=
+item.products.price*
+item.qty;
+
+total+=price;
 
 cartItems.innerHTML+=`
-
 <div class="cart-item">
-<span>${item.products.name} x ${item.qty}</span>
-<span>₹${price}</span>
-</div>
+<span>
+${item.products.name}
+x ${item.qty}
+</span>
 
+<span>
+₹${price}
+</span>
+</div>
 `;
 
 });
 
-document.getElementById("total").innerText="Total ₹"+totalPrice;
+total.innerText="Total ₹"+total;
 
 }
 
@@ -349,7 +478,8 @@ document.getElementById("total").innerText="Total ₹"+totalPrice;
 
 async function placeOrder(){
 
-const {data}=await supabaseClient
+const {data} =
+await supabaseClient
 .from("cart")
 .select(`
 qty,
@@ -365,7 +495,8 @@ await supabaseClient
 
 user_email:user.email,
 flower_name:item.products.name,
-price:item.products.price*item.qty,
+price:item.products.price*
+item.qty,
 status:"Placed"
 
 });
@@ -379,30 +510,141 @@ await supabaseClient
 
 alert("Order placed");
 
-showHome();
+showProfile();
 
 }
 
-/* SEARCH */
+/* SAVE PROFILE */
 
-async function searchProducts(){
+async function saveProfile(){
 
-const {data}=await supabaseClient
-.from("products")
+const name=
+nameInput.value;
+
+const phone=
+phoneInput.value;
+
+await supabaseClient
+.from("users")
+.upsert({
+
+email:user.email,
+name:name,
+phone:phone
+
+});
+
+alert("Profile saved");
+
+showProfile();
+
+}
+
+/* SHOW PROFILE */
+
+async function showProfile(){
+
+hideAll();
+
+profile.style.display="block";
+
+const {data} =
+await supabaseClient
+.from("users")
 .select("*")
-.ilike("name","%"+search.value+"%");
+.eq("email",user.email)
+.single();
 
-home.innerHTML="";
+if(data){
 
-data.forEach(p=>{
+nameInput.value=data.name||"";
+phoneInput.value=data.phone||"";
 
-home.innerHTML+=`
-<div class="card"
-onclick="showDetail('${p.id}')">
+profileInfo.innerHTML=
+`
+Name: ${data.name||""}
+<br>
+Phone: ${data.phone||""}
+`;
 
-<img src="${p.image_url}">
-<div>${p.name}</div>
-<div class="price">₹${p.price}</div>
+}
+
+loadOrders();
+loadAddresses();
+
+}
+
+/* ADDRESS */
+
+async function saveAddress(){
+
+navigator.geolocation
+.getCurrentPosition(async(pos)=>{
+
+let gps=
+pos.coords.latitude+
+","+pos.coords.longitude;
+
+await supabaseClient
+.from("addresses")
+.insert({
+
+user_email:user.email,
+address:
+addressInput.value+
+" GPS:"+gps
+
+});
+
+loadAddresses();
+
+});
+
+}
+
+async function loadAddresses(){
+
+const {data} =
+await supabaseClient
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+addressList.innerHTML="";
+
+data.forEach(a=>{
+
+addressList.innerHTML+=
+"<div>"+a.address+"</div>";
+
+});
+
+}
+
+/* ORDERS */
+
+async function loadOrders(){
+
+const {data} =
+await supabaseClient
+.from("orders")
+.select("*")
+.eq("user_email",user.email);
+
+ordersList.innerHTML="";
+
+data.forEach(o=>{
+
+ordersList.innerHTML+=`
+<div class="cart-item">
+
+<span>
+${o.flower_name}
+</span>
+
+<span>
+₹${o.price}
+</span>
 
 </div>
 `;
@@ -410,6 +652,57 @@ onclick="showDetail('${p.id}')">
 });
 
 }
+
+/* LOGOUT */
+
+function logout(){
+
+localStorage.removeItem("user");
+
+location="index.html";
+
+}
+
+/* SEARCH */
+
+async function searchProducts(){
+
+const {data} =
+await supabaseClient
+.from("products")
+.select("*")
+.ilike("name",
+"%"+search.value+"%");
+
+renderProducts(data);
+
+}
+
+/* FILTER */
+
+async function applyFilter(type){
+
+let query=
+supabaseClient
+.from("products")
+.select("*");
+
+if(type=="low")
+query=query.order("price",{ascending:true});
+
+if(type=="high")
+query=query.order("price",{ascending:false});
+
+if(type=="new")
+query=query.order("created_at",{ascending:false});
+
+const {data}=await query;
+
+renderProducts(data);
+
+}
+
+/* START */
 
 showHome();
 
