@@ -1,13 +1,19 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="js/buyer.js"></script>
 
 <style>
+
+/* =========================
+   GLOBAL
+========================= */
+
 body{
 margin:0;
 background:#0f1115;
@@ -19,8 +25,12 @@ font-family:system-ui;
 max-width:500px;
 margin:auto;
 min-height:100vh;
-padding-bottom:70px;
+padding-bottom:80px;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .header{
 background:#111;
@@ -32,6 +42,10 @@ text-align:center;
 height:50px;
 }
 
+/* =========================
+   FILTER BAR
+========================= */
+
 .filter-bar{
 padding:10px;
 background:#111;
@@ -39,25 +53,21 @@ display:flex;
 gap:10px;
 position:sticky;
 top:0;
+z-index:10;
 }
 
-.search,input{
+.search,input,select{
 flex:1;
 padding:10px;
 border-radius:8px;
 border:none;
 background:#222;
 color:white;
-margin-top:5px;
 }
 
-select{
-padding:10px;
-background:#222;
-color:white;
-border:none;
-border-radius:8px;
-}
+/* =========================
+   PRODUCTS GRID
+========================= */
 
 .products{
 display:grid;
@@ -71,6 +81,11 @@ background:#171a21;
 padding:10px;
 border-radius:12px;
 cursor:pointer;
+transition:.2s;
+}
+
+.card:hover{
+transform:scale(1.03);
 }
 
 .card img{
@@ -85,10 +100,18 @@ color:#ff4081;
 font-weight:bold;
 }
 
+/* =========================
+   SECTIONS
+========================= */
+
 .section{
 display:none;
 padding:12px;
 }
+
+/* =========================
+   BUTTONS
+========================= */
 
 .btn{
 background:#ff4081;
@@ -99,7 +122,53 @@ border-radius:8px;
 color:white;
 margin-top:10px;
 cursor:pointer;
+font-weight:bold;
 }
+
+.btn:hover{
+opacity:.9;
+}
+
+/* =========================
+   CART ITEMS
+========================= */
+
+.cart-item{
+background:#171a21;
+padding:12px;
+margin-top:10px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.avatar{
+width:100px;
+height:100px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+/* =========================
+   TOTAL BOX
+========================= */
+
+.total-box{
+margin-top:15px;
+background:#171a21;
+padding:15px;
+border-radius:10px;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
 
 .bottom{
 position:fixed;
@@ -108,6 +177,7 @@ width:100%;
 max-width:500px;
 display:flex;
 background:#111;
+border-top:1px solid #222;
 }
 
 .bottom div{
@@ -117,68 +187,79 @@ padding:15px;
 cursor:pointer;
 }
 
-.avatar{
-width:100px;
-height:100px;
-border-radius:50%;
+.bottom div:hover{
+background:#222;
 }
 
-.cart-item{
-background:#171a21;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-display:flex;
-justify-content:space-between;
-}
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
+<!-- HEADER -->
 <div class="header">
 <img src="Headerlogo.png" class="logo">
 </div>
 
+<!-- FILTER -->
 <div id="filterSection" class="filter-bar">
-<input id="search" placeholder="Search flowers" oninput="searchProducts()">
+
+<input id="search"
+placeholder="Search flowers"
+oninput="searchProducts()">
+
 <select onchange="applyFilter(this.value)">
 <option value="new">Newest</option>
-<option value="low">Low → High</option>
-<option value="high">High → Low</option>
+<option value="low">Price Low → High</option>
+<option value="high">Price High → Low</option>
 </select>
+
 </div>
 
+<!-- HOME -->
 <div id="home" class="products"></div>
 
+<!-- DETAIL -->
 <div id="detail" class="section"></div>
 
+<!-- PROFILE -->
 <div id="profile" class="section">
 
 <h2>My Profile</h2>
 
 <center>
-<img id="avatar" class="avatar" src="default-avatar.png">
-<input type="file" onchange="uploadAvatar(event)">
+<img id="avatar"
+class="avatar"
+src="default-avatar.png">
+
+<input type="file"
+onchange="uploadAvatar(event)">
 </center>
 
-<input id="nameInput" placeholder="Enter your name">
-<input id="phoneInput" placeholder="Enter phone number">
+<input id="nameInput"
+placeholder="Enter your name">
 
-<button class="btn" onclick="saveProfile()">
+<input id="phoneInput"
+placeholder="Enter phone">
+
+<button class="btn"
+onclick="saveProfile()">
 Save Profile
 </button>
 
 <div id="profileInfo"></div>
 
-<h3>Delivery Address</h3>
+<h3>Addresses</h3>
 
-<input id="addressInput" placeholder="Enter address">
+<input id="addressInput"
+placeholder="Enter address">
 
-<button class="btn" onclick="saveAddress()">
-Save Location
+<button class="btn"
+onclick="saveAddress()">
+Save Address
 </button>
 
 <div id="addressList"></div>
@@ -187,49 +268,61 @@ Save Location
 
 <div id="ordersList"></div>
 
-<button class="btn" onclick="logout()" style="background:#333">
+<button class="btn"
+style="background:#333"
+onclick="logout()">
 Logout
 </button>
 
 </div>
+
+<!-- CART -->
 <div id="cart" class="section">
 
 <h2>Cart</h2>
 
 <div id="cartItems"></div>
 
+<div class="total-box">
+
+<div>Subtotal: ₹<span id="subtotal">0</span></div>
+
+<div>Delivery: ₹<span id="delivery">0</span></div>
+
+<div>GST (5%): ₹<span id="gst">0</span></div>
+
+<div>Discount: ₹<span id="discount">0</span></div>
+
 <hr>
 
-<h3>Subtotal: ₹<span id="subtotal">0</span></h3>
+<h3>Total: ₹<span id="grandTotal">0</span></h3>
 
-<h3>Delivery: ₹<span id="delivery">0</span></h3>
+</div>
 
-<h3>GST (5%): ₹<span id="gst">0</span></h3>
+<select id="addressSelect"></select>
 
-<h3>Discount: ₹<span id="discount">0</span></h3>
+<input id="couponInput"
+placeholder="Coupon code">
 
-<hr>
+<button class="btn"
+onclick="applyCoupon()">
+Apply Coupon
+</button>
 
-<h2>Total: ₹<span id="grandTotal">0</span></h2>
-
-<select id="addressSelect" class="search"></select>
-
-<input id="couponInput" placeholder="Enter coupon code">
-
-<button class="btn" onclick="applyCoupon()">Apply Coupon</button>
-
-<button class="btn" onclick="placeOrder()">
+<button class="btn"
+onclick="placeOrder()">
 Place Order
 </button>
 
 </div>
 
-
-
+<!-- BOTTOM NAV -->
 <div class="bottom">
 
 <div onclick="showHome()">Home</div>
+
 <div onclick="showProfile()">Profile</div>
+
 <div onclick="showCart()">Cart</div>
 
 </div>
