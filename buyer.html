@@ -204,6 +204,7 @@ select{
     <div id="detail" class="section"></div>
 
     <div id="profile" class="section">
+        <span class="menu" onclick="toggleProfileMenu()">⋮</span>
         <h2>My Profile</h2>
         <center>
             <img id="avatar" class="avatar" src="default-avatar.png">
@@ -214,7 +215,7 @@ select{
         
         <h3>Delivery Address</h3>
         <input id="addressInput" class="search" placeholder="Enter delivery address" style="margin-bottom:10px;">
-        <button class="btn" onclick="saveAddress()">Save Address with</button>
+        <button class="btn" onclick="saveAddress()">Save Address with GPS</button>
         <div id="addressList" style="margin-top:10px;"></div>
 
         <h3>My Orders</h3>
@@ -370,103 +371,52 @@ function changeQty(v){
 }
 
 /* ADD CART */
+
 async function addCart(){
+    if(!user) { alert("Please login first"); return; }
 
-if(!user){
-alert("Please login first");
-return;
-}
+    await supabaseClient.from("cart").insert({
+        user_email: user.email,
+        product_id: currentProduct.id,
+        qty: currentQty
+    });
 
-const {error} =
-await supabaseClient
-.from("cart")
-.insert({
-user_email:user.email,
-product_id:currentProduct.id,
-qty:currentQty
-});
-
-if(error){
-alert(error.message);
-return;
-}
-
-alert("Added to cart");
-
+    alert("Added to cart");
+    showHome();
 }
 
 /* CART */
 
 async function showCart(){
+    hideAll();
+    cart.style.display="block";
 
-hideAll();
+    const {data} = await supabaseClient
+        .from("cart")
+        .select("qty,products(name,price)")
+        .eq("user_email", user.email);
 
-document.getElementById("cart").style.display="block";
+    let totalVal = 0;
+    cartItems.innerHTML = "";
 
-const {data,error} =
-await supabaseClient
-.from("cart")
-.select(`
-qty,
-product_id,
-products (
-name,
-price
-)
-`)
-.eq("user_email",user.email);
+    if(data && data.length > 0){
+        data.forEach(item=>{
+            if(item.products){
+                let price = item.products.price * item.qty;
+                totalVal += price;
+                cartItems.innerHTML += `
+                <div class="cart-item">
+                    <span>${item.products.name} (x${item.qty})</span>
+                    <span>₹${price}</span>
+                </div>`;
+            }
+        });
+    } else {
+        cartItems.innerHTML = "<p>Cart is empty</p>";
+    }
 
-const cartItems =
-document.getElementById("cartItems");
-
-cartItems.innerHTML="";
-
-let totalVal=0;
-
-if(error){
-console.log(error);
-return;
+    document.getElementById("total").innerText = "Total ₹" + totalVal;
 }
-
-if(!data || data.length===0){
-
-cartItems.innerHTML="<p>Cart is empty</p>";
-
-document.getElementById("total").innerText="Total ₹0";
-
-return;
-
-}
-
-data.forEach(item=>{
-
-if(!item.products) return;
-
-const price =
-item.products.price * item.qty;
-
-totalVal += price;
-
-cartItems.innerHTML += `
-<div class="cart-item">
-
-<span>
-${item.products.name} (x${item.qty})
-</span>
-
-<span>
-₹${price}
-</span>
-
-</div>
-`;
-
-});
-
-document.getElementById("total").innerText="Total ₹"+totalVal;
-
-}
-
 
 /* PROFILE */
 
@@ -541,57 +491,24 @@ async function loadAddresses(){
 }
 
 /* ORDERS */
-async function placeOrder(){
 
-const {data,error} =
-await supabaseClient
-.from("cart")
-.select(`
-qty,
-products (
-name,
-price
-)
-`)
-.eq("user_email",user.email);
+async function loadOrders(){
+    const {data} = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("user_email", user.email);
 
-if(error){
-alert(error.message);
-return;
-}
-
-if(!data || data.length===0){
-alert("Cart empty");
-return;
-}
-
-for(const item of data){
-
-await supabaseClient
-.from("orders")
-.insert({
-
-user_email:user.email,
-
-flower_name:item.products.name,
-
-price:item.products.price * item.qty,
-
-status:"Placed"
-
-});
-
-}
-
-await supabaseClient
-.from("cart")
-.delete()
-.eq("user_email",user.email);
-
-alert("Order placed successfully");
-
-showProfile();
-
+    ordersList.innerHTML = "";
+    if(data){
+        data.forEach(o=>{
+            ordersList.innerHTML += `
+            <div class="cart-item">
+                ${o.flower_name} <br> 
+                <span style="color:#aaa; font-size:12px">${o.status}</span>
+                <span>₹${o.price}</span>
+            </div>`;
+        });
+    }
 }
 
 /* AVATAR */
