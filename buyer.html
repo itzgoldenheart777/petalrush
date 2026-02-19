@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>PetalRush</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 body{
 margin:0;
 background:#0f1115;
@@ -28,6 +25,9 @@ display:flex;
 gap:10px;
 padding:12px;
 background:#111;
+position:sticky;
+top:0;
+z-index:10;
 }
 
 .logo{
@@ -48,19 +48,19 @@ display:grid;
 grid-template-columns:repeat(2,1fr);
 gap:12px;
 padding:12px;
-padding-bottom:80px;
+padding-bottom:90px;
 }
 
 .card{
 background:#171a21;
 padding:10px;
-border-radius:10px;
+border-radius:12px;
 cursor:pointer;
 }
 
 .card img{
 width:100%;
-height:120px;
+height:130px;
 object-fit:cover;
 border-radius:8px;
 }
@@ -72,27 +72,7 @@ color:#ff4081;
 .section{
 display:none;
 padding:12px;
-padding-bottom:80px;
-}
-
-.btn{
-background:#ff4081;
-border:none;
-padding:12px;
-width:100%;
-border-radius:8px;
-color:white;
-margin-top:10px;
-}
-
-.input{
-width:100%;
-padding:10px;
-margin-top:10px;
-background:#222;
-border:none;
-color:white;
-border-radius:8px;
+padding-bottom:90px;
 }
 
 .bottom{
@@ -106,25 +86,27 @@ background:#111;
 padding:12px;
 }
 
-.menu{
-margin-top:20px;
-}
-
-.menu div{
-padding:12px;
-border-bottom:1px solid #333;
+.btn{
+background:#ff4081;
+border:none;
+padding:10px;
+width:100%;
+border-radius:8px;
+color:white;
+margin-top:10px;
 cursor:pointer;
 }
 
-.avatar{
-width:100px;
-height:100px;
-border-radius:50%;
-object-fit:cover;
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+border:none;
+background:#222;
+color:white;
 }
-
 </style>
-
 </head>
 
 <body>
@@ -132,78 +114,50 @@ object-fit:cover;
 <div class="container">
 
 <!-- HEADER -->
-
 <div class="header">
 <img src="logoHeader.png" class="logo">
 <input id="search" class="search" placeholder="Search flowers">
 </div>
 
 <!-- HOME -->
-
 <div id="home" class="products"></div>
 
 <!-- DETAIL -->
-
 <div id="detail" class="section"></div>
 
 <!-- PROFILE -->
-
 <div id="profile" class="section">
+<h3>My Profile</h3>
 
-<img id="avatar" class="avatar" src="default-avatar.png">
+<img id="avatar" src="default-avatar.png" width="100">
 
 <input type="file" onchange="uploadAvatar(event)">
 
-<input id="name" class="input" placeholder="Name">
-
-<input id="phone" class="input" placeholder="Phone">
-
-<input id="address" class="input" placeholder="Address">
-
-<button class="btn" onclick="getGPS()">Use GPS</button>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
 
 <button class="btn" onclick="saveProfile()">Save Profile</button>
 
-<div class="menu">
+<h3>My Address</h3>
+<input id="addressInput" placeholder="Enter address">
+<button class="btn" onclick="saveAddress()">Save Address</button>
 
-<div onclick="showOrders()">My Orders</div>
-
-<div onclick="openHelp()">Help & Support</div>
-
-<div onclick="logout()">Logout</div>
-
-</div>
-
+<button class="btn" onclick="logout()">Logout</button>
 </div>
 
 <!-- CART -->
-
 <div id="cart" class="section">
-
 <h3>Cart</h3>
-
 <div id="cartItems"></div>
-
 <h3 id="total">Total ₹0</h3>
-
 <button class="btn" onclick="placeOrder()">Place Order</button>
-
 </div>
 
-<!-- ORDERS -->
-
-<div id="orders" class="section"></div>
-
-<!-- BOTTOM -->
-
+<!-- NAV -->
 <div class="bottom">
-
 <div onclick="showHome()">Home</div>
-
 <div onclick="showProfile()">Profile</div>
-
 <div onclick="showCart()">Cart</div>
-
 </div>
 
 </div>
@@ -216,229 +170,152 @@ const supabase = window.supabase.createClient(
 );
 
 const user = JSON.parse(localStorage.getItem("user"));
-
 if(!user) location="index.html";
 
-/* UTIL */
-
-function hideAll(){
-
-home.style.display="none";
-detail.style.display="none";
-profile.style.display="none";
-cart.style.display="none";
-orders.style.display="none";
-
-}
-
-/* HOME */
+/* ---------------- HOME ---------------- */
 
 async function showHome(){
-
 hideAll();
+document.getElementById("home").style.display="grid";
 
-home.style.display="grid";
+const {data} = await supabase
+.from("products")
+.select("*");
 
-const {data}=await supabase.from("products").select("*");
-
+const home = document.getElementById("home");
 home.innerHTML="";
 
+if(!data) return;
+
 data.forEach(p=>{
-
 home.innerHTML+=`
-
 <div class="card" onclick="showDetail('${p.id}')">
-
-<img src="${p.images?.[0] || 'default-avatar.png'}">
-
+<img src="${p.image_url}">
 ${p.name}
-
 <div class="price">₹${p.price}</div>
-
 </div>
-
 `;
-
 });
-
 }
 
-/* DETAIL */
+/* ---------------- DETAIL ---------------- */
 
 async function showDetail(id){
-
 hideAll();
+document.getElementById("detail").style.display="block";
 
-detail.style.display="block";
+const {data} = await supabase
+.from("products")
+.select("*")
+.eq("id",id)
+.single();
 
-const {data}=await supabase.from("products").select("*").eq("id",id).single();
-
-detail.innerHTML=`
-
-<img src="${data.images?.[0]}" width="100%">
-
+document.getElementById("detail").innerHTML=`
+<img src="${data.image_url}" width="100%">
 <h2>${data.name}</h2>
-
 ₹${data.price}
-
-<p>${data.description}</p>
-
-<button class="btn" onclick="addCart('${data.id}')">Add to cart</button>
-
+<p>${data.description || ""}</p>
+<button class="btn" onclick="addCart('${data.id}')">Add to Cart</button>
 `;
-
 }
 
-/* ADD CART */
+/* ---------------- CART ---------------- */
 
 async function addCart(id){
-
 await supabase.from("cart").insert({
-email:user.email,
-product_id:id
+user_email:user.email,
+product_id:id,
+qty:1
 });
-
 alert("Added to cart");
-
 }
-
-/* CART */
 
 async function showCart(){
-
 hideAll();
+document.getElementById("cart").style.display="block";
 
-cart.style.display="block";
-
-const {data}=await supabase
+const {data} = await supabase
 .from("cart")
 .select("*,products(*)")
-.eq("email",user.email);
+.eq("user_email",user.email);
 
+const cartDiv = document.getElementById("cartItems");
+cartDiv.innerHTML="";
 let total=0;
 
-cartItems.innerHTML="";
+if(!data) return;
 
-data?.forEach(c=>{
+data.forEach(item=>{
+total += item.products.price * item.qty;
 
-total+=c.products.price;
-
-cartItems.innerHTML+=`
+cartDiv.innerHTML+=`
 <div>
-${c.products.name} ₹${c.products.price}
+${item.products.name} x ${item.qty}
+₹${item.products.price}
 </div>
 `;
-
 });
 
-total.innerText="Total ₹"+total;
-
+document.getElementById("total").innerText="Total ₹"+total;
 }
 
-/* PROFILE */
+/* ---------------- PROFILE ---------------- */
 
 function showProfile(){
-
 hideAll();
-
-profile.style.display="block";
-
+document.getElementById("profile").style.display="block";
 }
-
-/* SAVE PROFILE */
 
 async function saveProfile(){
-
 await supabase.from("users").upsert({
 email:user.email,
-name:name.value,
-phone:phone.value,
-address:address.value
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value
 });
-
-alert("Saved");
-
+alert("Profile saved");
 }
 
-/* GPS */
-
-function getGPS(){
-
-navigator.geolocation.getCurrentPosition(pos=>{
-
-address.value=
-`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-
+async function saveAddress(){
+await supabase.from("addresses").insert({
+user_email:user.email,
+address:document.getElementById("addressInput").value
 });
-
+alert("Address saved");
 }
-
-/* AVATAR */
 
 async function uploadAvatar(e){
-
 const file=e.target.files[0];
 
-await supabase.storage.from("avatars").upload(user.email,file,{upsert:true});
+await supabase.storage
+.from("avatars")
+.upload(user.email,file,{upsert:true});
 
-avatar.src=
+document.getElementById("avatar").src=
 "https://lssjsgfppehhclxqulso.supabase.co/storage/v1/object/public/avatars/"+user.email;
-
 }
 
-/* ORDERS */
-
-async function showOrders(){
-
-hideAll();
-
-orders.style.display="block";
-
-const {data}=await supabase.from("orders").select("*").eq("email",user.email);
-
-orders.innerHTML="<h3>My Orders</h3>";
-
-data?.forEach(o=>{
-
-orders.innerHTML+=`
-<div>
-Order ₹${o.total}
-</div>
-`;
-
-});
-
-}
-
-/* ORDER */
+/* ---------------- ORDER ---------------- */
 
 async function placeOrder(){
-
-alert("Order placed");
-
+alert("Order placed (Next step: implement order_items)");
 }
 
-/* HELP */
+/* ---------------- UTIL ---------------- */
 
-function openHelp(){
-
-location="mailto:support@petalrush.com";
-
+function hideAll(){
+document.getElementById("home").style.display="none";
+document.getElementById("detail").style.display="none";
+document.getElementById("profile").style.display="none";
+document.getElementById("cart").style.display="none";
 }
-
-/* LOGOUT */
 
 function logout(){
-
 localStorage.removeItem("user");
-
 location="index.html";
-
 }
 
 showHome();
 
 </script>
-
 </body>
 </html>
