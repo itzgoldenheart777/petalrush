@@ -2,120 +2,140 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>PetalRush Buyer</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-body{
-margin:0;
-background:#0f1115;
-color:white;
-font-family:system-ui;
+body {
+    margin:0;
+    background:#0f1115;
+    color:white;
+    font-family:system-ui;
 }
 
-.container{
-max-width:500px;
-margin:auto;
-min-height:100vh;
+.container {
+    max-width:500px;
+    margin:auto;
+    min-height:100vh;
 }
 
-.header{
-display:flex;
-gap:10px;
-padding:12px;
-background:#111;
-position:sticky;
-top:0;
-z-index:10;
+.header {
+    display:flex;
+    gap:10px;
+    padding:12px;
+    background:#111;
+    position:sticky;
+    top:0;
+    z-index:10;
+    align-items: center;
 }
 
-.logo{
-height:40px;
+.logo {
+    height:40px;
 }
 
-.search{
-flex:1;
-padding:10px;
-border-radius:8px;
-border:none;
-background:#222;
-color:white;
+.search {
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:#222;
+    color:white;
 }
 
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:12px;
-padding:12px;
-padding-bottom:90px;
+.products {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    padding:12px;
+    padding-bottom:90px;
 }
 
-.card{
-background:#171a21;
-padding:10px;
-border-radius:12px;
-cursor:pointer;
+.card {
+    background:#171a21;
+    padding:10px;
+    border-radius:12px;
+    cursor:pointer;
 }
 
-.card img{
-width:100%;
-height:130px;
-object-fit:cover;
-border-radius:8px;
+.card img {
+    width:100%;
+    height:130px;
+    object-fit:cover;
+    border-radius:8px;
 }
 
-.price{
-color:#ff4081;
+.price {
+    color:#ff4081;
+    font-weight: bold;
+    margin-top: 5px;
 }
 
-.section{
-display:none;
-padding:12px;
-padding-bottom:90px;
+.section {
+    display:none;
+    padding:12px;
+    padding-bottom:90px;
 }
 
-.bottom{
-position:fixed;
-bottom:0;
-width:100%;
-max-width:500px;
-display:flex;
-justify-content:space-around;
-background:#111;
-padding:12px;
+.bottom {
+    position:fixed;
+    bottom:0;
+    width:100%;
+    max-width:500px;
+    display:flex;
+    justify-content:space-around;
+    background:#111;
+    padding:12px 0;
 }
 
-.btn{
-background:#ff4081;
-border:none;
-padding:12px;
-width:100%;
-border-radius:8px;
-color:white;
-margin-top:10px;
-cursor:pointer;
+.bottom div {
+    cursor: pointer;
+    padding: 10px;
+    flex: 1;
+    text-align: center;
 }
 
-input{
-width:100%;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-border:none;
-background:#222;
-color:white;
+.btn {
+    background:#ff4081;
+    border:none;
+    padding:12px;
+    width:100%;
+    border-radius:8px;
+    color:white;
+    margin-top:10px;
+    cursor:pointer;
+    font-weight: bold;
 }
 
-.avatar{
-width:100px;
-height:100px;
-border-radius:50%;
-object-fit:cover;
+input {
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:8px;
+    border:none;
+    background:#222;
+    color:white;
+    box-sizing: border-box;
 }
 
+.avatar {
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom: 10px;
+    border: 2px solid #ff4081;
+}
+
+.cart-item {
+    background: #171a21;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
 </style>
 </head>
 
@@ -123,581 +143,318 @@ object-fit:cover;
 
 <div class="container">
 
-<!-- HEADER -->
-
 <div class="header">
-
-<img src="logoHeader.png" class="logo">
-
-<input id="search" class="search" placeholder="Search flowers" oninput="searchProducts()">
-
+    <h3 style="margin:0; color:#ff4081;">PetalRush</h3>
+    <input id="search" class="search" placeholder="Search flowers" oninput="searchProducts()">
 </div>
-
-
-<!-- HOME -->
 
 <div id="home" class="products"></div>
 
-
-<!-- DETAIL -->
-
 <div id="detail" class="section"></div>
 
-
-<!-- PROFILE -->
-
 <div id="profile" class="section">
+    <h2>My Profile</h2>
+    <center>
+        <img id="avatar" class="avatar" src="https://ui-avatars.com/api/?name=Buyer&background=random">
+        <input type="file" accept="image/*" onchange="uploadAvatar(event)">
+    </center>
 
-<h2>My Profile</h2>
+    <input id="name" placeholder="Name">
+    <input id="phone" placeholder="Phone">
+    <button class="btn" onclick="saveProfile()">Save Profile</button>
 
-<img id="avatar" class="avatar" src="default-avatar.png">
+    <h3 style="margin-top: 30px;">My Address</h3>
+    <input id="addressInput" placeholder="Enter delivery address">
+    <button class="btn" onclick="saveAddress()">Save Address</button>
+    <div id="addressList" style="margin-top: 15px; color:#aaa;"></div>
 
-<input type="file" onchange="uploadAvatar(event)">
-
-<input id="name" placeholder="Name">
-
-<input id="phone" placeholder="Phone">
-
-<button class="btn" onclick="saveProfile()">Save Profile</button>
-
-
-<h3>My Address</h3>
-
-<input id="addressInput" placeholder="Enter address">
-
-<button class="btn" onclick="saveAddress()">Save Address</button>
-
-<div id="addressList"></div>
-
-
-<button class="btn" onclick="logout()">Logout</button>
-
+    <button class="btn" style="background:#444; margin-top: 30px;" onclick="logout()">Logout</button>
 </div>
-
-
-<!-- CART -->
 
 <div id="cart" class="section">
-
-<h2>Cart</h2>
-
-<div id="cartItems"></div>
-
-<h3 id="total">Total ₹0</h3>
-
-<button class="btn" onclick="placeOrder()">Place Order</button>
-
+    <h2>Cart</h2>
+    <div id="cartItems"></div>
+    <h3 id="total" style="text-align: right; color: #ff4081;">Total ₹0</h3>
+    <button class="btn" onclick="placeOrder()">Place Order</button>
 </div>
-
-
-<!-- NAV -->
 
 <div class="bottom">
-
-<div onclick="showHome()">Home</div>
-
-<div onclick="showProfile()">Profile</div>
-
-<div onclick="showCart()">Cart</div>
-
+    <div onclick="showHome()">Home</div>
+    <div onclick="showProfile()">Profile</div>
+    <div onclick="showCart()">Cart</div>
 </div>
 
-
 </div>
-
-
 
 <script>
+// 1. Rename variable to supabaseClient to prevent naming conflict with the CDN
+const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_URL="https://lssjsgfppehhclxqulso.supabase.co";
-
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
-
-
-const supabase = window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-
-const user = JSON.parse(localStorage.getItem("user"));
-
-if(!user){
-
-location="index.html";
-
+// 2. Safely handle user session
+let user = JSON.parse(localStorage.getItem("user"));
+if(!user) {
+    // For testing purposes, uncomment this to fake a user if needed:
+    // user = { email: "test@example.com" }; 
+    // localStorage.setItem("user", JSON.stringify(user));
+    
+    // Otherwise, redirect to login
+    window.location.href = "index.html";
 }
-
 
 /* ---------------- UTIL ---------------- */
-
-
-function hideAll(){
-
-document.getElementById("home").style.display="none";
-
-document.getElementById("detail").style.display="none";
-
-document.getElementById("profile").style.display="none";
-
-document.getElementById("cart").style.display="none";
-
+function hideAll() {
+    document.getElementById("home").style.display = "none";
+    document.getElementById("detail").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("cart").style.display = "none";
 }
-
 
 /* ---------------- HOME ---------------- */
+async function showHome() {
+    if(!user) return; // Prevent running if user isn't logged in
+    hideAll();
+    const home = document.getElementById("home");
+    home.style.display = "grid";
 
+    const { data, error } = await supabaseClient
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-async function showHome(){
+    if (error) {
+        console.error(error);
+        return;
+    }
 
-hideAll();
-
-const home=document.getElementById("home");
-
-home.style.display="grid";
-
-
-const {data,error}=await supabase
-
-.from("products")
-
-.select("*")
-
-.order("created_at",{ascending:false});
-
-
-if(error){
-
-console.log(error);
-
-return;
-
+    home.innerHTML = "";
+    data.forEach(p => {
+        home.innerHTML += `
+        <div class="card" onclick="showDetail('${p.id}')">
+            <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
+            <div style="margin-top:8px;">${p.name}</div>
+            <div class="price">₹${p.price}</div>
+        </div>
+        `;
+    });
 }
-
-
-home.innerHTML="";
-
-
-data.forEach(p=>{
-
-home.innerHTML+=`
-
-<div class="card" onclick="showDetail('${p.id}')">
-
-<img src="${p.image_url || 'default-avatar.png'}">
-
-<h3>${p.name}</h3>
-
-<div class="price">₹${p.price}</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-
 
 /* SEARCH */
+async function searchProducts() {
+    const text = document.getElementById("search").value;
 
+    const { data } = await supabaseClient
+        .from("products")
+        .select("*")
+        .ilike("name", "%" + text + "%");
 
-async function searchProducts(){
+    const home = document.getElementById("home");
+    home.innerHTML = "";
 
-const text=document.getElementById("search").value;
-
-
-const {data}=await supabase
-
-.from("products")
-
-.select("*")
-
-.ilike("name","%"+text+"%");
-
-
-const home=document.getElementById("home");
-
-home.innerHTML="";
-
-
-data.forEach(p=>{
-
-home.innerHTML+=`
-
-<div class="card" onclick="showDetail('${p.id}')">
-
-<img src="${p.image_url}">
-
-${p.name}
-
-<div class="price">₹${p.price}</div>
-
-</div>
-
-`;
-
-});
-
+    if(data) {
+        data.forEach(p => {
+            home.innerHTML += `
+            <div class="card" onclick="showDetail('${p.id}')">
+                <img src="${p.image_url || 'https://via.placeholder.com/150'}">
+                <div style="margin-top:8px;">${p.name}</div>
+                <div class="price">₹${p.price}</div>
+            </div>
+            `;
+        });
+    }
 }
-
-
 
 /* ---------------- DETAIL ---------------- */
+async function showDetail(id) {
+    hideAll();
+    const detail = document.getElementById("detail");
+    detail.style.display = "block";
 
+    const { data } = await supabaseClient
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-async function showDetail(id){
-
-hideAll();
-
-const detail=document.getElementById("detail");
-
-detail.style.display="block";
-
-
-const {data}=await supabase
-
-.from("products")
-
-.select("*")
-
-.eq("id",id)
-
-.single();
-
-
-detail.innerHTML=`
-
-<img src="${data.image_url}" width="100%">
-
-<h2>${data.name}</h2>
-
-<h3>₹${data.price}</h3>
-
-<p>${data.description || ""}</p>
-
-<button class="btn" onclick="addCart('${data.id}')">
-
-Add to Cart
-
-</button>
-
-`;
-
+    if(data) {
+        detail.innerHTML = `
+        <img src="${data.image_url || 'https://via.placeholder.com/400'}" width="100%" style="border-radius:12px;">
+        <h2 style="margin-bottom:5px;">${data.name}</h2>
+        <h3 class="price" style="margin-top:0;">₹${data.price}</h3>
+        <p style="line-height:1.5; color:#ccc;">${data.description || "No description provided."}</p>
+        <button class="btn" onclick="addCart('${data.id}')">Add to Cart</button>
+        `;
+    }
 }
-
-
 
 /* ---------------- CART ---------------- */
+async function addCart(product_id) {
+    const { error } = await supabaseClient
+        .from("cart")
+        .insert({
+            user_email: user.email,
+            product_id: product_id,
+            qty: 1
+        });
 
-
-async function addCart(product_id){
-
-const {error}=await supabase
-
-.from("cart")
-
-.insert({
-
-user_email:user.email,
-
-product_id:product_id,
-
-qty:1
-
-});
-
-
-if(error){
-
-alert(error.message);
-
-}else{
-
-alert("Added to cart");
-
+    if(error) alert(error.message);
+    else alert("Added to cart");
 }
 
+async function showCart() {
+    hideAll();
+    document.getElementById("cart").style.display = "block";
+
+    const { data, error } = await supabaseClient
+        .from("cart")
+        .select('qty, products(name, price)')
+        .eq("user_email", user.email);
+
+    const cartDiv = document.getElementById("cartItems");
+    cartDiv.innerHTML = "";
+    let total = 0;
+
+    if (data && data.length > 0) {
+        data.forEach(item => {
+            // Prevent crash if product was deleted
+            if(item.products) { 
+                total += item.products.price * item.qty;
+                cartDiv.innerHTML += `
+                <div class="cart-item">
+                    <div>
+                        <strong>${item.products.name}</strong><br>
+                        <small>Qty: ${item.qty}</small>
+                    </div>
+                    <div class="price">₹${item.products.price * item.qty}</div>
+                </div>
+                `;
+            }
+        });
+    } else {
+        cartDiv.innerHTML = "<p>Your cart is empty.</p>";
+    }
+
+    document.getElementById("total").innerText = "Total ₹" + total;
 }
-
-
-
-async function showCart(){
-
-hideAll();
-
-document.getElementById("cart").style.display="block";
-
-
-const {data,error}=await supabase
-
-.from("cart")
-
-.select(`
-
-qty,
-
-products(
-
-name,
-
-price,
-
-image_url
-
-)
-
-`)
-
-.eq("user_email",user.email);
-
-
-const cartDiv=document.getElementById("cartItems");
-
-cartDiv.innerHTML="";
-
-
-let total=0;
-
-
-if(data){
-
-data.forEach(item=>{
-
-total+=item.products.price * item.qty;
-
-
-cartDiv.innerHTML+=`
-
-<div>
-
-${item.products.name}
-
-₹${item.products.price}
-
-</div>
-
-`;
-
-});
-
-}
-
-
-document.getElementById("total").innerText="Total ₹"+total;
-
-}
-
-
 
 /* ---------------- PROFILE ---------------- */
+async function showProfile() {
+    hideAll();
+    document.getElementById("profile").style.display = "block";
 
+    const { data } = await supabaseClient
+        .from("users")
+        .select("*")
+        .eq("email", user.email)
+        .single();
 
-async function showProfile(){
+    if(data) {
+        document.getElementById("name").value = data.name || "";
+        document.getElementById("phone").value = data.phone || "";
+        if(data.avatar_url) {
+            document.getElementById("avatar").src = data.avatar_url;
+        }
+    }
 
-hideAll();
-
-document.getElementById("profile").style.display="block";
-
-
-const {data}=await supabase
-
-.from("users")
-
-.select("*")
-
-.eq("email",user.email)
-
-.single();
-
-
-if(data){
-
-document.getElementById("name").value=data.name || "";
-
-document.getElementById("phone").value=data.phone || "";
-
-if(data.avatar_url){
-
-document.getElementById("avatar").src=data.avatar_url;
-
+    loadAddresses();
 }
 
+async function saveProfile() {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+
+    const { error } = await supabaseClient
+        .from("users")
+        .upsert({
+            email: user.email,
+            name: name,
+            phone: phone
+        }, { onConflict: 'email' }); // Added onConflict to prevent DB errors
+
+    if(error) alert("Error saving profile: " + error.message);
+    else alert("Profile saved");
 }
-
-
-loadAddresses();
-
-}
-
-
-
-async function saveProfile(){
-
-const name=document.getElementById("name").value;
-
-const phone=document.getElementById("phone").value;
-
-
-await supabase
-
-.from("users")
-
-.upsert({
-
-email:user.email,
-
-name:name,
-
-phone:phone
-
-});
-
-
-alert("Profile saved");
-
-}
-
-
 
 /* ADDRESS */
+async function saveAddress() {
+    const address = document.getElementById("addressInput").value;
 
+    const { error } = await supabaseClient
+        .from("addresses")
+        .insert({
+            user_email: user.email,
+            address: address
+        });
 
-async function saveAddress(){
-
-const address=document.getElementById("addressInput").value;
-
-
-await supabase
-
-.from("addresses")
-
-.insert({
-
-user_email:user.email,
-
-address:address
-
-});
-
-
-alert("Address saved");
-
-loadAddresses();
-
+    if(error) alert("Error saving address");
+    else {
+        alert("Address saved");
+        document.getElementById("addressInput").value = "";
+        loadAddresses();
+    }
 }
 
+async function loadAddresses() {
+    const { data } = await supabaseClient
+        .from("addresses")
+        .select("*")
+        .eq("user_email", user.email);
 
+    const div = document.getElementById("addressList");
+    div.innerHTML = "";
 
-async function loadAddresses(){
-
-const {data}=await supabase
-
-.from("addresses")
-
-.select("*")
-
-.eq("user_email",user.email);
-
-
-const div=document.getElementById("addressList");
-
-div.innerHTML="";
-
-
-if(data){
-
-data.forEach(a=>{
-
-div.innerHTML+=`
-
-<div>${a.address}</div>
-
-`;
-
-});
-
+    if (data && data.length > 0) {
+        data.forEach(a => {
+            div.innerHTML += `<div style="padding:10px; background:#222; border-radius:8px; margin-bottom:8px;">${a.address}</div>`;
+        });
+    } else {
+        div.innerHTML = "No addresses saved yet.";
+    }
 }
-
-}
-
-
 
 /* AVATAR */
+async function uploadAvatar(e) {
+    const file = e.target.files[0];
+    if(!file) return;
 
+    // Added timestamp to prevent browser caching old images
+    const fileName = `${user.email}_${Date.now()}`; 
 
-async function uploadAvatar(e){
+    await supabaseClient.storage
+        .from("avatars")
+        .upload(fileName, file, { upsert: true });
 
-const file=e.target.files[0];
+    const url = SUPABASE_URL + "/storage/v1/object/public/avatars/" + fileName;
 
+    document.getElementById("avatar").src = url;
 
-await supabase.storage
-
-.from("avatars")
-
-.upload(user.email,file,{upsert:true});
-
-
-const url=
-
-SUPABASE_URL+
-
-"/storage/v1/object/public/avatars/"+user.email;
-
-
-document.getElementById("avatar").src=url;
-
-
-await supabase
-
-.from("users")
-
-.upsert({
-
-email:user.email,
-
-avatar_url:url
-
-});
-
+    await supabaseClient
+        .from("users")
+        .upsert({
+            email: user.email,
+            avatar_url: url
+        }, { onConflict: 'email' });
 }
-
-
 
 /* ORDER */
-
-
-function placeOrder(){
-
-alert("Order system ready (Next step implement orders)");
-
+function placeOrder() {
+    alert("Order system ready (Next step implement orders)");
 }
-
-
 
 /* LOGOUT */
-
-
-function logout(){
-
-localStorage.removeItem("user");
-
-location="index.html";
-
+function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
 }
 
-
-
-/* START */
-
-
-showHome();
-
-
+/* START APP */
+// Only start if user is logged in to avoid console errors
+if(user) {
+    showHome();
+}
 </script>
-
 
 </body>
 </html>
