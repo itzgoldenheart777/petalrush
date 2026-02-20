@@ -28,7 +28,9 @@ padding:15px;
 text-align:center;
 }
 
-.logo{height:50px;}
+.logo{
+height:50px;
+}
 
 .filter-bar{
 padding:10px;
@@ -67,7 +69,10 @@ object-fit:cover;
 border-radius:8px;
 }
 
-.section{display:none;padding:10px;}
+.section{
+display:none;
+padding:10px;
+}
 
 .btn{
 background:#ff4081;
@@ -82,16 +87,11 @@ cursor:pointer;
 
 .cart-item{
 background:#171a21;
-padding:12px;
+padding:10px;
 margin-top:10px;
-border-radius:10px;
-}
-
-.invoice{
-background:#171a21;
-padding:15px;
-margin-top:10px;
-border-radius:10px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
 }
 
 .bottom{
@@ -111,12 +111,12 @@ cursor:pointer;
 }
 
 .avatar{
-width:130px;
-height:130px;
+width:120px;
+height:120px;
 border-radius:50%;
-border:3px solid #ff4081;
 object-fit:cover;
 cursor:pointer;
+border:3px solid #ff4081;
 }
 
 </style>
@@ -131,51 +131,55 @@ cursor:pointer;
 </div>
 
 <div id="filterSection" class="filter-bar">
-<input id="search" placeholder="Search" oninput="searchProducts()">
+
+<input id="search" placeholder="Search"
+oninput="searchProducts()">
+
 <select onchange="applyFilter(this.value)">
 <option value="new">Newest</option>
 <option value="low">Low Price</option>
 <option value="high">High Price</option>
 </select>
+
 </div>
 
 <div id="home" class="products"></div>
 
 <div id="detail" class="section"></div>
 
-
 <!-- CART -->
+
 <div id="cart" class="section">
 
 <h2>Cart</h2>
 
 <div id="cartItems"></div>
 
-<div class="invoice">
+<br>
 
 Subtotal ₹<span id="subtotal">0</span><br>
 Delivery ₹<span id="delivery">0</span><br>
 GST ₹<span id="gst">0</span><br>
 Discount ₹<span id="discount">0</span><br>
 
-<hr>
-
-<b>Total ₹<span id="grandTotal">0</span></b>
-
-</div>
+<h3>Total ₹<span id="grandTotal">0</span></h3>
 
 <select id="addressSelect"></select>
 
-<input id="couponInput" placeholder="Enter coupon">
+<input id="couponInput" placeholder="Coupon">
 
-<button class="btn" onclick="applyCoupon()">Apply Coupon</button>
+<button class="btn" onclick="applyCoupon()">
+Apply Coupon
+</button>
 
-<button class="btn" onclick="placeOrder()">Place Order</button>
+<button class="btn" onclick="placeOrder()">
+Place Order
+</button>
 
 </div>
 
-
 <!-- PROFILE -->
+
 <div id="profile" class="section">
 
 <h2>Profile</h2>
@@ -185,25 +189,31 @@ Discount ₹<span id="discount">0</span><br>
 <img id="avatar"
 class="avatar"
 src="default-avatar.png"
-onclick="avatarFile.click()">
+onclick="avatarUpload.click()">
 
 <input type="file"
-id="avatarFile"
+id="avatarUpload"
 hidden
 onchange="uploadAvatar(event)">
 
 </center>
 
+<br>
+
 <input id="nameInput" placeholder="Name">
 <input id="phoneInput" placeholder="Phone">
 
-<button class="btn" onclick="saveProfile()">Save Profile</button>
+<button class="btn" onclick="saveProfile()">
+Save Profile
+</button>
 
 <h3>Addresses</h3>
 
 <input id="addressInput" placeholder="Address">
 
-<button class="btn" onclick="saveAddress()">Save Address</button>
+<button class="btn" onclick="saveAddress()">
+Save Address
+</button>
 
 <div id="addressList"></div>
 
@@ -211,29 +221,31 @@ onchange="uploadAvatar(event)">
 
 <div id="ordersList"></div>
 
-<button class="btn" onclick="logout()">Logout</button>
+<button class="btn" onclick="logout()">
+Logout
+</button>
 
 </div>
 
-
 <div class="bottom">
+
 <div onclick="showHome()">Home</div>
 <div onclick="showCart()">Cart</div>
 <div onclick="showProfile()">Profile</div>
-</div>
 
 </div>
 
+</div>
 
 <script>
 
-/* SUPABASE INIT */
+/* SUPABASE CONNECTION */
 
-const supabase = window.supabase.createClient(
+const supabaseClient =
+window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
-
 
 /* USER */
 
@@ -243,12 +255,11 @@ if(!user){
 location="index.html";
 }
 
+/* GLOBAL */
 
 let cartData=[];
 let discountAmount=0;
-let appliedCoupon=null;
 let currentProduct=null;
-
 
 /* NAV */
 
@@ -262,7 +273,6 @@ filterSection.style.display="none";
 
 }
 
-
 /* HOME */
 
 async function showHome(){
@@ -272,14 +282,15 @@ hideAll();
 home.style.display="grid";
 filterSection.style.display="flex";
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("products")
-.select("*");
+.select("*")
+.order("created_at",{ascending:false});
 
-renderProducts(data||[]);
+renderProducts(data);
 
 }
-
 
 function renderProducts(data){
 
@@ -288,10 +299,15 @@ home.innerHTML="";
 data.forEach(p=>{
 
 home.innerHTML+=`
-<div class="card" onclick="showDetail('${p.id}')">
+<div class="card"
+onclick="showDetail('${p.id}')">
+
 <img src="${p.image_url}">
+
 <div>${p.name}</div>
+
 ₹${p.price}
+
 </div>
 `;
 
@@ -299,6 +315,43 @@ home.innerHTML+=`
 
 }
 
+/* SEARCH */
+
+async function searchProducts(){
+
+const {data} =
+await supabaseClient
+.from("products")
+.select("*")
+.ilike("name","%"+search.value+"%");
+
+renderProducts(data);
+
+}
+
+/* FILTER */
+
+async function applyFilter(type){
+
+let query =
+supabaseClient
+.from("products")
+.select("*");
+
+if(type=="low")
+query=query.order("price",{ascending:true});
+
+if(type=="high")
+query=query.order("price",{ascending:false});
+
+if(type=="new")
+query=query.order("created_at",{ascending:false});
+
+const {data}=await query;
+
+renderProducts(data);
+
+}
 
 /* DETAIL */
 
@@ -308,7 +361,8 @@ hideAll();
 
 detail.style.display="block";
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("products")
 .select("*")
 .eq("id",id)
@@ -324,20 +378,22 @@ detail.innerHTML=`
 
 ₹${data.price}
 
-<button class="btn" onclick="addCart()">Add Cart</button>
+<button class="btn"
+onclick="addCart()">Add Cart</button>
 
-<button class="btn" onclick="showHome()">Back</button>
+<button class="btn"
+onclick="showHome()">Back</button>
 
 `;
 
 }
 
-
 /* ADD CART */
 
 async function addCart(){
 
-const {data:exist}=await supabase
+const {data:exist} =
+await supabaseClient
 .from("cart")
 .select("*")
 .eq("user_email",user.email)
@@ -346,15 +402,16 @@ const {data:exist}=await supabase
 
 if(exist){
 
-await supabase
+await supabaseClient
 .from("cart")
-.update({qty:exist.qty+1})
+.update({
+qty:exist.qty+1
+})
 .eq("id",exist.id);
 
-}
-else{
+}else{
 
-await supabase
+await supabaseClient
 .from("cart")
 .insert({
 user_email:user.email,
@@ -368,7 +425,6 @@ showCart();
 
 }
 
-
 /* SHOW CART */
 
 async function showCart(){
@@ -377,18 +433,23 @@ hideAll();
 
 cart.style.display="block";
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("cart")
-.select(`id,qty,product_id,products(name,price)`)
+.select(`
+id,
+qty,
+products(name,price)
+`)
 .eq("user_email",user.email);
 
-cartData=data||[];
+cartData=data;
 
 let sub=0;
 
 cartItems.innerHTML="";
 
-cartData.forEach(i=>{
+data.forEach(i=>{
 
 let price=i.qty*i.products.price;
 
@@ -396,9 +457,13 @@ sub+=price;
 
 cartItems.innerHTML+=`
 <div class="cart-item">
+
 ${i.products.name} x ${i.qty}
-<br>₹${price}
-<button onclick="removeCart('${i.id}')">Delete</button>
+
+₹${price}
+
+<button onclick="removeCart('${i.id}')">X</button>
+
 </div>
 `;
 
@@ -406,35 +471,36 @@ ${i.products.name} x ${i.qty}
 
 calculateTotals(sub);
 
+loadCoupons();
+
 loadAddresses();
 
 }
-
 
 /* TOTAL */
 
 function calculateTotals(sub){
 
-let delivery=sub===0?0:50;
+let del=sub===0?0:50;
 
 let gst=sub*0.05;
 
-let total=sub+delivery+gst-discountAmount;
+let total=sub+del+gst-discountAmount;
 
-subtotal.innerText=sub.toFixed(2);
-delivery.innerText=delivery.toFixed(2);
-gst.innerText=gst.toFixed(2);
-discount.innerText=discountAmount.toFixed(2);
-grandTotal.innerText=total.toFixed(2);
+document.getElementById("subtotal").innerText=sub;
+document.getElementById("delivery").innerText=del;
+document.getElementById("gst").innerText=gst;
+document.getElementById("discount").innerText=discountAmount;
+document.getElementById("grandTotal").innerText=total;
 
 }
 
-
-/* REMOVE */
+/* REMOVE CART */
 
 async function removeCart(id){
 
-await supabase.from("cart")
+await supabaseClient
+.from("cart")
 .delete()
 .eq("id",id);
 
@@ -442,35 +508,39 @@ showCart();
 
 }
 
+/* COUPONS */
 
-/* COUPON */
+async function loadCoupons(){
+
+const {data} =
+await supabaseClient
+.from("coupons")
+.select("*");
+
+couponInput.placeholder=
+"Available: "+
+data.map(c=>c.code).join(", ");
+
+}
 
 async function applyCoupon(){
 
-let code=couponInput.value.trim();
+const code=couponInput.value;
 
-if(!code){
-alert("Enter coupon");
-return;
-}
-
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("coupons")
 .select("*")
 .eq("code",code)
 .maybeSingle();
 
 if(!data){
+
 alert("Invalid coupon");
-return;
-}
 
-if(data.usage_limit && data.used_count>=data.usage_limit){
-alert("Coupon expired");
 return;
-}
 
-appliedCoupon=data;
+}
 
 discountAmount=data.discount;
 
@@ -478,71 +548,39 @@ showCart();
 
 }
 
-
 /* PLACE ORDER */
 
 async function placeOrder(){
 
 if(cartData.length===0){
+
 alert("Cart empty");
+
 return;
+
 }
 
 let orderId="ORD"+Date.now();
 
-let total=parseFloat(grandTotal.innerText);
-
-await supabase.from("orders").insert({
+await supabaseClient
+.from("orders")
+.insert({
 id:orderId,
 user_email:user.email,
-price:total,
+price:grandTotal.innerText,
 status:"Placed"
 });
 
-
-for(const item of cartData){
-
-await supabase.from("order_items").insert({
-
-order_id:orderId,
-product_id:item.product_id,
-qty:item.qty,
-price:item.products.price
-
-});
-
-}
-
-
-/* increase coupon usage */
-if(appliedCoupon){
-
-await supabase
-.from("coupons")
-.update({
-used_count:appliedCoupon.used_count+1
-})
-.eq("code",appliedCoupon.code);
-
-}
-
-
-/* clear cart */
-
-await supabase
+await supabaseClient
 .from("cart")
 .delete()
 .eq("user_email",user.email);
 
-
-alert("Order placed successfully");
-
-discountAmount=0;
+alert("Order placed");
 
 showProfile();
 
 }
-
 
 /* PROFILE */
 
@@ -554,16 +592,16 @@ profile.style.display="block";
 
 loadProfile();
 
-loadAddresses();
-
 loadOrders();
+
+loadAddresses();
 
 }
 
-
 async function loadProfile(){
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("users")
 .select("*")
 .eq("email",user.email)
@@ -579,25 +617,19 @@ avatar.src=data.avatar_url||"default-avatar.png";
 
 }
 
-
-/* SAVE PROFILE */
-
 async function saveProfile(){
 
-await supabase
+await supabaseClient
 .from("users")
 .upsert({
-
 email:user.email,
 name:nameInput.value,
 phone:phoneInput.value
-
 });
 
 alert("Saved");
 
 }
-
 
 /* AVATAR */
 
@@ -605,41 +637,45 @@ async function uploadAvatar(e){
 
 const file=e.target.files[0];
 
-if(!file)return;
+const fileName=user.email+Date.now();
 
-const fileName=user.email+"-"+Date.now();
-
-await supabase.storage
+await supabaseClient.storage
 .from("avatars")
-.upload(fileName,file,{upsert:true});
+.upload(fileName,file);
 
-const {data}=supabase.storage
+const {data} =
+supabaseClient.storage
 .from("avatars")
 .getPublicUrl(fileName);
 
 avatar.src=data.publicUrl;
 
-await supabase
+await supabaseClient
 .from("users")
-.update({avatar_url:data.publicUrl})
+.update({
+avatar_url:data.publicUrl
+})
 .eq("email",user.email);
 
 }
-
 
 /* ADDRESS */
 
 async function saveAddress(){
 
-navigator.geolocation.getCurrentPosition(async pos=>{
+navigator.geolocation.getCurrentPosition(
 
-let gps=pos.coords.latitude+","+pos.coords.longitude;
+async pos=>{
 
-await supabase.from("addresses").insert({
+let gps=
+pos.coords.latitude+
+","+pos.coords.longitude;
 
+await supabaseClient
+.from("addresses")
+.insert({
 user_email:user.email,
 address:addressInput.value+" GPS:"+gps
-
 });
 
 loadAddresses();
@@ -648,10 +684,10 @@ loadAddresses();
 
 }
 
-
 async function loadAddresses(){
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("addresses")
 .select("*")
 .eq("user_email",user.email);
@@ -659,12 +695,11 @@ const {data}=await supabase
 addressList.innerHTML="";
 addressSelect.innerHTML="";
 
-(data||[]).forEach(a=>{
+data.forEach(a=>{
 
 addressList.innerHTML+=`
 <div class="cart-item">
 ${a.address}
-<button onclick="deleteAddress('${a.id}')">Delete</button>
 </div>
 `;
 
@@ -676,46 +711,30 @@ addressSelect.innerHTML+=`
 
 }
 
-
-/* ORDERS + INVOICE */
+/* ORDERS */
 
 async function loadOrders(){
 
-const {data}=await supabase
+const {data} =
+await supabaseClient
 .from("orders")
 .select("*")
-.eq("user_email",user.email)
-.order("created_at",{ascending:false});
+.eq("user_email",user.email);
 
 ordersList.innerHTML="";
 
-for(const order of data||[]){
-
-const {data:items}=await supabase
-.from("order_items")
-.select(`qty,price,products(name)`)
-.eq("order_id",order.id);
+data.forEach(o=>{
 
 ordersList.innerHTML+=`
-<div class="invoice">
-
-<b>Order ID:</b> ${order.id}<br>
-<b>Total:</b> ₹${order.price}<br>
-
-<hr>
-
-${items.map(i=>`
-${i.products.name} x ${i.qty}
-₹${i.qty*i.price}
-`).join("<br>")}
-
+<div class="cart-item">
+${o.id}
+₹${o.price}
 </div>
 `;
 
-}
+});
 
 }
-
 
 /* LOGOUT */
 
@@ -726,7 +745,6 @@ localStorage.removeItem("user");
 location="index.html";
 
 }
-
 
 /* START */
 
