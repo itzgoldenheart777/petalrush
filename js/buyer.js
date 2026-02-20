@@ -2,433 +2,460 @@
    SUPABASE INIT
 ========================= */
 
-const supabaseClient = window.supabase.createClient(
-  "https://lssjsgfppehhclxqulso.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
-); 
+const SUPABASE_URL = "https://lssjsgfppehhclxqulso.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0";
 
-/* 
-const supabase = window.supabase.createClient(
- "https://lssjsgfppehhclxqulso.supabase.co",
- "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
-); 
-*/
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* =========================
+   USER CHECK
+========================= */
 
 let user = JSON.parse(localStorage.getItem("user"));
 
-if(!user){
-location="index.html";
+if (!user) {
+  alert("Login required");
+  location = "index.html";
 }
 
-/* NAVIGATION */
+/* =========================
+   GLOBALS
+========================= */
 
-function hideAll(){
-home.style.display="none";
-cart.style.display="none";
-profile.style.display="none";
-detail.style.display="none";
-filterSection.style.display="none";
-}
+let currentProduct = null;
+let currentQty = 1;
+let cartData = [];
+let discountAmount = 0;
 
-/* HOME */
+/* =========================
+   NAVIGATION
+========================= */
 
-async function showHome(){
+function hideAll() {
 
-hideAll();
-
-home.style.display="grid";
-filterSection.style.display="block";
-
-let {data} = await supabase
-.from("products")
-.select("*");
-
-home.innerHTML="";
-
-data.forEach(p=>{
-
-home.innerHTML+=`
-
-<div class="card" onclick="showDetail('${p.id}')">
-
-<img src="${p.image_url}">
-
-<div>${p.name}</div>
-
-<div class="price">₹${p.price}</div>
-
-</div>
-
-`;
-
-});
+  document.getElementById("home").style.display = "none";
+  document.getElementById("detail").style.display = "none";
+  document.getElementById("profile").style.display = "none";
+  document.getElementById("cart").style.display = "none";
+  document.getElementById("filterSection").style.display = "none";
 
 }
 
-/* DETAIL */
+/* =========================
+   HOME
+========================= */
 
-async function showDetail(id){
+async function showHome() {
 
-hideAll();
+  hideAll();
 
-detail.style.display="block";
+  document.getElementById("home").style.display = "grid";
+  document.getElementById("filterSection").style.display = "flex";
 
-let {data} = await supabase
-.from("products")
-.select("*")
-.eq("id",id)
-.single();
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-detail.innerHTML=`
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-<img src="${data.image_url}" width="100%">
-
-<h3>${data.name}</h3>
-
-<div>₹${data.price}</div>
-
-<button class="btn" onclick="addCart('${data.id}')">
-Add to Cart
-</button>
-
-<button class="btn" onclick="showHome()">Back</button>
-
-`;
-
+  renderProducts(data);
 }
 
-/* ADD CART */
+function renderProducts(products) {
 
-async function addCart(productId){
+  const home = document.getElementById("home");
 
-let {data} = await supabase
-.from("cart")
-.insert({
-user_email:user.email,
-product_id:productId,
-qty:1
-});
+  home.innerHTML = "";
 
-alert("Added to cart");
+  products.forEach(p => {
 
+    home.innerHTML += `
+      <div class="card" onclick="showDetail('${p.id}')">
+
+        <img src="${p.image_url}">
+
+        <div>${p.name}</div>
+
+        <div class="price">₹${p.price}</div>
+
+      </div>
+    `;
+  });
 }
 
-/* SHOW CART */
+/* =========================
+   SEARCH
+========================= */
 
-let discount=0;
+async function searchProducts() {
 
-async function showCart(){
+  const value = document.getElementById("search").value;
 
-hideAll();
+  const { data } = await supabaseClient
+    .from("products")
+    .select("*")
+    .ilike("name", `%${value}%`);
 
-cart.style.display="block";
-
-let {data} = await supabase
-.from("cart")
-.select(`
-id,
-qty,
-products(name,price,quantity,id)
-`)
-.eq("user_email",user.email);
-
-cartItems.innerHTML="";
-
-let subtotal=0;
-
-data.forEach(item=>{
-
-let price=item.products.price*item.qty;
-
-subtotal+=price;
-
-cartItems.innerHTML+=`
-
-<div class="cart-item">
-
-<div>
-${item.products.name} x ${item.qty}
-</div>
-
-<div>
-₹${price}
-<button onclick="removeCart('${item.id}')">X</button>
-</div>
-
-</div>
-
-`;
-
-});
-
-let delivery=subtotal<500?50:subtotal*0.05;
-let gst=subtotal*0.05;
-let total=subtotal+delivery+gst-discount;
-
-subtotal.innerText=subtotal;
-delivery.innerText=delivery;
-gst.innerText=gst;
-discount.innerText=discount;
-grandTotal.innerText=total;
-
-loadAddressDropdown();
-
+  renderProducts(data);
 }
 
-/* REMOVE CART */
+/* =========================
+   FILTER
+========================= */
 
-async function removeCart(id){
+async function applyFilter(type) {
 
-await supabase
-.from("cart")
-.delete()
-.eq("id",id);
+  let query = supabaseClient.from("products").select("*");
 
-showCart();
+  if (type === "low")
+    query = query.order("price", { ascending: true });
 
+  if (type === "high")
+    query = query.order("price", { ascending: false });
+
+  if (type === "new")
+    query = query.order("created_at", { ascending: false });
+
+  const { data } = await query;
+
+  renderProducts(data);
 }
 
-/* COUPON */
+/* =========================
+   PRODUCT DETAIL
+========================= */
 
-async function applyCoupon(){
+async function showDetail(id) {
 
-let code=couponInput.value;
+  hideAll();
 
-let {data}=await supabase
-.from("coupons")
-.select("*")
-.eq("code",code)
-.single();
+  document.getElementById("detail").style.display = "block";
 
-if(!data){
-alert("Invalid coupon");
-return;
+  const { data } = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  currentProduct = data;
+  currentQty = 1;
+
+  document.getElementById("detail").innerHTML = `
+
+    <img src="${data.image_url}" width="100%">
+
+    <h2>${data.name}</h2>
+
+    <div class="price">
+      ₹<span id="price">${data.price}</span>
+    </div>
+
+    Stock: ${data.quantity}
+
+    <br><br>
+
+    <button onclick="changeQty(-1)">-</button>
+
+    <span id="qty">1</span>
+
+    <button onclick="changeQty(1)">+</button>
+
+    <button class="btn" onclick="addCart()">
+      Add to Cart
+    </button>
+
+    <button class="btn" onclick="showHome()" style="background:#333">
+      Back
+    </button>
+
+  `;
 }
 
-discount=data.discount;
+/* =========================
+   CHANGE QTY
+========================= */
 
-alert("Applied");
+function changeQty(val) {
 
-showCart();
+  currentQty += val;
 
+  if (currentQty < 1) currentQty = 1;
+
+  if (currentQty > currentProduct.quantity) {
+
+    alert("Stock limit reached");
+
+    currentQty = currentProduct.quantity;
+  }
+
+  document.getElementById("qty").innerText = currentQty;
+
+  document.getElementById("price").innerText =
+    currentProduct.price * currentQty;
 }
 
-/* PLACE ORDER */
+/* =========================
+   ADD CART
+========================= */
 
-async function placeOrder(){
+async function addCart() {
 
-let orderId="ORD-"+Date.now();
+  const { data: existing } = await supabaseClient
+    .from("cart")
+    .select("*")
+    .eq("user_email", user.email)
+    .eq("product_id", currentProduct.id)
+    .maybeSingle();
 
-let {data}=await supabase
-.from("cart")
-.select(`
-id,
-qty,
-products(id,price,quantity,name)
-`)
-.eq("user_email",user.email);
+  if (existing) {
 
-let total=0;
+    await supabaseClient
+      .from("cart")
+      .update({
+        qty: existing.qty + currentQty
+      })
+      .eq("id", existing.id);
 
-for(let item of data){
+  } else {
 
-let price=item.qty*item.products.price;
+    await supabaseClient
+      .from("cart")
+      .insert({
+        user_email: user.email,
+        product_id: currentProduct.id,
+        qty: currentQty
+      });
+  }
 
-total+=price;
-
-await supabase.from("order_items")
-.insert({
-order_id:orderId,
-product_id:item.products.id,
-qty:item.qty,
-price:price
-});
-
-await supabase.from("products")
-.update({
-quantity:item.products.quantity-item.qty
-})
-.eq("id",item.products.id);
-
+  alert("Added to cart");
 }
 
-await supabase.from("orders")
-.insert({
-id:orderId,
-user_email:user.email,
-price:total-discount
-});
+/* =========================
+   SHOW CART
+========================= */
 
-await supabase
-.from("cart")
-.delete()
-.eq("user_email",user.email);
+async function showCart() {
 
-alert("Order placed\n"+orderId);
+  hideAll();
 
-showProfile();
+  document.getElementById("cart").style.display = "block";
 
+  const { data } = await supabaseClient
+    .from("cart")
+    .select(`
+      id,
+      qty,
+      products(id,name,price,quantity)
+    `)
+    .eq("user_email", user.email);
+
+  cartData = data;
+
+  let subtotal = 0;
+
+  const div = document.getElementById("cartItems");
+
+  div.innerHTML = "";
+
+  data.forEach(item => {
+
+    let price = item.products.price * item.qty;
+
+    subtotal += price;
+
+    div.innerHTML += `
+      <div class="cart-item">
+
+        ${item.products.name} x ${item.qty}
+
+        <button onclick="removeCart('${item.id}')">
+          X
+        </button>
+
+      </div>
+    `;
+  });
+
+  calculateTotals(subtotal);
+
+  loadAddresses();
 }
 
-/* PROFILE */
+/* =========================
+   REMOVE CART
+========================= */
 
-async function showProfile(){
+async function removeCart(id) {
 
-hideAll();
+  await supabaseClient
+    .from("cart")
+    .delete()
+    .eq("id", id);
 
-profile.style.display="block";
-
-loadAddresses();
-loadOrders();
-
+  showCart();
 }
 
-/* SAVE PROFILE */
+/* =========================
+   TOTAL CALCULATION
+========================= */
 
-async function saveProfile(){
+function calculateTotals(subtotal) {
 
-await supabase
-.from("users")
-.upsert({
-email:user.email,
-name:nameInput.value,
-phone:phoneInput.value
-});
+  let delivery = subtotal < 500 ? 50 : subtotal * 0.05;
 
-alert("Saved");
+  let gst = subtotal * 0.05;
 
+  let total = subtotal + delivery + gst - discountAmount;
+
+  document.getElementById("subtotal").innerText = subtotal;
+
+  document.getElementById("delivery").innerText = delivery;
+
+  document.getElementById("gst").innerText = gst;
+
+  document.getElementById("discount").innerText = discountAmount;
+
+  document.getElementById("grandTotal").innerText = total;
 }
 
-/* ADDRESS */
+/* =========================
+   COUPON
+========================= */
 
-async function saveAddress(){
+async function applyCoupon() {
 
-let {data}=await supabase
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
+  const code = document.getElementById("couponInput").value;
 
-if(data.length>=3){
-alert("Max 3 address");
-return;
+  const { data } = await supabaseClient
+    .from("coupons")
+    .select("*")
+    .eq("code", code)
+    .maybeSingle();
+
+  if (!data) {
+    alert("Invalid coupon");
+    return;
+  }
+
+  discountAmount = data.discount;
+
+  alert("Coupon applied");
+
+  showCart();
 }
 
-navigator.geolocation.getCurrentPosition(async pos=>{
+/* =========================
+   PLACE ORDER
+========================= */
 
-await supabase
-.from("addresses")
-.insert({
-user_email:user.email,
-address:addressInput.value,
-gps:pos.coords.latitude+","+pos.coords.longitude
-});
+async function placeOrder() {
 
-loadAddresses();
+  if (cartData.length === 0) {
 
-});
+    alert("Cart empty");
 
+    return;
+  }
+
+  const orderId = "ORD-" + Date.now();
+
+  let total = 0;
+
+  for (const item of cartData) {
+
+    let price = item.qty * item.products.price;
+
+    total += price;
+
+    await supabaseClient
+      .from("order_items")
+      .insert({
+
+        order_id: orderId,
+
+        product_id: item.products.id,
+
+        qty: item.qty,
+
+        price: price
+
+      });
+
+    await supabaseClient
+      .from("products")
+      .update({
+
+        quantity: item.products.quantity - item.qty
+
+      })
+      .eq("id", item.products.id);
+  }
+
+  await supabaseClient
+    .from("orders")
+    .insert({
+
+      id: orderId,
+
+      user_email: user.email,
+
+      price: total,
+
+      status: "Placed"
+
+    });
+
+  await supabaseClient
+    .from("cart")
+    .delete()
+    .eq("user_email", user.email);
+
+  alert("Order placed: " + orderId);
+
+  showHome();
 }
 
-async function loadAddresses(){
+/* =========================
+   ADDRESS
+========================= */
 
-let {data}=await supabase
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
+async function loadAddresses() {
 
-addressList.innerHTML="";
+  const { data } = await supabaseClient
+    .from("addresses")
+    .select("*")
+    .eq("user_email", user.email);
 
-data.forEach(a=>{
+  const select = document.getElementById("addressSelect");
 
-addressList.innerHTML+=`
-<div class="address-card">
+  select.innerHTML = "";
 
-${a.address}
+  data.forEach(a => {
 
-<button onclick="deleteAddress('${a.id}')">
-Delete
-</button>
-
-</div>
-`;
-
-});
-
+    select.innerHTML += `<option>${a.address}</option>`;
+  });
 }
 
-async function deleteAddress(id){
+/* =========================
+   PROFILE
+========================= */
 
-await supabase
-.from("addresses")
-.delete()
-.eq("id",id);
+function showProfile() {
 
-loadAddresses();
+  hideAll();
 
+  document.getElementById("profile").style.display = "block";
 }
 
-async function loadAddressDropdown(){
-
-let {data}=await supabase
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
-
-addressSelect.innerHTML="";
-
-data.forEach(a=>{
-
-addressSelect.innerHTML+=`
-
-<option>${a.address}</option>
-
-`;
-
-});
-
-}
-
-/* ORDERS */
-
-async function loadOrders(){
-
-let {data}=await supabase
-.from("orders")
-.select("*")
-.eq("user_email",user.email);
-
-ordersList.innerHTML="";
-
-data.forEach(o=>{
-
-ordersList.innerHTML+=`
-
-<div class="order-card">
-
-Order ID: ${o.id}
-
-<br>
-
-₹${o.price}
-
-</div>
-
-`;
-
-});
-
-}
-
-/* LOGOUT */
-
-function logout(){
-
-localStorage.removeItem("user");
-
-location="index.html";
-
-}
-
-/* START */
+/* =========================
+   START
+========================= */
 
 showHome();
