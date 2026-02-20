@@ -2,322 +2,431 @@
    SUPABASE INIT
 ========================= */
 
-const supabaseClient = window.supabase.createClient(
+/* const supabaseClient = window.supabase.createClient(
   "https://lssjsgfppehhclxqulso.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
+); */
+
+const supabase = window.supabase.createClient(
+"https://lssjsgfppehhclxqulso.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
 let user = JSON.parse(localStorage.getItem("user"));
 
-if (!user) {
-  alert("Login required");
-  location = "index.html";
+if(!user){
+location="index.html";
 }
 
-/* =========================
-   GLOBALS
-========================= */
+/* NAVIGATION */
 
-let currentProduct = null;
-let currentQty = 1;
-let cartData = [];
-let discountAmount = 0;
-
-/* =========================
-   NAVIGATION
-========================= */
-
-function hideAll() {
-  document.getElementById("home").style.display = "none";
-  document.getElementById("detail").style.display = "none";
-  document.getElementById("profile").style.display = "none";
-  document.getElementById("cart").style.display = "none";
-  document.getElementById("filterSection").style.display = "none";
+function hideAll(){
+home.style.display="none";
+cart.style.display="none";
+profile.style.display="none";
+detail.style.display="none";
+filterSection.style.display="none";
 }
 
-/* =========================
-   HOME
-========================= */
+/* HOME */
 
-async function showHome() {
-  hideAll();
-  document.getElementById("home").style.display = "grid";
-  document.getElementById("filterSection").style.display = "flex";
+async function showHome(){
 
-  const { data } = await supabaseClient
-    .from("products")
-    .select("*");
+hideAll();
 
-  renderProducts(data);
+home.style.display="grid";
+filterSection.style.display="block";
+
+let {data} = await supabase
+.from("products")
+.select("*");
+
+home.innerHTML="";
+
+data.forEach(p=>{
+
+home.innerHTML+=`
+
+<div class="card" onclick="showDetail('${p.id}')">
+
+<img src="${p.image_url}">
+
+<div>${p.name}</div>
+
+<div class="price">₹${p.price}</div>
+
+</div>
+
+`;
+
+});
+
 }
 
-function renderProducts(data) {
-  const home = document.getElementById("home");
-  home.innerHTML = "";
+/* DETAIL */
 
-  data.forEach(p => {
-    home.innerHTML += `
-      <div class="card" onclick="showDetail('${p.id}')">
-        <img src="${p.image_url}">
-        <div>${p.name}</div>
-        <div class="price">₹${p.price}</div>
-      </div>
-    `;
-  });
+async function showDetail(id){
+
+hideAll();
+
+detail.style.display="block";
+
+let {data} = await supabase
+.from("products")
+.select("*")
+.eq("id",id)
+.single();
+
+detail.innerHTML=`
+
+<img src="${data.image_url}" width="100%">
+
+<h3>${data.name}</h3>
+
+<div>₹${data.price}</div>
+
+<button class="btn" onclick="addCart('${data.id}')">
+Add to Cart
+</button>
+
+<button class="btn" onclick="showHome()">Back</button>
+
+`;
+
 }
 
-/* =========================
-   DETAIL
-========================= */
+/* ADD CART */
 
-async function showDetail(id) {
-  hideAll();
-  document.getElementById("detail").style.display = "block";
+async function addCart(productId){
 
-  const { data } = await supabaseClient
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .single();
+let {data} = await supabase
+.from("cart")
+.insert({
+user_email:user.email,
+product_id:productId,
+qty:1
+});
 
-  currentProduct = data;
-  currentQty = 1;
+alert("Added to cart");
 
-  document.getElementById("detail").innerHTML = `
-    <img src="${data.image_url}" width="100%">
-    <h2>${data.name}</h2>
-    <div class="price">
-      ₹<span id="price">${data.price}</span>
-    </div>
-    Stock: ${data.quantity}
-    <br><br>
-    <button onclick="changeQty(-1)">-</button>
-    <span id="qty">1</span>
-    <button onclick="changeQty(1)">+</button>
-    <button class="btn" onclick="addCart()">Add to Cart</button>
-    <button class="btn" onclick="showHome()" style="background:#333">Back</button>
-  `;
 }
 
-function changeQty(val) {
-  currentQty += val;
-  if (currentQty < 1) currentQty = 1;
-  if (currentQty > currentProduct.quantity) {
-    alert("Not enough stock");
-    currentQty = currentProduct.quantity;
-  }
+/* SHOW CART */
 
-  document.getElementById("qty").innerText = currentQty;
-  document.getElementById("price").innerText =
-    currentProduct.price * currentQty;
+let discount=0;
+
+async function showCart(){
+
+hideAll();
+
+cart.style.display="block";
+
+let {data} = await supabase
+.from("cart")
+.select(`
+id,
+qty,
+products(name,price,quantity,id)
+`)
+.eq("user_email",user.email);
+
+cartItems.innerHTML="";
+
+let subtotal=0;
+
+data.forEach(item=>{
+
+let price=item.products.price*item.qty;
+
+subtotal+=price;
+
+cartItems.innerHTML+=`
+
+<div class="cart-item">
+
+<div>
+${item.products.name} x ${item.qty}
+</div>
+
+<div>
+₹${price}
+<button onclick="removeCart('${item.id}')">X</button>
+</div>
+
+</div>
+
+`;
+
+});
+
+let delivery=subtotal<500?50:subtotal*0.05;
+let gst=subtotal*0.05;
+let total=subtotal+delivery+gst-discount;
+
+subtotal.innerText=subtotal;
+delivery.innerText=delivery;
+gst.innerText=gst;
+discount.innerText=discount;
+grandTotal.innerText=total;
+
+loadAddressDropdown();
+
 }
 
-/* =========================
-   ADD CART
-========================= */
+/* REMOVE CART */
 
-async function addCart() {
+async function removeCart(id){
 
-  const { data: product } = await supabaseClient
-    .from("products")
-    .select("quantity")
-    .eq("id", currentProduct.id)
-    .single();
+await supabase
+.from("cart")
+.delete()
+.eq("id",id);
 
-  if (currentQty > product.quantity) {
-    alert("Stock not available");
-    return;
-  }
+showCart();
 
-  const { data: existing } = await supabaseClient
-    .from("cart")
-    .select("*")
-    .eq("user_email", user.email)
-    .eq("product_id", currentProduct.id)
-    .maybeSingle();
-
-  if (existing) {
-    await supabaseClient
-      .from("cart")
-      .update({ qty: existing.qty + currentQty })
-      .eq("id", existing.id);
-  } else {
-    await supabaseClient
-      .from("cart")
-      .insert({
-        user_email: user.email,
-        product_id: currentProduct.id,
-        qty: currentQty
-      });
-  }
-
-  alert("Added to cart");
 }
 
-/* =========================
-   CART
-========================= */
+/* COUPON */
 
-async function showCart() {
-  hideAll();
-  document.getElementById("cart").style.display = "block";
+async function applyCoupon(){
 
-  const { data } = await supabaseClient
-    .from("cart")
-    .select(`
-      id,
-      qty,
-      products(id,name,price,quantity)
-    `)
-    .eq("user_email", user.email);
+let code=couponInput.value;
 
-  cartData = data;
-  let subtotal = 0;
+let {data}=await supabase
+.from("coupons")
+.select("*")
+.eq("code",code)
+.single();
 
-  const cartDiv = document.getElementById("cartItems");
-  cartDiv.innerHTML = "";
-
-  data.forEach(item => {
-    let price = item.products.price * item.qty;
-    subtotal += price;
-
-    cartDiv.innerHTML += `
-      <div class="cart-item">
-        <span>${item.products.name} x ${item.qty}</span>
-        <div>
-          ₹${price}
-          <button onclick="removeCart('${item.id}')" 
-          style="background:red;color:white;border:none;margin-left:10px">X</button>
-        </div>
-      </div>
-    `;
-  });
-
-  calculateTotals(subtotal);
-  loadAddressDropdown();
+if(!data){
+alert("Invalid coupon");
+return;
 }
 
-function calculateTotals(subtotal) {
-  let delivery = subtotal < 500 ? 50 : subtotal * 0.05;
-  let gst = subtotal * 0.05;
-  let grand = subtotal + delivery + gst - discountAmount;
+discount=data.discount;
 
-  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-  document.getElementById("delivery").innerText = delivery.toFixed(2);
-  document.getElementById("gst").innerText = gst.toFixed(2);
-  document.getElementById("discount").innerText = discountAmount.toFixed(2);
-  document.getElementById("grandTotal").innerText = grand.toFixed(2);
+alert("Applied");
+
+showCart();
+
 }
 
-async function removeCart(id) {
-  await supabaseClient.from("cart").delete().eq("id", id);
-  showCart();
+/* PLACE ORDER */
+
+async function placeOrder(){
+
+let orderId="ORD-"+Date.now();
+
+let {data}=await supabase
+.from("cart")
+.select(`
+id,
+qty,
+products(id,price,quantity,name)
+`)
+.eq("user_email",user.email);
+
+let total=0;
+
+for(let item of data){
+
+let price=item.qty*item.products.price;
+
+total+=price;
+
+await supabase.from("order_items")
+.insert({
+order_id:orderId,
+product_id:item.products.id,
+qty:item.qty,
+price:price
+});
+
+await supabase.from("products")
+.update({
+quantity:item.products.quantity-item.qty
+})
+.eq("id",item.products.id);
+
 }
 
-/* =========================
-   COUPON
-========================= */
+await supabase.from("orders")
+.insert({
+id:orderId,
+user_email:user.email,
+price:total-discount
+});
 
-async function applyCoupon() {
+await supabase
+.from("cart")
+.delete()
+.eq("user_email",user.email);
 
-  const code = document.getElementById("couponInput").value.trim();
+alert("Order placed\n"+orderId);
 
-  const { data } = await supabaseClient
-    .from("coupons")
-    .select("*")
-    .eq("code", code)
-    .maybeSingle();
+showProfile();
 
-  if (!data) {
-    alert("Invalid coupon");
-    return;
-  }
-
-  if (data.usage_limit && data.used_count >= data.usage_limit) {
-    alert("Coupon limit reached");
-    return;
-  }
-
-  discountAmount = data.discount;
-
-  await supabaseClient
-    .from("coupons")
-    .update({ used_count: data.used_count + 1 })
-    .eq("code", code);
-
-  alert("Coupon applied");
-  showCart();
 }
 
-/* =========================
-   PLACE ORDER
-========================= */
+/* PROFILE */
 
-async function placeOrder() {
+async function showProfile(){
 
-  if (cartData.length === 0) {
-    alert("Cart empty");
-    return;
-  }
+hideAll();
 
-  const orderId = "ORD-" + Date.now();
-  let subtotal = 0;
+profile.style.display="block";
 
-  for (const item of cartData) {
+loadAddresses();
+loadOrders();
 
-    if (item.qty > item.products.quantity) {
-      alert("Stock not available for " + item.products.name);
-      return;
-    }
-
-    let itemTotal = item.qty * item.products.price;
-    subtotal += itemTotal;
-
-    await supabaseClient.from("order_items").insert({
-      order_id: orderId,
-      product_id: item.products.id,
-      qty: item.qty,
-      price: itemTotal
-    });
-
-    await supabaseClient
-      .from("products")
-      .update({
-        quantity: item.products.quantity - item.qty
-      })
-      .eq("id", item.products.id);
-  }
-
-  await supabaseClient.from("orders").insert({
-    id: orderId,
-    user_email: user.email,
-    price: subtotal - discountAmount,
-    status: "Placed"
-  });
-
-  await supabaseClient.from("cart")
-    .delete()
-    .eq("user_email", user.email);
-
-  discountAmount = 0;
-
-  alert("Order placed successfully\nOrder ID: " + orderId);
-
-  showProfile();
 }
 
-/* =========================
-   PROFILE
-========================= */
+/* SAVE PROFILE */
 
-async function showProfile() {
-  hideAll();
-  document.getElementById("profile").style.display = "block";
+async function saveProfile(){
+
+await supabase
+.from("users")
+.upsert({
+email:user.email,
+name:nameInput.value,
+phone:phoneInput.value
+});
+
+alert("Saved");
+
 }
 
-/* =========================
-   START
-========================= */
+/* ADDRESS */
+
+async function saveAddress(){
+
+let {data}=await supabase
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+if(data.length>=3){
+alert("Max 3 address");
+return;
+}
+
+navigator.geolocation.getCurrentPosition(async pos=>{
+
+await supabase
+.from("addresses")
+.insert({
+user_email:user.email,
+address:addressInput.value,
+gps:pos.coords.latitude+","+pos.coords.longitude
+});
+
+loadAddresses();
+
+});
+
+}
+
+async function loadAddresses(){
+
+let {data}=await supabase
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+addressList.innerHTML="";
+
+data.forEach(a=>{
+
+addressList.innerHTML+=`
+<div class="address-card">
+
+${a.address}
+
+<button onclick="deleteAddress('${a.id}')">
+Delete
+</button>
+
+</div>
+`;
+
+});
+
+}
+
+async function deleteAddress(id){
+
+await supabase
+.from("addresses")
+.delete()
+.eq("id",id);
+
+loadAddresses();
+
+}
+
+async function loadAddressDropdown(){
+
+let {data}=await supabase
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+addressSelect.innerHTML="";
+
+data.forEach(a=>{
+
+addressSelect.innerHTML+=`
+
+<option>${a.address}</option>
+
+`;
+
+});
+
+}
+
+/* ORDERS */
+
+async function loadOrders(){
+
+let {data}=await supabase
+.from("orders")
+.select("*")
+.eq("user_email",user.email);
+
+ordersList.innerHTML="";
+
+data.forEach(o=>{
+
+ordersList.innerHTML+=`
+
+<div class="order-card">
+
+Order ID: ${o.id}
+
+<br>
+
+₹${o.price}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* LOGOUT */
+
+function logout(){
+
+localStorage.removeItem("user");
+
+location="index.html";
+
+}
+
+/* START */
 
 showHome();
-
