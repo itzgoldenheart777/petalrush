@@ -9,8 +9,6 @@
 
 <style>
 
-/* GLOBAL */
-
 body{
 margin:0;
 background:#0f1115;
@@ -21,11 +19,8 @@ font-family:system-ui;
 .container{
 max-width:500px;
 margin:auto;
-min-height:100vh;
 padding-bottom:80px;
 }
-
-/* HEADER */
 
 .header{
 background:#111;
@@ -37,15 +32,11 @@ text-align:center;
 height:50px;
 }
 
-/* FILTER */
-
 .filter-bar{
 padding:10px;
 background:#111;
 display:flex;
 gap:10px;
-position:sticky;
-top:0;
 }
 
 input,select{
@@ -56,8 +47,6 @@ border:none;
 background:#222;
 color:white;
 }
-
-/* PRODUCTS */
 
 .products{
 display:grid;
@@ -80,18 +69,10 @@ object-fit:cover;
 border-radius:8px;
 }
 
-.price{
-color:#ff4081;
-}
-
-/* SECTION */
-
 .section{
 display:none;
 padding:10px;
 }
-
-/* BUTTON */
 
 .btn{
 background:#ff4081;
@@ -103,8 +84,6 @@ color:white;
 margin-top:10px;
 }
 
-/* CART */
-
 .cart-item{
 background:#171a21;
 padding:10px;
@@ -113,8 +92,6 @@ border-radius:8px;
 display:flex;
 justify-content:space-between;
 }
-
-/* NAV */
 
 .bottom{
 position:fixed;
@@ -129,6 +106,14 @@ background:#111;
 flex:1;
 text-align:center;
 padding:15px;
+cursor:pointer;
+}
+
+.avatar{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
 cursor:pointer;
 }
 
@@ -161,22 +146,65 @@ oninput="searchProducts()">
 
 <div id="detail" class="section"></div>
 
+<div id="cart" class="section">
+
+<h2>Cart</h2>
+
+<div id="cartItems"></div>
+
+Subtotal ₹<span id="subtotal">0</span><br>
+Delivery ₹<span id="delivery">0</span><br>
+GST ₹<span id="gst">0</span><br>
+Discount ₹<span id="discount">0</span><br>
+
+<h3>Total ₹<span id="grandTotal">0</span></h3>
+
+<select id="addressSelect"></select>
+
+<input id="couponInput">
+
+<button class="btn" onclick="applyCoupon()">
+Apply Coupon
+</button>
+
+<button class="btn" onclick="placeOrder()">
+Place Order
+</button>
+
+</div>
+
 <div id="profile" class="section">
 
 <h2>Profile</h2>
 
+<center>
+
+<img id="avatar"
+class="avatar"
+src="default-avatar.png"
+onclick="avatarUpload.click()">
+
+<input type="file"
+id="avatarUpload"
+hidden
+onchange="uploadAvatar(event)">
+
+</center>
+
 <input id="nameInput" placeholder="Name">
 <input id="phoneInput" placeholder="Phone">
 
-<button class="btn"
-onclick="saveProfile()">Save</button>
+<button class="btn" onclick="saveProfile()">
+Save Profile
+</button>
 
-<h3>Addresses</h3>
+<h3>Addresses (max 3)</h3>
 
 <input id="addressInput" placeholder="Address">
 
-<button class="btn"
-onclick="saveAddress()">Save Address</button>
+<button class="btn" onclick="saveAddress()">
+Save Address
+</button>
 
 <div id="addressList"></div>
 
@@ -184,37 +212,9 @@ onclick="saveAddress()">Save Address</button>
 
 <div id="ordersList"></div>
 
-<button class="btn"
-onclick="logout()">Logout</button>
-
-</div>
-
-<div id="cart" class="section">
-
-<h2>Cart</h2>
-
-<div id="cartItems"></div>
-
-<div>
-
-Subtotal ₹<span id="subtotal">0</span><br>
-Delivery ₹<span id="delivery">0</span><br>
-GST ₹<span id="gst">0</span><br>
-Discount ₹<span id="discount">0</span><br>
-
-Total ₹<span id="grandTotal">0</span>
-
-</div>
-
-<select id="addressSelect"></select>
-
-<input id="couponInput" placeholder="Coupon">
-
-<button class="btn"
-onclick="applyCoupon()">Apply Coupon</button>
-
-<button class="btn"
-onclick="placeOrder()">Place Order</button>
+<button class="btn" onclick="logout()">
+Logout
+</button>
 
 </div>
 
@@ -228,128 +228,208 @@ onclick="placeOrder()">Place Order</button>
 
 </div>
 
-
-
 <script>
 
-const supabaseClient = window.supabase.createClient(
+/* SUPABASE */
+
+const supabase =
+window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-let user = JSON.parse(localStorage.getItem("user"));
-if(!user){ location="index.html"; }
+/* USER */
 
-let currentProduct=null;
-let currentQty=1;
-let cartData=[];
-let discountAmount=0;
+let user =
+JSON.parse(localStorage.getItem("user"));
 
-/* ================= NAV ================= */
-
-function hideAll(){
-home.style.display="none";
-detail.style.display="none";
-profile.style.display="none";
-cart.style.display="none";
-filterSection.style.display="none";
+if(!user){
+location="index.html";
 }
 
-/* ================= HOME ================= */
+/* GLOBAL */
+
+let cartData=[];
+let discountAmount=0;
+let currentProduct=null;
+let currentQty=1;
+
+/* NAV */
+
+function hideAll(){
+
+home.style.display="none";
+detail.style.display="none";
+cart.style.display="none";
+profile.style.display="none";
+filterSection.style.display="none";
+
+}
+
+/* HOME */
 
 async function showHome(){
+
 hideAll();
+
 home.style.display="grid";
 filterSection.style.display="flex";
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("products")
 .select("*");
 
 renderProducts(data);
+
 }
 
 function renderProducts(data){
+
 home.innerHTML="";
+
 data.forEach(p=>{
+
 home.innerHTML+=`
-<div class="card" onclick="showDetail('${p.id}')">
+<div class="card"
+onclick="showDetail('${p.id}')">
+
 <img src="${p.image_url}">
+
 <div>${p.name}</div>
-<div class="price">₹${p.price}</div>
-</div>`;
+
+₹${p.price}
+
+</div>
+`;
+
 });
+
 }
 
-/* ================= DETAIL ================= */
+/* SEARCH */
+
+async function searchProducts(){
+
+const {data} =
+await supabase
+.from("products")
+.select("*")
+.ilike("name",
+"%"+search.value+"%");
+
+renderProducts(data);
+
+}
+
+/* FILTER */
+
+async function applyFilter(type){
+
+let query =
+supabase
+.from("products")
+.select("*");
+
+if(type=="low")
+query=query.order("price");
+
+if(type=="high")
+query=query.order("price",{ascending:false});
+
+const {data} =
+await query;
+
+renderProducts(data);
+
+}
+
+/* DETAIL */
 
 async function showDetail(id){
+
 hideAll();
+
 detail.style.display="block";
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("products")
 .select("*")
 .eq("id",id)
 .single();
 
 currentProduct=data;
-currentQty=1;
 
 detail.innerHTML=`
+
 <img src="${data.image_url}" width="100%">
+
 <h2>${data.name}</h2>
-₹<span id="price">${data.price}</span><br>
-Stock: ${data.quantity}<br><br>
-<button onclick="changeQty(-1)">-</button>
-<span id="qty">1</span>
-<button onclick="changeQty(1)">+</button>
-<button class="btn" onclick="addCart()">Add Cart</button>
-<button class="btn" onclick="showHome()">Back</button>
+
+₹${data.price}
+
+<button class="btn"
+onclick="addCart()">
+Add Cart
+</button>
+
+<button class="btn"
+onclick="showHome()">
+Back
+</button>
+
 `;
+
 }
 
-function changeQty(v){
-currentQty+=v;
-if(currentQty<1) currentQty=1;
-qty.innerText=currentQty;
-price.innerText=currentProduct.price*currentQty;
-}
-
-/* ================= CART ================= */
+/* ADD CART */
 
 async function addCart(){
 
 const {data:exist} =
-await supabaseClient.from("cart")
+await supabase
+.from("cart")
 .select("*")
 .eq("user_email",user.email)
 .eq("product_id",currentProduct.id)
 .maybeSingle();
 
 if(exist){
-await supabaseClient.from("cart")
-.update({qty:exist.qty+currentQty})
+
+await supabase
+.from("cart")
+.update({
+qty:exist.qty+1
+})
 .eq("id",exist.id);
+
 }else{
-await supabaseClient.from("cart")
+
+await supabase
+.from("cart")
 .insert({
 user_email:user.email,
 product_id:currentProduct.id,
-qty:currentQty
+qty:1
 });
+
 }
 
-alert("Added to cart");
 showCart();
+
 }
+
+/* CART */
 
 async function showCart(){
 
 hideAll();
+
 cart.style.display="block";
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("cart")
 .select(`
 id,
@@ -359,200 +439,361 @@ products(id,name,price)
 .eq("user_email",user.email);
 
 cartData=data;
+
 let subtotal=0;
 
 cartItems.innerHTML="";
 
 data.forEach(i=>{
-let price=i.products.price*i.qty;
+
+let price=i.qty*i.products.price;
+
 subtotal+=price;
 
 cartItems.innerHTML+=`
 <div class="cart-item">
-${i.products.name} x ${i.qty}
-<button onclick="removeCart('${i.id}')">X</button>
-</div>`;
+
+${i.products.name}
+
+₹${price}
+
+<button onclick="removeCart('${i.id}')">
+X
+</button>
+
+</div>
+`;
+
 });
 
 calculateTotals(subtotal);
+
+loadCoupons();
+
 loadAddresses();
-loadAvailableCoupons();
+
 }
+
+/* TOTAL */
 
 function calculateTotals(sub){
 
-let del = sub===0 ? 0 : (sub<500?50:0);
-let gst = sub*0.05;
-let total = sub+del+gst-discountAmount;
+let delivery=sub===0?0:50;
+
+let gst=sub*0.05;
+
+let total=sub+delivery+gst-discountAmount;
 
 subtotal.innerText=sub;
-delivery.innerText=del;
+
+delivery.innerText=delivery;
+
 gst.innerText=gst;
+
 discount.innerText=discountAmount;
+
 grandTotal.innerText=total;
+
 }
+
+/* REMOVE CART */
 
 async function removeCart(id){
-await supabaseClient.from("cart").delete().eq("id",id);
+
+await supabase
+.from("cart")
+.delete()
+.eq("id",id);
+
 showCart();
+
 }
 
-/* ================= COUPON ================= */
+/* COUPONS */
 
-async function loadAvailableCoupons(){
+async function loadCoupons(){
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("coupons")
 .select("*");
 
-let available = data.filter(c=> 
-!c.usage_limit || c.used_count < c.usage_limit
-);
+couponInput.placeholder =
+"Available: "+
+data.map(c=>c.code).join(",");
 
-if(available.length>0){
-couponInput.placeholder = "Available: " + 
-available.map(c=>c.code).join(", ");
-}
 }
 
 async function applyCoupon(){
 
-const code = couponInput.value.trim();
+const code=couponInput.value;
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("coupons")
 .select("*")
 .eq("code",code)
 .maybeSingle();
 
 if(!data){
-alert("Invalid coupon");
-return;
-}
 
-if(data.usage_limit && data.used_count >= data.usage_limit){
-alert("Coupon limit reached");
+alert("Invalid coupon");
+
 return;
+
 }
 
 discountAmount=data.discount;
 
-await supabaseClient
-.from("coupons")
-.update({used_count:data.used_count+1})
-.eq("code",code);
-
-alert("Coupon applied");
 showCart();
+
 }
 
-/* ================= ORDER ================= */
+/* ORDER */
 
 async function placeOrder(){
 
 if(cartData.length===0){
-alert("Cart empty");
+
+alert("Empty cart");
+
 return;
+
 }
 
-let orderId="ORD-"+Date.now();
+let orderId="ORD"+Date.now();
 
-for(const item of cartData){
+await supabase
+.from("orders")
+.insert({
 
-await supabaseClient.from("order_items").insert({
-order_id:orderId,
-product_id:item.products.id,
-qty:item.qty,
-price:item.products.price
-});
-}
-
-await supabaseClient.from("orders").insert({
 id:orderId,
 user_email:user.email,
 price:grandTotal.innerText,
 status:"Placed"
+
 });
 
-await supabaseClient.from("cart")
-.delete().eq("user_email",user.email);
+await supabase
+.from("cart")
+.delete()
+.eq("user_email",user.email);
 
-alert("Order placed\nOrder ID: "+orderId);
+alert("Order placed");
 
-discountAmount=0;
 showProfile();
+
 }
 
-/* ================= PROFILE ================= */
+/* PROFILE */
 
 async function showProfile(){
+
 hideAll();
+
 profile.style.display="block";
 
-loadOrders();
+loadProfile();
+
 loadAddresses();
+
+loadOrders();
+
 }
+
+async function loadProfile(){
+
+const {data} =
+await supabase
+.from("users")
+.select("*")
+.eq("email",user.email)
+.maybeSingle();
+
+if(data){
+
+nameInput.value=data.name||"";
+
+phoneInput.value=data.phone||"";
+
+avatar.src=data.avatar_url||"default-avatar.png";
+
+}
+
+}
+
+async function saveProfile(){
+
+await supabase
+.from("users")
+.upsert({
+
+email:user.email,
+name:nameInput.value,
+phone:phoneInput.value
+
+});
+
+alert("Saved");
+
+}
+
+/* AVATAR */
+
+async function uploadAvatar(e){
+
+const file=e.target.files[0];
+
+const fileName=
+user.email+"-"+Date.now();
+
+await supabase.storage
+.from("avatars")
+.upload(fileName,file);
+
+const {data} =
+supabase.storage
+.from("avatars")
+.getPublicUrl(fileName);
+
+avatar.src=data.publicUrl;
+
+await supabase
+.from("users")
+.update({
+avatar_url:data.publicUrl
+})
+.eq("email",user.email);
+
+}
+
+/* ADDRESS */
+
+async function saveAddress(){
+
+const {data} =
+await supabase
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+if(data.length>=3){
+
+alert("Max 3 address allowed");
+
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async pos=>{
+
+let gps=
+pos.coords.latitude+
+","+pos.coords.longitude;
+
+await supabase
+.from("addresses")
+.insert({
+
+user_email:user.email,
+address:
+addressInput.value+
+" GPS:"+gps
+
+});
+
+loadAddresses();
+
+});
+
+}
+
+async function loadAddresses(){
+
+const {data} =
+await supabase
+.from("addresses")
+.select("*")
+.eq("user_email",user.email);
+
+addressList.innerHTML="";
+
+addressSelect.innerHTML="";
+
+data.forEach(a=>{
+
+addressList.innerHTML+=`
+<div class="cart-item">
+
+${a.address}
+
+<button onclick="deleteAddress('${a.id}')">
+Delete
+</button>
+
+</div>
+`;
+
+addressSelect.innerHTML+=`
+<option>${a.address}</option>
+`;
+
+});
+
+}
+
+async function deleteAddress(id){
+
+await supabase
+.from("addresses")
+.delete()
+.eq("id",id);
+
+loadAddresses();
+
+}
+
+/* ORDERS */
 
 async function loadOrders(){
 
-const {data} = await supabaseClient
+const {data} =
+await supabase
 .from("orders")
 .select("*")
 .eq("user_email",user.email);
 
 ordersList.innerHTML="";
 
-for(const o of data){
-
-const {data:items} =
-await supabaseClient
-.from("order_items")
-.select("*")
-.eq("order_id",o.id);
+data.forEach(o=>{
 
 ordersList.innerHTML+=`
 <div class="cart-item">
-<b>${o.id}</b><br>
-₹${o.price}<br>
-${items.map(i=>"Qty:"+i.qty+" ₹"+i.price).join("<br>")}
-</div>`;
-}
-}
 
-/* ================= ADDRESS ================= */
+${o.id}
 
-async function saveAddress(){
+₹${o.price}
 
-navigator.geolocation.getCurrentPosition(async pos=>{
+</div>
+`;
 
-let gps=pos.coords.latitude+","+pos.coords.longitude;
-
-await supabaseClient.from("addresses").insert({
-user_email:user.email,
-address:addressInput.value+" GPS:"+gps
 });
 
-loadAddresses();
-});
 }
 
-async function loadAddresses(){
+/* LOGOUT */
 
-const {data} = await supabaseClient
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
+function logout(){
 
-addressSelect.innerHTML="";
-addressList.innerHTML="";
+localStorage.removeItem("user");
 
-data.forEach(a=>{
-addressSelect.innerHTML+=`<option>${a.address}</option>`;
-addressList.innerHTML+=`<div>${a.address}</div>`;
-});
+location="index.html";
+
 }
 
-/* ================= START ================= */
+/* START */
 
 showHome();
 
