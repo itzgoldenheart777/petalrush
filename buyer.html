@@ -82,6 +82,7 @@ width:100%;
 border-radius:8px;
 color:white;
 margin-top:10px;
+cursor:pointer;
 }
 
 .cart-item{
@@ -115,10 +116,10 @@ height:120px;
 border-radius:50%;
 object-fit:cover;
 cursor:pointer;
+border:3px solid #ff4081;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -146,11 +147,15 @@ oninput="searchProducts()">
 
 <div id="detail" class="section"></div>
 
+<!-- CART -->
+
 <div id="cart" class="section">
 
 <h2>Cart</h2>
 
 <div id="cartItems"></div>
+
+<br>
 
 Subtotal ₹<span id="subtotal">0</span><br>
 Delivery ₹<span id="delivery">0</span><br>
@@ -161,7 +166,7 @@ Discount ₹<span id="discount">0</span><br>
 
 <select id="addressSelect"></select>
 
-<input id="couponInput">
+<input id="couponInput" placeholder="Coupon">
 
 <button class="btn" onclick="applyCoupon()">
 Apply Coupon
@@ -172,6 +177,8 @@ Place Order
 </button>
 
 </div>
+
+<!-- PROFILE -->
 
 <div id="profile" class="section">
 
@@ -191,6 +198,8 @@ onchange="uploadAvatar(event)">
 
 </center>
 
+<br>
+
 <input id="nameInput" placeholder="Name">
 <input id="phoneInput" placeholder="Phone">
 
@@ -198,7 +207,7 @@ onchange="uploadAvatar(event)">
 Save Profile
 </button>
 
-<h3>Addresses (max 3)</h3>
+<h3>Addresses</h3>
 
 <input id="addressInput" placeholder="Address">
 
@@ -230,9 +239,9 @@ Logout
 
 <script>
 
-/* SUPABASE */
+/* SUPABASE CONNECTION */
 
-const supabase =
+const supabaseClient =
 window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
@@ -240,8 +249,7 @@ window.supabase.createClient(
 
 /* USER */
 
-let user =
-JSON.parse(localStorage.getItem("user"));
+let user = JSON.parse(localStorage.getItem("user"));
 
 if(!user){
 location="index.html";
@@ -252,7 +260,6 @@ location="index.html";
 let cartData=[];
 let discountAmount=0;
 let currentProduct=null;
-let currentQty=1;
 
 /* NAV */
 
@@ -276,9 +283,10 @@ home.style.display="grid";
 filterSection.style.display="flex";
 
 const {data} =
-await supabase
+await supabaseClient
 .from("products")
-.select("*");
+.select("*")
+.order("created_at",{ascending:false});
 
 renderProducts(data);
 
@@ -312,11 +320,10 @@ onclick="showDetail('${p.id}')">
 async function searchProducts(){
 
 const {data} =
-await supabase
+await supabaseClient
 .from("products")
 .select("*")
-.ilike("name",
-"%"+search.value+"%");
+.ilike("name","%"+search.value+"%");
 
 renderProducts(data);
 
@@ -327,18 +334,20 @@ renderProducts(data);
 async function applyFilter(type){
 
 let query =
-supabase
+supabaseClient
 .from("products")
 .select("*");
 
 if(type=="low")
-query=query.order("price");
+query=query.order("price",{ascending:true});
 
 if(type=="high")
 query=query.order("price",{ascending:false});
 
-const {data} =
-await query;
+if(type=="new")
+query=query.order("created_at",{ascending:false});
+
+const {data}=await query;
 
 renderProducts(data);
 
@@ -353,7 +362,7 @@ hideAll();
 detail.style.display="block";
 
 const {data} =
-await supabase
+await supabaseClient
 .from("products")
 .select("*")
 .eq("id",id)
@@ -370,14 +379,10 @@ detail.innerHTML=`
 ₹${data.price}
 
 <button class="btn"
-onclick="addCart()">
-Add Cart
-</button>
+onclick="addCart()">Add Cart</button>
 
 <button class="btn"
-onclick="showHome()">
-Back
-</button>
+onclick="showHome()">Back</button>
 
 `;
 
@@ -388,7 +393,7 @@ Back
 async function addCart(){
 
 const {data:exist} =
-await supabase
+await supabaseClient
 .from("cart")
 .select("*")
 .eq("user_email",user.email)
@@ -397,7 +402,7 @@ await supabase
 
 if(exist){
 
-await supabase
+await supabaseClient
 .from("cart")
 .update({
 qty:exist.qty+1
@@ -406,7 +411,7 @@ qty:exist.qty+1
 
 }else{
 
-await supabase
+await supabaseClient
 .from("cart")
 .insert({
 user_email:user.email,
@@ -420,7 +425,7 @@ showCart();
 
 }
 
-/* CART */
+/* SHOW CART */
 
 async function showCart(){
 
@@ -429,18 +434,18 @@ hideAll();
 cart.style.display="block";
 
 const {data} =
-await supabase
+await supabaseClient
 .from("cart")
 .select(`
 id,
 qty,
-products(id,name,price)
+products(name,price)
 `)
 .eq("user_email",user.email);
 
 cartData=data;
 
-let subtotal=0;
+let sub=0;
 
 cartItems.innerHTML="";
 
@@ -448,25 +453,23 @@ data.forEach(i=>{
 
 let price=i.qty*i.products.price;
 
-subtotal+=price;
+sub+=price;
 
 cartItems.innerHTML+=`
 <div class="cart-item">
 
-${i.products.name}
+${i.products.name} x ${i.qty}
 
 ₹${price}
 
-<button onclick="removeCart('${i.id}')">
-X
-</button>
+<button onclick="removeCart('${i.id}')">X</button>
 
 </div>
 `;
 
 });
 
-calculateTotals(subtotal);
+calculateTotals(sub);
 
 loadCoupons();
 
@@ -478,21 +481,17 @@ loadAddresses();
 
 function calculateTotals(sub){
 
-let delivery=sub===0?0:50;
+let del=sub===0?0:50;
 
 let gst=sub*0.05;
 
-let total=sub+delivery+gst-discountAmount;
+let total=sub+del+gst-discountAmount;
 
-subtotal.innerText=sub;
-
-delivery.innerText=delivery;
-
-gst.innerText=gst;
-
-discount.innerText=discountAmount;
-
-grandTotal.innerText=total;
+document.getElementById("subtotal").innerText=sub;
+document.getElementById("delivery").innerText=del;
+document.getElementById("gst").innerText=gst;
+document.getElementById("discount").innerText=discountAmount;
+document.getElementById("grandTotal").innerText=total;
 
 }
 
@@ -500,7 +499,7 @@ grandTotal.innerText=total;
 
 async function removeCart(id){
 
-await supabase
+await supabaseClient
 .from("cart")
 .delete()
 .eq("id",id);
@@ -514,13 +513,13 @@ showCart();
 async function loadCoupons(){
 
 const {data} =
-await supabase
+await supabaseClient
 .from("coupons")
 .select("*");
 
-couponInput.placeholder =
+couponInput.placeholder=
 "Available: "+
-data.map(c=>c.code).join(",");
+data.map(c=>c.code).join(", ");
 
 }
 
@@ -529,7 +528,7 @@ async function applyCoupon(){
 const code=couponInput.value;
 
 const {data} =
-await supabase
+await supabaseClient
 .from("coupons")
 .select("*")
 .eq("code",code)
@@ -549,13 +548,13 @@ showCart();
 
 }
 
-/* ORDER */
+/* PLACE ORDER */
 
 async function placeOrder(){
 
 if(cartData.length===0){
 
-alert("Empty cart");
+alert("Cart empty");
 
 return;
 
@@ -563,18 +562,16 @@ return;
 
 let orderId="ORD"+Date.now();
 
-await supabase
+await supabaseClient
 .from("orders")
 .insert({
-
 id:orderId,
 user_email:user.email,
 price:grandTotal.innerText,
 status:"Placed"
-
 });
 
-await supabase
+await supabaseClient
 .from("cart")
 .delete()
 .eq("user_email",user.email);
@@ -595,16 +592,16 @@ profile.style.display="block";
 
 loadProfile();
 
-loadAddresses();
-
 loadOrders();
+
+loadAddresses();
 
 }
 
 async function loadProfile(){
 
 const {data} =
-await supabase
+await supabaseClient
 .from("users")
 .select("*")
 .eq("email",user.email)
@@ -613,9 +610,7 @@ await supabase
 if(data){
 
 nameInput.value=data.name||"";
-
 phoneInput.value=data.phone||"";
-
 avatar.src=data.avatar_url||"default-avatar.png";
 
 }
@@ -624,14 +619,12 @@ avatar.src=data.avatar_url||"default-avatar.png";
 
 async function saveProfile(){
 
-await supabase
+await supabaseClient
 .from("users")
 .upsert({
-
 email:user.email,
 name:nameInput.value,
 phone:phoneInput.value
-
 });
 
 alert("Saved");
@@ -644,21 +637,20 @@ async function uploadAvatar(e){
 
 const file=e.target.files[0];
 
-const fileName=
-user.email+"-"+Date.now();
+const fileName=user.email+Date.now();
 
-await supabase.storage
+await supabaseClient.storage
 .from("avatars")
 .upload(fileName,file);
 
 const {data} =
-supabase.storage
+supabaseClient.storage
 .from("avatars")
 .getPublicUrl(fileName);
 
 avatar.src=data.publicUrl;
 
-await supabase
+await supabaseClient
 .from("users")
 .update({
 avatar_url:data.publicUrl
@@ -671,20 +663,6 @@ avatar_url:data.publicUrl
 
 async function saveAddress(){
 
-const {data} =
-await supabase
-.from("addresses")
-.select("*")
-.eq("user_email",user.email);
-
-if(data.length>=3){
-
-alert("Max 3 address allowed");
-
-return;
-
-}
-
 navigator.geolocation.getCurrentPosition(
 
 async pos=>{
@@ -693,15 +671,11 @@ let gps=
 pos.coords.latitude+
 ","+pos.coords.longitude;
 
-await supabase
+await supabaseClient
 .from("addresses")
 .insert({
-
 user_email:user.email,
-address:
-addressInput.value+
-" GPS:"+gps
-
+address:addressInput.value+" GPS:"+gps
 });
 
 loadAddresses();
@@ -713,26 +687,19 @@ loadAddresses();
 async function loadAddresses(){
 
 const {data} =
-await supabase
+await supabaseClient
 .from("addresses")
 .select("*")
 .eq("user_email",user.email);
 
 addressList.innerHTML="";
-
 addressSelect.innerHTML="";
 
 data.forEach(a=>{
 
 addressList.innerHTML+=`
 <div class="cart-item">
-
 ${a.address}
-
-<button onclick="deleteAddress('${a.id}')">
-Delete
-</button>
-
 </div>
 `;
 
@@ -744,23 +711,12 @@ addressSelect.innerHTML+=`
 
 }
 
-async function deleteAddress(id){
-
-await supabase
-.from("addresses")
-.delete()
-.eq("id",id);
-
-loadAddresses();
-
-}
-
 /* ORDERS */
 
 async function loadOrders(){
 
 const {data} =
-await supabase
+await supabaseClient
 .from("orders")
 .select("*")
 .eq("user_email",user.email);
@@ -771,11 +727,8 @@ data.forEach(o=>{
 
 ordersList.innerHTML+=`
 <div class="cart-item">
-
 ${o.id}
-
 ₹${o.price}
-
 </div>
 `;
 
