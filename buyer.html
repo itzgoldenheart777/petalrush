@@ -182,7 +182,15 @@ cursor:pointer;
 </div>
 
 <div id="filterSection" class="filter-bar">
-<input id="search" placeholder="Search flowers">
+
+<input id="search" oninput="searchProducts()">
+
+<select onchange="applyFilter(this.value)">
+<option value="new">Newest</option>
+<option value="low">Low → High</option>
+<option value="high">High → Low</option>
+</select>
+
 </div>
 
 <div id="home" class="products"></div>
