@@ -2,134 +2,30 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>PetalRush Buyer</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-body{
-margin:0;
-background:#0f1115;
-color:white;
-font-family:system-ui;
-}
-
-.container{
-max-width:500px;
-margin:auto;
-padding-bottom:80px;
-}
-
-.header{
-background:#111;
-padding:15px;
-text-align:center;
-}
-
-.logo{
-height:50px;
-}
-
-.filter-bar{
-padding:10px;
-background:#111;
-display:flex;
-gap:10px;
-}
-
-input,select{
-flex:1;
-padding:10px;
-border-radius:8px;
-border:none;
-background:#222;
-color:white;
-}
-
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:10px;
-padding:10px;
-}
-
-.card{
-background:#171a21;
-padding:10px;
-border-radius:10px;
-cursor:pointer;
-}
-
-.card img{
-width:100%;
-height:130px;
-object-fit:cover;
-border-radius:8px;
-}
-
-.section{
-display:none;
-padding:10px;
-}
-
-.btn{
-background:#ff4081;
-border:none;
-padding:12px;
-width:100%;
-border-radius:8px;
-color:white;
-margin-top:10px;
-cursor:pointer;
-}
-
-.cart-item{
-background:#171a21;
-padding:12px;
-margin-top:10px;
-border-radius:10px;
-}
-
-.bottom{
-position:fixed;
-bottom:0;
-width:100%;
-max-width:500px;
-display:flex;
-background:#111;
-}
-
-.bottom div{
-flex:1;
-text-align:center;
-padding:15px;
-cursor:pointer;
-}
-
-.avatar{
-width:130px;
-height:130px;
-border-radius:50%;
-border:3px solid #ff4081;
-object-fit:cover;
-cursor:pointer;
-}
-
-.invoice{
-background:#171a21;
-padding:15px;
-margin-top:10px;
-border-radius:10px;
-}
-
+body{margin:0;background:#0f1115;color:white;font-family:system-ui;}
+.container{max-width:500px;margin:auto;padding-bottom:80px;}
+.header{background:#111;padding:15px;text-align:center;}
+.logo{height:50px;}
+.filter-bar{padding:10px;background:#111;display:flex;gap:10px;}
+input,select{flex:1;padding:10px;border-radius:8px;border:none;background:#222;color:white;}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:10px;}
+.card{background:#171a21;padding:10px;border-radius:10px;cursor:pointer;}
+.card img{width:100%;height:130px;object-fit:cover;border-radius:8px;}
+.section{display:none;padding:10px;}
+.btn{background:#ff4081;border:none;padding:12px;width:100%;border-radius:8px;color:white;margin-top:10px;cursor:pointer;}
+.cart-item{background:#171a21;padding:12px;margin-top:10px;border-radius:10px;}
+.bottom{position:fixed;bottom:0;width:100%;max-width:500px;display:flex;background:#111;}
+.bottom div{flex:1;text-align:center;padding:15px;cursor:pointer;}
+.avatar{width:130px;height:130px;border-radius:50%;border:3px solid #ff4081;object-fit:cover;cursor:pointer;}
+.invoice{background:#171a21;padding:15px;margin-top:10px;border-radius:10px;}
 </style>
-
 </head>
 
 <body>
-
 <div class="container">
 
 <div class="header">
@@ -146,194 +42,114 @@ border-radius:10px;
 </div>
 
 <div id="home" class="products"></div>
-
 <div id="detail" class="section"></div>
 
 <div id="cart" class="section">
-
 <h2>Cart</h2>
-
 <div id="cartItems"></div>
-
 <div class="invoice">
-
 Subtotal ₹<span id="subtotal">0</span><br>
 Delivery ₹<span id="delivery">0</span><br>
 GST ₹<span id="gst">0</span><br>
 Discount ₹<span id="discount">0</span><br>
-
 <hr>
-
 <b>Total ₹<span id="grandTotal">0</span></b>
-
 </div>
-
 <select id="addressSelect"></select>
-
 <input id="couponInput" placeholder="Coupon">
-
 <button class="btn" onclick="applyCoupon()">Apply Coupon</button>
 <button class="btn" onclick="placeOrder()">Place Order</button>
-
 </div>
-
 
 <div id="profile" class="section">
-
 <h2>Profile</h2>
-
 <center>
-
 <img id="avatar" class="avatar" src="default-avatar.png"
 onclick="document.getElementById('avatarFile').click()">
-
 <input type="file" id="avatarFile" hidden onchange="uploadAvatar(event)">
-
 </center>
-
 <input id="nameInput" placeholder="Name">
 <input id="phoneInput" placeholder="Phone">
-
 <button class="btn" onclick="saveProfile()">Save Profile</button>
-
-
 <h3>Addresses (max 3)</h3>
-
 <input id="addressInput" placeholder="Address">
-
 <button class="btn" onclick="saveAddress()">Save Address</button>
-
 <div id="addressList"></div>
-
-
 <h3>Orders</h3>
-
 <div id="ordersList"></div>
-
 <button class="btn" onclick="logout()">Logout</button>
-
 </div>
 
-
 <div class="bottom">
-
 <div onclick="showHome()">Home</div>
 <div onclick="showCart()">Cart</div>
 <div onclick="showProfile()">Profile</div>
-
 </div>
 
 </div>
-
 
 <script>
 
-/* SUPABASE */
-
-const supabase = window.supabase.createClient(
+/* SINGLE SUPABASE INIT ONLY */
+const supabaseClient = window.supabase.createClient(
 "https://lssjsgfppehhclxqulso.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-
-/* USER */
-
 let user = JSON.parse(localStorage.getItem("user"));
-
-if(!user){
-location="index.html";
-}
-
-
-/* GLOBAL */
+if(!user){ location="index.html"; }
 
 let cartData=[];
 let discountAmount=0;
 let currentProduct=null;
 
-
 /* NAV */
-
 function hideAll(){
-home.style.display="none";
-detail.style.display="none";
-cart.style.display="none";
-profile.style.display="none";
-filterSection.style.display="none";
+document.getElementById("home").style.display="none";
+document.getElementById("detail").style.display="none";
+document.getElementById("cart").style.display="none";
+document.getElementById("profile").style.display="none";
+document.getElementById("filterSection").style.display="none";
 }
-
 
 /* HOME */
-
 async function showHome(){
-
 hideAll();
-
 home.style.display="grid";
 filterSection.style.display="flex";
-
-const {data} = await supabase
-.from("products")
-.select("*");
-
-renderProducts(data);
-
+const {data}=await supabaseClient.from("products").select("*");
+renderProducts(data||[]);
 }
 
-
 function renderProducts(data){
-
 home.innerHTML="";
-
 data.forEach(p=>{
-
 home.innerHTML+=`
 <div class="card" onclick="showDetail('${p.id}')">
-
 <img src="${p.image_url}">
 <div>${p.name}</div>
 ₹${p.price}
-
-</div>
-`;
-
+</div>`;
 });
-
 }
 
-
 /* DETAIL */
-
 async function showDetail(id){
-
 hideAll();
-
 detail.style.display="block";
-
-const {data} = await supabase
-.from("products")
-.select("*")
-.eq("id",id)
-.single();
-
+const {data}=await supabaseClient.from("products").select("*").eq("id",id).single();
 currentProduct=data;
-
 detail.innerHTML=`
 <img src="${data.image_url}" width="100%">
 <h2>${data.name}</h2>
 ₹${data.price}
 <button class="btn" onclick="addCart()">Add Cart</button>
-<button class="btn" onclick="showHome()">Back</button>
-`;
-
+<button class="btn" onclick="showHome()">Back</button>`;
 }
 
-
-/* ADD CART */
-
+/* CART */
 async function addCart(){
-
-const {data:exist} = await supabase
+const {data:exist}=await supabaseClient
 .from("cart")
 .select("*")
 .eq("user_email",user.email)
@@ -341,323 +157,173 @@ const {data:exist} = await supabase
 .maybeSingle();
 
 if(exist){
-
-await supabase.from("cart")
+await supabaseClient.from("cart")
 .update({qty:exist.qty+1})
 .eq("id",exist.id);
-
 }else{
-
-await supabase.from("cart")
-.insert({
+await supabaseClient.from("cart").insert({
 user_email:user.email,
 product_id:currentProduct.id,
 qty:1
 });
-
 }
-
 showCart();
-
 }
-
-
-/* CART */
 
 async function showCart(){
-
 hideAll();
-
 cart.style.display="block";
-
-const {data} = await supabase
+const {data}=await supabaseClient
 .from("cart")
-.select(`
-id,
-qty,
-products(name,price)
-`)
+.select(`id,qty,products(name,price, id)`)
 .eq("user_email",user.email);
 
-cartData=data;
-
-let subtotal=0;
-
+cartData=data||[];
+let sub=0;
 cartItems.innerHTML="";
-
-data.forEach(i=>{
-
+cartData.forEach(i=>{
 let price=i.qty*i.products.price;
-
-subtotal+=price;
-
+sub+=price;
 cartItems.innerHTML+=`
 <div class="cart-item">
-
 ${i.products.name} x ${i.qty}
 ₹${price}
-
 <button onclick="removeCart('${i.id}')">Delete</button>
-
-</div>
-`;
-
+</div>`;
 });
-
-calculateTotals(subtotal);
-
+calculateTotals(sub);
 loadAddresses();
-
 }
 
-
 function calculateTotals(sub){
-
-let delivery=sub===0?0:50;
+let del=sub===0?0:50;
 let gst=sub*0.05;
-let total=sub+delivery+gst-discountAmount;
-
+let total=sub+del+gst-discountAmount;
 subtotal.innerText=sub;
-delivery.innerText=delivery;
+delivery.innerText=del;
 gst.innerText=gst;
 discount.innerText=discountAmount;
 grandTotal.innerText=total;
-
 }
 
-
-/* ORDER */
-
-async function placeOrder(){
-
-if(cartData.length===0){
-
-alert("Empty Cart");
-return;
-
+async function removeCart(id){
+await supabaseClient.from("cart").delete().eq("id",id);
+showCart();
 }
-
-let orderId="ORD"+Date.now();
-
-let total=grandTotal.innerText;
-
-await supabase.from("orders").insert({
-id:orderId,
-user_email:user.email,
-price:total,
-status:"Placed"
-});
-
-
-for(const item of cartData){
-
-await supabase.from("order_items").insert({
-order_id:orderId,
-product_id:item.product_id,
-qty:item.qty,
-price:item.products.price
-});
-
-}
-
-await supabase.from("cart")
-.delete()
-.eq("user_email",user.email);
-
-showProfile();
-
-}
-
 
 /* PROFILE */
-
 async function showProfile(){
-
 hideAll();
-
 profile.style.display="block";
-
 loadProfile();
-loadAddresses();
 loadOrders();
-
+loadAddresses();
 }
 
-
 async function loadProfile(){
-
-const {data} = await supabase
+const {data}=await supabaseClient
 .from("users")
 .select("*")
 .eq("email",user.email)
 .maybeSingle();
-
 if(data){
-
 nameInput.value=data.name||"";
 phoneInput.value=data.phone||"";
 avatar.src=data.avatar_url||"default-avatar.png";
-
 }
-
 }
-
 
 async function saveProfile(){
-
-await supabase.from("users").upsert({
-
+await supabaseClient.from("users").upsert({
 email:user.email,
 name:nameInput.value,
 phone:phoneInput.value
-
 });
-
 alert("Profile Saved");
-
 }
 
-
-/* AVATAR UPLOAD */
-
+/* AVATAR */
 async function uploadAvatar(e){
-
 const file=e.target.files[0];
-
+if(!file) return;
 const fileName=user.email+"-"+Date.now();
-
-await supabase.storage
-.from("avatars")
-.upload(fileName,file);
-
-const {data} = supabase.storage
-.from("avatars")
-.getPublicUrl(fileName);
-
+await supabaseClient.storage.from("avatars").upload(fileName,file,{upsert:true});
+const {data}=supabaseClient.storage.from("avatars").getPublicUrl(fileName);
 avatar.src=data.publicUrl;
-
-await supabase.from("users")
+await supabaseClient.from("users")
 .update({avatar_url:data.publicUrl})
 .eq("email",user.email);
-
 }
-
 
 /* ADDRESS */
-
 async function saveAddress(){
-
-const {data} = await supabase
+const {data}=await supabaseClient
 .from("addresses")
 .select("*")
 .eq("user_email",user.email);
-
-if(data.length>=3){
-
-alert("Max 3 allowed");
-return;
-
-}
-
+if(data.length>=3){alert("Max 3 address allowed");return;}
 navigator.geolocation.getCurrentPosition(async pos=>{
-
 let gps=pos.coords.latitude+","+pos.coords.longitude;
-
-await supabase.from("addresses").insert({
-
+await supabaseClient.from("addresses").insert({
 user_email:user.email,
 address:addressInput.value+" GPS:"+gps
-
 });
-
 loadAddresses();
-
 });
-
 }
 
-
 async function loadAddresses(){
-
-const {data} = await supabase
+const {data}=await supabaseClient
 .from("addresses")
 .select("*")
 .eq("user_email",user.email);
-
 addressList.innerHTML="";
 addressSelect.innerHTML="";
-
-data.forEach(a=>{
-
+(data||[]).forEach(a=>{
 addressList.innerHTML+=`
 <div class="cart-item">
-
 ${a.address}
-
 <button onclick="deleteAddress('${a.id}')">Delete</button>
-
-</div>
-`;
-
-addressSelect.innerHTML+=`
-<option>${a.address}</option>
-`;
-
+</div>`;
+addressSelect.innerHTML+=`<option>${a.address}</option>`;
 });
-
 }
 
+async function deleteAddress(id){
+await supabaseClient.from("addresses").delete().eq("id",id);
+loadAddresses();
+}
 
-/* ORDERS WITH INVOICE */
-
+/* ORDERS */
 async function loadOrders(){
-
-const {data} = await supabase
+const {data}=await supabaseClient
 .from("orders")
 .select("*")
 .eq("user_email",user.email);
 
 ordersList.innerHTML="";
-
-for(const order of data){
-
-const {data:items} = await supabase
+for(const order of (data||[])){
+const {data:items}=await supabaseClient
 .from("order_items")
 .select("qty,price,products(name)")
 .eq("order_id",order.id);
 
 ordersList.innerHTML+=`
-
 <div class="invoice">
-
 <b>Order ID:</b> ${order.id}<br>
 <b>Total:</b> ₹${order.price}<br><br>
-
-${items.map(i=>`
-${i.products.name} x ${i.qty}
-₹${i.price*i.qty}
-`).join("<br>")}
-
-</div>
-
-`;
-
+${(items||[]).map(i=>`${i.products.name} x ${i.qty} ₹${i.price*i.qty}`).join("<br>")}
+</div>`;
 }
-
 }
-
 
 function logout(){
-
 localStorage.removeItem("user");
 location="index.html";
-
 }
-
 
 showHome();
 
 </script>
-
 </body>
 </html>
