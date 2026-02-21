@@ -70,6 +70,14 @@ body{
   margin-top:-2px;
 }
 
+.header-img-logo{
+  height:46px;
+  max-width:200px;
+  object-fit:contain;
+  display:block;
+  margin:0 auto;
+}
+
 /* FILTER BAR */
 .filter-bar{
   padding:12px 14px;
@@ -487,6 +495,62 @@ select option{background:#1a1d26;}
 }
 
 /* BILL STYLES */
+.bill-logo-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,64,129,0.1);
+}
+.bill-logo-img{
+  height:36px;
+  max-width:130px;
+  object-fit:contain;
+}
+.bill-logo-fallback{
+  font-family:'Playfair Display',serif;
+  font-size:16px;
+  font-weight:700;
+  color:#ff4081;
+}
+.bill-meta-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+  margin-bottom:10px;
+}
+.bill-meta-block{
+  min-width:0;
+}
+.bill-meta-label{
+  font-size:10px;
+  color:#555;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  margin-bottom:2px;
+}
+.bill-meta-val{
+  font-size:12px;
+  color:#bbb;
+  word-break:break-all;
+  line-height:1.3;
+}
+.bill-deliver-row{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+.bill-footer{
+  text-align:center;
+  font-size:12px;
+  color:#555;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed rgba(255,64,129,0.15);
+  font-style:italic;
+}
+
 .bill-card{
   background:#13161f;
   border:1px solid rgba(255,64,129,0.15);
@@ -605,7 +669,9 @@ select option{background:#1a1d26;}
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-logo">
+    <img src="Headerlogo.png" class="header-img-logo" alt="PetalRush"
+         onerror="this.style.display='none';document.getElementById('headerFallback').style.display='flex';">
+    <div class="header-logo" id="headerFallback" style="display:none;">
       <div class="header-logo-icon">🌸</div>
       <div>
         <div class="header-logo-text">PetalRush</div>
@@ -959,9 +1025,18 @@ async function placeOrder(){
 
   // Store full item details as JSON string in flower_name column
   // Format: "JSON::[{name,qty,price},...]" so loadOrders can parse it
-  var itemsJson = "JSON::" + JSON.stringify(cartData.map(function(i){
-    return { name: i.products.name, qty: i.qty, price: i.products.price };
-  }));
+  var now = new Date();
+  var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
+  var orderDate = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var orderTime = pad(now.getHours())+':'+pad(now.getMinutes());
+  var invoiceId = 'INV-' + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+
+  var itemsJson = "JSON::" + JSON.stringify({
+    items: cartData.map(function(i){ return { name: i.products.name, qty: i.qty, price: i.products.price }; }),
+    date: orderDate,
+    time: orderTime,
+    invoiceId: invoiceId
+  });
 
   // orders table: id=uuid(auto), order_id=text, user_email, flower_name, price, total_amount, status, delivery_address
   var res = await _supabase.from("orders").insert({
@@ -1200,26 +1275,50 @@ async function loadOrders(){
     var displayId = order.order_id || order.id;
     var grandTotal = parseFloat(order.total_amount || order.price || 0);
 
-    // Parse items from flower_name column
-    // New orders: stored as "JSON::[{name,qty,price}]"
-    // Old orders: stored as plain "Orchid Purple, Yellow Rose"
+    // Parse items + metadata from flower_name column
     var items = [];
+    var orderDate = '';
+    var orderTime = '';
+    var invoiceId = '';
     var fn = order.flower_name || '';
+
     if(fn.indexOf('JSON::') === 0){
-      try { items = JSON.parse(fn.substring(6)); } catch(e){ items = []; }
+      try {
+        var parsed = JSON.parse(fn.substring(6));
+        // New format: {items:[], date, time, invoiceId}
+        if(parsed.items){
+          items = parsed.items;
+          orderDate = parsed.date || '';
+          orderTime = parsed.time || '';
+          invoiceId = parsed.invoiceId || '';
+        } else if(Array.isArray(parsed)){
+          // Old JSON format: [{name,qty,price}]
+          items = parsed;
+        }
+      } catch(e){ items = []; }
     } else if(fn){
-      // Old format: plain comma-separated names, no price/qty
       items = fn.split(', ').map(function(n){ return { name:n.trim(), qty:null, price:null }; });
+    }
+
+    // Auto-generate invoiceId from order_id if missing
+    if(!invoiceId && displayId){
+      var ts = displayId.replace('ORD','');
+      if(ts && !isNaN(ts)){
+        var d = new Date(parseInt(ts));
+        var pad = function(n){ return n<10?'0'+n:''+n; };
+        invoiceId = 'INV-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+        if(!orderDate) orderDate = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+        if(!orderTime) orderTime = pad(d.getHours()) + ':' + pad(d.getMinutes());
+      }
     }
 
     // Build items table rows
     var itemRowsHtml = '';
     var itemSubtotal = 0;
-
     if(items.length > 0){
       for(var k=0; k<items.length; k++){
         var it = items[k];
-        var hasDetail = it.qty !== null && it.price !== null;
+        var hasDetail = it.qty !== null && it.qty !== undefined && it.price !== null && it.price !== undefined;
         var itTotal = hasDetail ? it.qty * it.price : null;
         if(itTotal) itemSubtotal += itTotal;
         itemRowsHtml +=
@@ -1227,12 +1326,12 @@ async function loadOrders(){
             '<td>' + it.name + '</td>' +
             '<td>' + (hasDetail ? it.qty : '-') + '</td>' +
             '<td>' + (hasDetail ? 'Rs.' + parseFloat(it.price).toFixed(2) : '-') + '</td>' +
-            '<td>' + (hasDetail ? 'Rs.' + itTotal.toFixed(2) : '-') + '</td>' +
+            '<td>' + (itTotal ? 'Rs.' + itTotal.toFixed(2) : '-') + '</td>' +
           '</tr>';
       }
       if(itemSubtotal === 0) itemSubtotal = grandTotal;
     } else {
-      itemRowsHtml = '<tr><td colspan="4" style="color:#555;text-align:center;">No item details</td></tr>';
+      itemRowsHtml = '<tr><td colspan="4" style="color:#555;text-align:center;padding:10px;">No item details</td></tr>';
       itemSubtotal = grandTotal;
     }
 
@@ -1242,13 +1341,13 @@ async function loadOrders(){
     var discount = parseFloat(Math.max(0, itemSubtotal + delivery + gst - grandTotal).toFixed(2));
 
     // Delivery address
-    var addrHtml = '';
     var addrVal = order.delivery_address || '';
-    if(addrVal && addrVal !== '' && addrVal.indexOf('Select delivery') === -1){
+    var addrHtml = '';
+    if(addrVal && addrVal.indexOf('Select delivery') === -1 && addrVal.trim()){
       addrHtml =
-        '<div class="bill-address">' +
-          '<div style="font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">Deliver To</div>' +
-          '<span>' + addrVal + '</span>' +
+        '<div class="bill-deliver-row">' +
+          '<div class="bill-meta-label">Deliver To</div>' +
+          '<div class="bill-meta-val" style="color:#ccc;">' + addrVal + '</div>' +
         '</div>';
     }
 
@@ -1260,29 +1359,51 @@ async function loadOrders(){
 
     el.innerHTML +=
       '<div class="bill-card">' +
+
+        // ── Bill Header with logo ──────────────────────────────
         '<div class="bill-header">' +
-          '<div class="bill-header-top">' +
-            '<div>' +
-              '<div class="bill-shop">PetalRush</div>' +
-              '<div class="bill-sub">Fresh Flowers · Fast Delivery</div>' +
-            '</div>' +
-            '<div class="bill-order-no">' +
-              '<div style="color:#666;font-size:10px;margin-bottom:2px;">ORDER ID</div>' +
-              '<b>' + displayId + '</b>' +
-            '</div>' +
+
+          '<div class="bill-logo-row">' +
+            '<img src="Headerlogo.png" class="bill-logo-img" alt="PetalRush" ' +
+              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">' +
+            '<span class="bill-logo-fallback" style="display:none;">🌸 PetalRush</span>' +
+            '<span class="status-badge" style="background:' + statusColor + '22;color:' + statusColor + ';border-color:' + statusColor + '44;margin-left:auto;">' + (order.status || 'Placed') + '</span>' +
           '</div>' +
-          '<div style="margin-top:8px;">' +
-            '<span class="status-badge" style="background:' + statusColor + '22;color:' + statusColor + ';border-color:' + statusColor + '44;">' + (order.status || 'Placed') + '</span>' +
+
+          '<div class="bill-meta-grid">' +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Invoice No.</div>' +
+              '<div class="bill-meta-val">' + (invoiceId || displayId) + '</div>' +
+            '</div>' +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Order ID</div>' +
+              '<div class="bill-meta-val">' + displayId + '</div>' +
+            '</div>' +
+
+            (orderDate ? '<div class="bill-meta-block"><div class="bill-meta-label">Date</div><div class="bill-meta-val">' + orderDate + '</div></div>' : '') +
+            (orderTime ? '<div class="bill-meta-block"><div class="bill-meta-label">Time</div><div class="bill-meta-val">' + orderTime + '</div></div>' : '') +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Billed To</div>' +
+              '<div class="bill-meta-val">' + (user.email || '-') + '</div>' +
+            '</div>' +
+
           '</div>' +
+
           addrHtml +
+
         '</div>' +
 
+        // ── Items Table ────────────────────────────────────────
         '<div class="bill-body">' +
           '<table class="bill-table">' +
             '<thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>' +
             '<tbody>' + itemRowsHtml + '</tbody>' +
           '</table>' +
 
+          // ── Totals ──────────────────────────────────────────
           '<div class="bill-totals">' +
             '<div class="bill-row"><span>Item Total</span><span>Rs.' + itemSubtotal.toFixed(2) + '</span></div>' +
             '<div class="bill-row"><span>Delivery Fee</span><span>' + (delivery > 0 ? 'Rs.' + delivery.toFixed(2) : 'FREE') + '</span></div>' +
@@ -1290,11 +1411,15 @@ async function loadOrders(){
             (discount > 1 ? '<div class="bill-row discount"><span>Discount Applied</span><span>- Rs.' + discount.toFixed(2) + '</span></div>' : '') +
             '<div class="bill-grand"><span>Order Total</span><span>Rs.' + grandTotal.toFixed(2) + '</span></div>' +
           '</div>' +
+
+          '<div class="bill-footer">Thank you for choosing PetalRush 🌸</div>' +
+
         '</div>' +
 
       '</div>';
   }
 }
+
 
 // ─── LOGOUT ───────────────────────────────────────────────────────
 function doLogout(){
