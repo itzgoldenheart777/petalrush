@@ -1571,80 +1571,126 @@ function downloadBill(billId, format, invoiceName){
   var el = document.getElementById(billId);
   if(!el){ showToast("Receipt not found"); return; }
 
-  showToast("Preparing download...");
-
-  // Temporarily show the printable div in-page (not off-screen)
-  // Must be visible and in viewport for html2canvas to work
+  // ── Build full-screen overlay with close button ──────────────────
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;';
-  document.body.appendChild(overlay);
+  overlay.id = 'bill-overlay';
+  overlay.style.cssText = [
+    'position:fixed','top:0','left:0','width:100%','height:100%',
+    'background:rgba(0,0,0,0.88)','z-index:9998',
+    'display:flex','flex-direction:column',
+    'align-items:center','overflow-y:auto','padding:16px 0 80px'
+  ].join(';');
 
-  var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'margin:20px auto;';
-  overlay.appendChild(wrapper);
+  // Close button bar
+  var closeBar = document.createElement('div');
+  closeBar.style.cssText = 'width:100%;max-width:420px;display:flex;justify-content:flex-end;margin-bottom:10px;padding:0 8px;box-sizing:border-box;flex-shrink:0;';
+  closeBar.innerHTML = '<button onclick="document.getElementById(\'bill-overlay\').remove()" style="background:#222;border:1px solid rgba(255,64,129,0.3);color:#ff4081;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;">✕ Close</button>';
+  overlay.appendChild(closeBar);
 
-  // Clone the printable into the overlay
+  // Clone receipt card (white print version)
   el.style.display = 'block';
-  el.style.position = 'static';
-  el.style.left = '0';
   var clone = el.cloneNode(true);
-  clone.style.cssText = 'display:block;position:static;left:0;width:360px;background:#fff;color:#111;font-family:Arial,sans-serif;padding:28px 24px;box-sizing:border-box;';
-  wrapper.appendChild(clone);
+  clone.removeAttribute('id');
+  clone.style.cssText = [
+    'display:block','position:static','left:0',
+    'width:340px','max-width:92vw',
+    'background:#fff','color:#111',
+    'font-family:Arial,sans-serif',
+    'padding:24px 20px','box-sizing:border-box',
+    'border-radius:10px',
+    'box-shadow:0 8px 40px rgba(0,0,0,0.5)'
+  ].join(';');
+  overlay.appendChild(clone);
   el.style.display = 'none';
 
-  setTimeout(function(){
-    html2canvas(clone, {
+  // Download action buttons (PDF + PNG + Save to Device)
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:14px;width:340px;max-width:92vw;';
+  btnRow.innerHTML = [
+    '<button onclick="triggerCapture(\''+billId+'\',\'pdf\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">⬇ PDF</button>',
+    '<button onclick="triggerCapture(\''+billId+'\',\'png\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">🖼 PNG</button>',
+    '<button onclick="triggerCapture(\''+billId+'\',\'share\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">📲 Share</button>'
+  ].join('');
+  overlay.appendChild(btnRow);
+
+  document.body.appendChild(overlay);
+
+  // Close on backdrop tap (not on card itself)
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay){ overlay.remove(); }
+  });
+}
+
+// Capture and download/share the visible clone inside overlay
+async function triggerCapture(billId, format, invoiceName){
+  var overlay = document.getElementById('bill-overlay');
+  if(!overlay){ showToast("Preview closed"); return; }
+
+  // Find the cloned receipt (second child after closeBar)
+  var clone = overlay.children[1];
+  if(!clone){ showToast("Receipt element not found"); return; }
+
+  showToast("Generating...");
+
+  try {
+    var canvas = await html2canvas(clone, {
       scale: 2,
       backgroundColor: '#ffffff',
       useCORS: true,
       allowTaint: true,
-      logging: false,
-      width: 360,
-      windowWidth: 360
-    }).then(function(canvas){
-      document.body.removeChild(overlay);
-
-      if(format === 'pdf'){
-        try {
-          var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
-          if(!jsPDFLib){
-            // Fallback: download as PNG if jsPDF failed to load
-            showToast("Saving as PNG instead...");
-            var lnk = document.createElement('a');
-            lnk.download = (invoiceName||'receipt') + '.png';
-            lnk.href = canvas.toDataURL('image/png');
-            document.body.appendChild(lnk);
-            lnk.click();
-            document.body.removeChild(lnk);
-            return;
-          }
-          var imgData = canvas.toDataURL('image/png');
-          var pxW = canvas.width / 2;
-          var pxH = canvas.height / 2;
-          var pdf = new jsPDFLib({ orientation:'portrait', unit:'px', format:[pxW, pxH] });
-          pdf.addImage(imgData, 'PNG', 0, 0, pxW, pxH);
-          pdf.save((invoiceName||'receipt') + '.pdf');
-          showToast("PDF downloaded!");
-        } catch(err){
-          showToast("PDF error: " + err.message);
-        }
-      } else {
-        var lnk = document.createElement('a');
-        lnk.download = (invoiceName||'receipt') + '.png';
-        lnk.href = canvas.toDataURL('image/png');
-        document.body.appendChild(lnk);
-        lnk.click();
-        document.body.removeChild(lnk);
-        showToast("PNG downloaded!");
-      }
-    }).catch(function(err){
-      document.body.removeChild(overlay);
-      showToast("Capture failed: " + err.message);
+      logging: false
     });
-  }, 300);
+
+    var dataUrl = canvas.toDataURL('image/png');
+
+    if(format === 'share' && navigator.share){
+      // Web Share API → Save to device / WhatsApp / etc.
+      canvas.toBlob(async function(blob){
+        var file = new File([blob], (invoiceName||'receipt')+'.png', { type:'image/png' });
+        try {
+          await navigator.share({ files:[file], title:'PetalRush Receipt', text:'My order receipt from PetalRush' });
+          showToast("Shared!");
+        } catch(e){
+          if(e.name !== 'AbortError') showToast("Share failed: "+e.message);
+        }
+      }, 'image/png');
+
+    } else if(format === 'pdf'){
+      var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+      if(!jsPDFLib){
+        // Fallback to PNG if jsPDF not loaded
+        var a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = (invoiceName||'receipt')+'.png';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        showToast("Saved as PNG (PDF lib unavailable)");
+      } else {
+        var pxW = canvas.width / 2;
+        var pxH = canvas.height / 2;
+        var pdf = new jsPDFLib({ orientation:'portrait', unit:'px', format:[pxW, pxH] });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, pxW, pxH);
+        pdf.save((invoiceName||'receipt')+'.pdf');
+        showToast("PDF saved!");
+      }
+
+    } else {
+      // PNG save to device
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = (invoiceName||'receipt')+'.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("PNG saved to device!");
+    }
+
+  } catch(err){
+    showToast("Error: " + err.message);
+    console.error(err);
+  }
 }
 
-// ─── LOGOUT ───────────────────────────────────────────────────────// ─── LOGOUT ───────────────────────────────────────────────────────
+// ─── LOGOUT ───────────────────────────────────────────────────────// ─── LOGOUT ───────────────────────────────────────────────────────// ─── LOGOUT ───────────────────────────────────────────────────────
 function doLogout(){
   localStorage.removeItem("user");
   location.href = "index.html";
