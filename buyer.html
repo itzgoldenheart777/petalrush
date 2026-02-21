@@ -954,14 +954,20 @@ async function placeOrder(){
   var orderId = "ORD" + Date.now();
   var total = parseFloat(document.getElementById('grandTotal').textContent);
   var addr = document.getElementById('addressSelect').value || '';
-  // Build flower names list for the flower_name column
+  // Build flower names (plain text) for flower_name column
   var flowerNames = cartData.map(function(i){ return i.products.name; }).join(", ");
+
+  // Store full item details as JSON string in flower_name column
+  // Format: "JSON::[{name,qty,price},...]" so loadOrders can parse it
+  var itemsJson = "JSON::" + JSON.stringify(cartData.map(function(i){
+    return { name: i.products.name, qty: i.qty, price: i.products.price };
+  }));
 
   // orders table: id=uuid(auto), order_id=text, user_email, flower_name, price, total_amount, status, delivery_address
   var res = await _supabase.from("orders").insert({
     order_id: orderId,
     user_email: user.email,
-    flower_name: flowerNames,
+    flower_name: itemsJson,
     price: total,
     total_amount: total,
     status: "Placed",
@@ -970,7 +976,7 @@ async function placeOrder(){
 
   if(res.error){ showToast("Order failed: " + res.error.message); return; }
 
-  // Insert order_items using orderId text (order_id field)
+  // Also try inserting order_items (best effort, may fail due to RLS/uuid - not critical)
   for(var i=0; i<cartData.length; i++){
     var item = cartData[i];
     await _supabase.from("order_items").insert({
@@ -1194,13 +1200,17 @@ async function loadOrders(){
     var displayId = order.order_id || order.id;
     var grandTotal = parseFloat(order.total_amount || order.price || 0);
 
-    // Fetch order_items with product details
-    var iRes = await _supabase
-      .from("order_items")
-      .select("qty,price,products(name)")
-      .eq("order_id", displayId);
-
-    var items = iRes.data || [];
+    // Parse items from flower_name column
+    // New orders: stored as "JSON::[{name,qty,price}]"
+    // Old orders: stored as plain "Orchid Purple, Yellow Rose"
+    var items = [];
+    var fn = order.flower_name || '';
+    if(fn.indexOf('JSON::') === 0){
+      try { items = JSON.parse(fn.substring(6)); } catch(e){ items = []; }
+    } else if(fn){
+      // Old format: plain comma-separated names, no price/qty
+      items = fn.split(', ').map(function(n){ return { name:n.trim(), qty:null, price:null }; });
+    }
 
     // Build items table rows
     var itemRowsHtml = '';
@@ -1209,40 +1219,36 @@ async function loadOrders(){
     if(items.length > 0){
       for(var k=0; k<items.length; k++){
         var it = items[k];
-        var itTotal = it.qty * it.price;
-        itemSubtotal += itTotal;
+        var hasDetail = it.qty !== null && it.price !== null;
+        var itTotal = hasDetail ? it.qty * it.price : null;
+        if(itTotal) itemSubtotal += itTotal;
         itemRowsHtml +=
           '<tr>' +
-            '<td>' + (it.products ? it.products.name : 'Item') + '</td>' +
-            '<td>' + it.qty + '</td>' +
-            '<td>Rs.' + it.price.toFixed(2) + '</td>' +
-            '<td>Rs.' + itTotal.toFixed(2) + '</td>' +
+            '<td>' + it.name + '</td>' +
+            '<td>' + (hasDetail ? it.qty : '-') + '</td>' +
+            '<td>' + (hasDetail ? 'Rs.' + parseFloat(it.price).toFixed(2) : '-') + '</td>' +
+            '<td>' + (hasDetail ? 'Rs.' + itTotal.toFixed(2) : '-') + '</td>' +
           '</tr>';
       }
-    } else if(order.flower_name){
-      // Fallback from flower_name column
-      var names = order.flower_name.split(', ');
-      for(var n=0; n<names.length; n++){
-        itemRowsHtml += '<tr><td>' + names[n] + '</td><td>-</td><td>-</td><td>-</td></tr>';
-      }
-      itemSubtotal = grandTotal;
+      if(itemSubtotal === 0) itemSubtotal = grandTotal;
     } else {
       itemRowsHtml = '<tr><td colspan="4" style="color:#555;text-align:center;">No item details</td></tr>';
       itemSubtotal = grandTotal;
     }
 
-    // Recalculate billing breakdown
+    // Billing breakdown
     var delivery = itemSubtotal > 0 ? 50 : 0;
-    var gst = itemSubtotal * 0.05;
-    var discount = Math.max(0, (itemSubtotal + delivery + gst) - grandTotal);
+    var gst = parseFloat((itemSubtotal * 0.05).toFixed(2));
+    var discount = parseFloat(Math.max(0, itemSubtotal + delivery + gst - grandTotal).toFixed(2));
 
-    // Delivery address display
+    // Delivery address
     var addrHtml = '';
-    if(order.delivery_address && order.delivery_address.trim() && order.delivery_address !== '— Select delivery address —'){
+    var addrVal = order.delivery_address || '';
+    if(addrVal && addrVal !== '' && addrVal.indexOf('Select delivery') === -1){
       addrHtml =
         '<div class="bill-address">' +
           '<div style="font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">Deliver To</div>' +
-          '<span>' + order.delivery_address + '</span>' +
+          '<span>' + addrVal + '</span>' +
         '</div>';
     }
 
@@ -1250,52 +1256,39 @@ async function loadOrders(){
     var statusColor = '#ff4081';
     if(order.status === 'Delivered') statusColor = '#4caf50';
     else if(order.status === 'Cancelled') statusColor = '#f44336';
+    else if(order.status === 'Shipped') statusColor = '#ff9800';
 
     el.innerHTML +=
       '<div class="bill-card">' +
-
-        // Header
         '<div class="bill-header">' +
           '<div class="bill-header-top">' +
             '<div>' +
-              '<div class="bill-shop">🌸 PetalRush</div>' +
+              '<div class="bill-shop">PetalRush</div>' +
               '<div class="bill-sub">Fresh Flowers · Fast Delivery</div>' +
             '</div>' +
             '<div class="bill-order-no">' +
-              '<div style="color:#666;font-size:10px;">ORDER ID</div>' +
+              '<div style="color:#666;font-size:10px;margin-bottom:2px;">ORDER ID</div>' +
               '<b>' + displayId + '</b>' +
             '</div>' +
           '</div>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">' +
+          '<div style="margin-top:8px;">' +
             '<span class="status-badge" style="background:' + statusColor + '22;color:' + statusColor + ';border-color:' + statusColor + '44;">' + (order.status || 'Placed') + '</span>' +
           '</div>' +
           addrHtml +
         '</div>' +
 
-        // Items table
         '<div class="bill-body">' +
           '<table class="bill-table">' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Item</th>' +
-                '<th>Qty</th>' +
-                '<th>Rate</th>' +
-                '<th>Amount</th>' +
-              '</tr>' +
-            '</thead>' +
+            '<thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>' +
             '<tbody>' + itemRowsHtml + '</tbody>' +
           '</table>' +
 
-          // Totals
           '<div class="bill-totals">' +
             '<div class="bill-row"><span>Item Total</span><span>Rs.' + itemSubtotal.toFixed(2) + '</span></div>' +
             '<div class="bill-row"><span>Delivery Fee</span><span>' + (delivery > 0 ? 'Rs.' + delivery.toFixed(2) : 'FREE') + '</span></div>' +
             '<div class="bill-row"><span>GST (5%)</span><span>Rs.' + gst.toFixed(2) + '</span></div>' +
-            (discount > 0.5 ? '<div class="bill-row discount"><span>Discount Applied</span><span>- Rs.' + discount.toFixed(2) + '</span></div>' : '') +
-            '<div class="bill-grand">' +
-              '<span>Order Total</span>' +
-              '<span>Rs.' + grandTotal.toFixed(2) + '</span>' +
-            '</div>' +
+            (discount > 1 ? '<div class="bill-row discount"><span>Discount Applied</span><span>- Rs.' + discount.toFixed(2) + '</span></div>' : '') +
+            '<div class="bill-grand"><span>Order Total</span><span>Rs.' + grandTotal.toFixed(2) + '</span></div>' +
           '</div>' +
         '</div>' +
 
