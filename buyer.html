@@ -813,49 +813,75 @@ async function applyCoupon(){
 }
 
 // ─── PLACE ORDER ──────────────────────────────────────────────────
+  
 async function placeOrder(){
   if(!cartData.length){ showToast("Cart is empty"); return; }
 
-  var orderId = "ORD" + Date.now();
   var total = parseFloat(document.getElementById('grandTotal').textContent);
-  var addr = document.getElementById('addressSelect').value || '';
+  var addrId = document.getElementById('addressSelect').value;
+  if(!addrId){ showToast("Select delivery address"); return; }
 
-  var res = await _supabase.from("orders").insert({
-    id: orderId,
-    user_email: user.email,
-    price: total,
-    status: "Placed",
-    delivery_address: addr
-  });
+  var orderCode = "ORD" + Date.now();
 
-  if(res.error){ showToast("Order failed: " + res.error.message); return; }
+  // create main order
+  var { data: orderInsert, error } = await _supabase
+    .from("orders")
+    .insert({
+      order_id: orderCode,
+      user_email: user.email,
+      total_amount: total,
+      status: "Placed",
+      delivery_address: addrId
+    })
+    .select()
+    .single();
 
+  if(error){
+    showToast("Order failed: " + error.message);
+    return;
+  }
+
+  // insert order items
   for(var i=0; i<cartData.length; i++){
     var item = cartData[i];
     await _supabase.from("order_items").insert({
-      order_id: orderId,
+      order_id: orderInsert.id, // real UUID
       product_id: item.product_id,
       qty: item.qty,
       price: item.products.price
     });
   }
 
-  if(appliedCoupon){
-    await _supabase.from("coupons")
-      .update({ used_count: (appliedCoupon.used_count||0)+1 })
-      .eq("code", appliedCoupon.code);
+  // update coupon usage
+ async function applyCoupon(){
+  var code = document.getElementById('couponInput').value.trim();
+  if(!code){ showToast("Enter a coupon code"); return; }
+
+  var { data, error } = await _supabase
+    .from("coupons")
+    .select("*")
+    .eq("code", code)
+    .single();
+
+  if(error || !data){
+    showToast("❌ Invalid coupon");
+    return;
   }
 
-  await _supabase.from("cart").delete().eq("user_email", user.email);
+  if(data.usage_limit && data.used_count >= data.usage_limit){
+    showToast("⚠️ Coupon limit reached");
+    return;
+  }
 
-  discountAmount = 0;
-  appliedCoupon = null;
-  cartData = [];
+  appliedCoupon = data;
+  discountAmount = Number(data.discount) || 0;
 
-  showToast("🎉 Order placed successfully!");
-  setTimeout(function(){ showProfile(); }, 800);
+  showToast("✅ Coupon applied! ₹" + discountAmount + " off");
+
+  // recalculate totals WITHOUT reloading cart
+  var sub = parseFloat(document.getElementById('subtotal').textContent);
+  calculateTotals(sub);
 }
-
 // ─── PROFILE ──────────────────────────────────────────────────────
 async function showProfile(){
   hideAll();
