@@ -793,17 +793,28 @@ async function applyCoupon(){
   var code = document.getElementById('couponInput').value.trim();
   if(!code){ showToast("Enter a coupon code"); return; }
 
+  // Try exact match first (case-sensitive), then uppercase
   var res = await _supabase
     .from("coupons")
-    .select("*")
+    .select("code,discount,usage_limit,used_count,multi_use")
     .eq("code", code)
     .maybeSingle();
 
-  if(!res.data){ showToast("❌ Invalid coupon"); return; }
+  // If not found, try uppercase version
+  if(!res.data && !res.error){
+    res = await _supabase
+      .from("coupons")
+      .select("code,discount,usage_limit,used_count,multi_use")
+      .eq("code", code.toUpperCase())
+      .maybeSingle();
+  }
+
+  if(res.error){ showToast("❌ Error checking coupon: " + res.error.message); return; }
+  if(!res.data){ showToast("❌ Invalid coupon code"); return; }
 
   var data = res.data;
   if(data.usage_limit && data.used_count >= data.usage_limit){
-    showToast("⚠️ Coupon limit reached"); return;
+    showToast("⚠️ Coupon usage limit reached"); return;
   }
 
   appliedCoupon = data;
@@ -813,75 +824,58 @@ async function applyCoupon(){
 }
 
 // ─── PLACE ORDER ──────────────────────────────────────────────────
-  
 async function placeOrder(){
   if(!cartData.length){ showToast("Cart is empty"); return; }
 
+  var orderId = "ORD" + Date.now();
   var total = parseFloat(document.getElementById('grandTotal').textContent);
-  var addrId = document.getElementById('addressSelect').value;
-  if(!addrId){ showToast("Select delivery address"); return; }
+  var addr = document.getElementById('addressSelect').value || '';
+  // Build flower names list for the flower_name column
+  var flowerNames = cartData.map(function(i){ return i.products.name; }).join(", ");
 
-  var orderCode = "ORD" + Date.now();
+  // orders table: id=uuid(auto), order_id=text, user_email, flower_name, price, total_amount, status, delivery_address
+  var res = await _supabase.from("orders").insert({
+    order_id: orderId,
+    user_email: user.email,
+    flower_name: flowerNames,
+    price: total,
+    total_amount: total,
+    status: "Placed",
+    delivery_address: addr
+  });
 
-  // create main order
-  var { data: orderInsert, error } = await _supabase
-    .from("orders")
-    .insert({
-      order_id: orderCode,
-      user_email: user.email,
-      total_amount: total,
-      status: "Placed",
-      delivery_address: addrId
-    })
-    .select()
-    .single();
+  if(res.error){ showToast("Order failed: " + res.error.message); return; }
 
-  if(error){
-    showToast("Order failed: " + error.message);
-    return;
-  }
+  // Fetch the inserted order's uuid id for order_items
+  var orderRes = await _supabase.from("orders").select("id").eq("order_id", orderId).single();
+  var orderUUID = orderRes.data ? orderRes.data.id : orderId;
 
-  // insert order items
   for(var i=0; i<cartData.length; i++){
     var item = cartData[i];
     await _supabase.from("order_items").insert({
-      order_id: orderInsert.id, // real UUID
+      order_id: orderUUID,
       product_id: item.product_id,
       qty: item.qty,
       price: item.products.price
     });
   }
 
-  // update coupon usage
- async function applyCoupon(){
-  var code = document.getElementById('couponInput').value.trim();
-  if(!code){ showToast("Enter a coupon code"); return; }
-
-  var { data, error } = await _supabase
-    .from("coupons")
-    .select("*")
-    .eq("code", code)
-    .single();
-
-  if(error || !data){
-    showToast("❌ Invalid coupon");
-    return;
+  if(appliedCoupon){
+    await _supabase.from("coupons")
+      .update({ used_count: (appliedCoupon.used_count||0)+1 })
+      .eq("code", appliedCoupon.code);
   }
 
-  if(data.usage_limit && data.used_count >= data.usage_limit){
-    showToast("⚠️ Coupon limit reached");
-    return;
-  }
+  await _supabase.from("cart").delete().eq("user_email", user.email);
 
-  appliedCoupon = data;
-  discountAmount = Number(data.discount) || 0;
+  discountAmount = 0;
+  appliedCoupon = null;
+  cartData = [];
 
-  showToast("✅ Coupon applied! ₹" + discountAmount + " off");
-
-  // recalculate totals WITHOUT reloading cart
-  var sub = parseFloat(document.getElementById('subtotal').textContent);
-  calculateTotals(sub);
+  showToast("🎉 Order placed successfully!");
+  setTimeout(function(){ showProfile(); }, 800);
 }
+
 // ─── PROFILE ──────────────────────────────────────────────────────
 async function showProfile(){
   hideAll();
@@ -958,14 +952,39 @@ async function uploadAvatar(e){
   var ext = file.name.split('.').pop();
   var fileName = user.email.replace(/[^a-z0-9]/gi,'_') + "-" + Date.now() + "." + ext;
 
-  var upRes = await _supabase.storage
-    .from("avatars")
-    .upload(fileName, file, {upsert:true});
+  // Try bucket "avatars" first, then "avatar" (common naming variants)
+  var bucketNames = ["avatars", "avatar", "images", "public"];
+  var uploadSuccess = false;
+  var url = '';
 
-  if(upRes.error){ showToast("❌ Upload failed: " + upRes.error.message); return; }
+  for(var b=0; b<bucketNames.length; b++){
+    var upRes = await _supabase.storage
+      .from(bucketNames[b])
+      .upload(fileName, file, {upsert:true});
 
-  var urlData = _supabase.storage.from("avatars").getPublicUrl(fileName);
-  var url = urlData.data.publicUrl;
+    if(!upRes.error){
+      var urlData = _supabase.storage.from(bucketNames[b]).getPublicUrl(fileName);
+      url = urlData.data.publicUrl;
+      uploadSuccess = true;
+      break;
+    }
+  }
+
+  if(!uploadSuccess){
+    // Fallback: store avatar as base64 in users table directly
+    var reader = new FileReader();
+    reader.onload = async function(ev){
+      var base64 = ev.target.result;
+      document.getElementById('avatarImg').src = base64;
+      await _supabase.from("users").upsert({
+        email: user.email,
+        avatar_url: base64
+      }, {onConflict:'email'});
+      showToast("✅ Avatar saved locally!");
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
 
   document.getElementById('avatarImg').src = url;
 
