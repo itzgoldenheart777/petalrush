@@ -1054,16 +1054,21 @@ async function deleteAddress(id){
   loadAddressesList();
 }
 
-// ─── ORDERS ───────────────────────────────────────────────────────
+// ─── ORDERS ──────────────────────────────────────────────
 async function loadOrders(){
   var el = document.getElementById('ordersList');
   el.innerHTML = '<div class="loading"><span class="spinner"></span>Loading orders...</div>';
 
+  // orders table columns (no created_at): id, order_id, user_email, flower_name, price, total_amount, status, delivery_address
   var res = await _supabase
     .from("orders")
-    .select("id,order_id,flower_name,price,total_amount,status,delivery_address,created_at")
-    .eq("user_email", user.email)
-    .order("created_at", {ascending:false});
+    .select("id,order_id,flower_name,price,total_amount,status,delivery_address")
+    .eq("user_email", user.email);
+
+  if(res.error){
+    el.innerHTML = '<div class="empty-state"><div>📦</div>Could not load orders.<br><small style="font-size:11px;color:#666;">' + res.error.message + '</small></div>';
+    return;
+  }
 
   var orders = res.data || [];
 
@@ -1075,33 +1080,40 @@ async function loadOrders(){
   el.innerHTML = '';
   for(var j=0; j<orders.length; j++){
     var order = orders[j];
-    // Use order_id text field for linking to order_items
     var displayId = order.order_id || order.id;
+
+    // Try to fetch order_items using order_id (text field)
     var iRes = await _supabase
       .from("order_items")
       .select("qty,price,products(name)")
       .eq("order_id", displayId);
 
     var items = iRes.data || [];
-    // If no items via order_id, try flower_name from orders table
     var itemLines = '';
+
     if(items.length > 0){
       itemLines = items.map(function(i){
         return '<div class="order-item-line">' +
-          (i.products ? i.products.name : 'Item') + ' × ' + i.qty +
-          ' — ₹' + (i.qty * i.price).toFixed(2) +
+          (i.products ? i.products.name : 'Item') + ' x ' + i.qty +
+          ' - Rs.' + (i.qty * i.price).toFixed(2) +
         '</div>';
       }).join('');
     } else if(order.flower_name){
-      itemLines = '<div class="order-item-line">' + order.flower_name + '</div>';
+      // Fallback: show flower_name stored directly on order
+      itemLines = order.flower_name.split(', ').map(function(name){
+        return '<div class="order-item-line">' + name + '</div>';
+      }).join('');
     }
+
+    var amount = parseFloat(order.total_amount || order.price || 0).toFixed(2);
 
     el.innerHTML +=
       '<div class="order-card">' +
-        '<div class="order-id">Order ID: ' + displayId + '</div>' +
-        '<span class="status-badge">' + (order.status||'Placed') + '</span>' +
-        '<div class="order-total">₹' + parseFloat(order.price||order.total_amount||0).toFixed(2) + '</div>' +
-        itemLines +
+        '<div class="order-id">Order: ' + displayId + '</div>' +
+        '<span class="status-badge">' + (order.status || 'Placed') + '</span>' +
+        '<div class="order-total">Rs.' + amount + '</div>' +
+        (itemLines || '<div class="order-item-line" style="color:#555;">No item details</div>') +
+        (order.delivery_address ? '<div style="font-size:11px;color:#555;margin-top:6px;">Deliver to: ' + order.delivery_address + '</div>' : '') +
       '</div>';
   }
 }
