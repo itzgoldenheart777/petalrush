@@ -71,11 +71,22 @@ body{
 }
 
 .header-img-logo{
-  height:46px;
-  max-width:200px;
+  height:44px;
+  max-width:150px;
   object-fit:contain;
   display:block;
-  margin:0 auto;
+  flex-shrink:0;
+}
+
+.header-logo-combined{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+
+.header-logo-text-block{
+  text-align:left;
 }
 
 /* FILTER BAR */
@@ -669,11 +680,10 @@ select option{background:#1a1d26;}
 
   <!-- HEADER -->
   <div class="header">
-    <img src="Headerlogo.png" class="header-img-logo" alt="PetalRush"
-         onerror="this.style.display='none';document.getElementById('headerFallback').style.display='flex';">
-    <div class="header-logo" id="headerFallback" style="display:none;">
-      <div class="header-logo-icon">🌸</div>
-      <div>
+    <div class="header-logo-combined">
+      <img src="Headerlogo.png" class="header-img-logo" alt="PetalRush"
+           onerror="this.style.display='none';">
+      <div class="header-logo-text-block">
         <div class="header-logo-text">PetalRush</div>
         <div class="header-logo-sub">Fresh Flowers · Fast Delivery</div>
       </div>
@@ -1019,7 +1029,12 @@ async function placeOrder(){
 
   var orderId = "ORD" + Date.now();
   var total = parseFloat(document.getElementById('grandTotal').textContent);
-  var addr = document.getElementById('addressSelect').value || '';
+  // Get the actual address TEXT from the selected option (not the UUID value)
+  var addrSelect = document.getElementById('addressSelect');
+  var addr = '';
+  if(addrSelect && addrSelect.selectedIndex > 0){
+    addr = addrSelect.options[addrSelect.selectedIndex].text;
+  }
   // Build flower names (plain text) for flower_name column
   var flowerNames = cartData.map(function(i){ return i.products.name; }).join(", ");
 
