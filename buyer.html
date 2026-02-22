@@ -33,23 +33,18 @@
 }
 
 body.light-mode{
-  --bg:#f4f1ee;
-  --bg2:#fff;
-  --bg3:#fafafa;
-  --bg4:#f0ede8;
+  --bg:#f7f4f2;
+  --bg2:#ffffff;
+  --bg3:#faf7f5;
+  --bg4:#f1ece9;
   --border:rgba(0,0,0,0.08);
-  --border2:rgba(0,0,0,0.1);
+  --border2:rgba(0,0,0,0.12);
   --text:#1a1a1a;
-  --text2:#333;
-  --text3:#666;
-  --text4:#999;
-  --accent:#ff4081;
-  --accent2:#e0205f;
+  --text2:#333333;
+  --text3:#666666;
+  --text4:#999999;
   --card:#ffffff;
-  --input-bg:#f5f2ef;
-  --header-bg:linear-gradient(135deg,#fff5f7 0%,#fff 100%);
-  --bottom-bg:#ffffff;
-  --shadow:rgba(255,64,129,0.15);
+  --input-bg:#f3efec;
 }
 
 body{
@@ -846,6 +841,17 @@ body.light-mode .header-logo-sub{ color:#888; }
 body.light-mode .qty-stepper{ border-color:rgba(255,64,129,0.4); }
 body.light-mode .qty-btn{ background:#f0ede8; }
 body.light-mode .qty-num{ background:#e8e4e0; color:#1a1a1a; }
+body.light-mode .card-name{
+  color:#222 !important;
+}
+
+body.light-mode .product-name{
+  color:#1a1a1a !important;
+}
+
+body.light-mode .product-desc{
+  color:#444 !important;
+}
 </style>
 </head>
 <body>
@@ -1846,32 +1852,42 @@ async function captureAndSave(format, invoiceName){
   showToast("Preparing...");
 
   try {
-    var canvas = await html2canvas(clone, {
-      scale: 2.5,
-      backgroundColor: '#ffffff',
-      useCORS: true,
-      allowTaint: true,
-      logging: false
-    });
+   var canvas = await html2canvas(clone, {
+     scale: window.devicePixelRatio > 1 ? 3 : 2,
+     backgroundColor: '#ffffff',
+     useCORS: true,
+     allowTaint: false
+   });
 
-    if(format === 'share'){
-      // Share as PNG (works great on Android/iOS - saves to gallery or share sheet)
-      canvas.toBlob(async function(blob){
-        var file = new File([blob], (invoiceName||'PetalRush-Receipt')+'.png', { type:'image/png' });
-        if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
-          try {
-            await navigator.share({ files:[file], title:'PetalRush Receipt', text:'My order receipt' });
-            showToast("Shared!");
-          } catch(e){
-            if(e.name !== 'AbortError') downloadPNG(canvas, invoiceName);
-          }
-        } else {
-          // Fallback: direct PNG download
+   if(format === 'share'){
+  canvas.toBlob(async function(blob){
+
+    const file = new File(
+      [blob],
+      (invoiceName || 'PetalRush-Receipt') + '.png',
+      { type: 'image/png' }
+    );
+
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({
+          files: [file],
+          title: 'PetalRush Receipt',
+          text: 'My order receipt'
+        });
+        showToast("Shared successfully!");
+        overlay.remove();
+      }catch(e){
+        if(e.name !== 'AbortError'){
           downloadPNG(canvas, invoiceName);
         }
-      }, 'image/png');
-
+      }
     } else {
+      downloadPNG(canvas, invoiceName);
+    }
+
+  }, 'image/png');
+   }else {
       // PDF download
       var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
       if(!jsPDFLib){
@@ -2048,35 +2064,49 @@ async function changePassword(){
   var newPwd = document.getElementById('pwdNew').value.trim();
   var conf = document.getElementById('pwdConfirm').value.trim();
 
-  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
-  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
+  if(!oldPwd || !newPwd || !conf){
+    showToast("Fill in all password fields");
+    return;
+  }
 
-  // Step 1: Re-authenticate with old password via Supabase Auth signIn
-  var signInRes = await _supabase.auth.signInWithPassword({
+  if(newPwd !== conf){
+    showToast("New passwords don't match");
+    return;
+  }
+
+  if(newPwd.length < 6){
+    showToast("Password must be at least 6 characters");
+    return;
+  }
+
+  // Step 1: Verify old password
+  const { error: signInError } = await _supabase.auth.signInWithPassword({
     email: user.email,
     password: oldPwd
   });
 
-  if(signInRes.error){
+  if(signInError){
     showToast("Current password is incorrect");
     return;
   }
 
-  // Step 2: Update password via Supabase Auth
-  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
+  // Step 2: Update password securely
+  const { error: updateError } = await _supabase.auth.updateUser({
+    password: newPwd
+  });
 
-  if(updateRes.error){
-    showToast("Error: " + updateRes.error.message);
-  } else {
-    // Also update in users table if stored there
-    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
-    showToast("Password updated successfully!");
-    document.getElementById('pwdOld').value = '';
-    document.getElementById('pwdNew').value = '';
-    document.getElementById('pwdConfirm').value = '';
-    togglePwdEdit();
+  if(updateError){
+    showToast(updateError.message);
+    return;
   }
+
+  showToast("Password updated successfully!");
+
+  document.getElementById('pwdOld').value = '';
+  document.getElementById('pwdNew').value = '';
+  document.getElementById('pwdConfirm').value = '';
+  togglePwdEdit();
+}
 }
 
 // ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
