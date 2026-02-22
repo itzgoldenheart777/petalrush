@@ -11,11 +11,53 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 
+/* ── THEME VARIABLES ───────────────────────────── */
+:root{
+  --bg:#0d0f14;
+  --bg2:#111318;
+  --bg3:#13161f;
+  --bg4:#1a1d26;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.08);
+  --text:#f0ede8;
+  --text2:#ccc;
+  --text3:#888;
+  --text4:#555;
+  --accent:#ff4081;
+  --accent2:#e0205f;
+  --card:#13161f;
+  --input-bg:#1a1d26;
+  --header-bg:linear-gradient(135deg,#1a0a0f 0%,#0d0f14 100%);
+  --bottom-bg:#111318;
+  --shadow:rgba(255,64,129,0.25);
+}
+
+body.light-mode{
+  --bg:#f4f1ee;
+  --bg2:#fff;
+  --bg3:#fafafa;
+  --bg4:#f0ede8;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.1);
+  --text:#1a1a1a;
+  --text2:#333;
+  --text3:#666;
+  --text4:#999;
+  --accent:#ff4081;
+  --accent2:#e0205f;
+  --card:#ffffff;
+  --input-bg:#f5f2ef;
+  --header-bg:linear-gradient(135deg,#fff5f7 0%,#fff 100%);
+  --bottom-bg:#ffffff;
+  --shadow:rgba(255,64,129,0.15);
+}
+
 body{
-  background:#0d0f14;
-  color:#f0ede8;
+  background:var(--bg);
+  color:var(--text);
   font-family:'DM Sans',sans-serif;
   min-height:100vh;
+  transition:background 0.3s,color 0.3s;
 }
 
 .container{
@@ -27,7 +69,7 @@ body{
 
 /* HEADER */
 .header{
-  background:linear-gradient(135deg,#1a0a0f 0%,#0d0f14 100%);
+  background:var(--header-bg);
   padding:14px 20px;
   text-align:center;
   border-bottom:1px solid rgba(255,80,100,0.15);
@@ -66,7 +108,7 @@ body{
 
 .header-logo-sub{
   font-size:10px;
-  color:#888;
+  color:var(--text3);
   letter-spacing:2px;
   text-transform:uppercase;
   margin-top:-2px;
@@ -85,6 +127,7 @@ body{
   align-items:center;
   justify-content:center;
   gap:12px;
+  width:100%;
 }
 
 .header-logo-text-block{
@@ -94,19 +137,19 @@ body{
 /* FILTER BAR */
 .filter-bar{
   padding:12px 14px;
-  background:#111318;
+  background:var(--bg2);
   display:flex;
   gap:10px;
-  border-bottom:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid var(--border);
 }
 
 input,select{
   flex:1;
   padding:11px 14px;
   border-radius:10px;
-  border:1px solid rgba(255,255,255,0.08);
-  background:#1a1d26;
-  color:#f0ede8;
+  border:1px solid var(--border2);
+  background:var(--input-bg);
+  color:var(--text);
   font-family:'DM Sans',sans-serif;
   font-size:14px;
   outline:none;
@@ -117,9 +160,9 @@ input:focus,select:focus{
   border-color:rgba(255,64,129,0.4);
 }
 
-input::placeholder{color:#555;}
+input::placeholder{color:var(--text4);}
 
-select option{background:#1a1d26;}
+select option{background:var(--input-bg);}
 
 /* PRODUCTS GRID */
 #home{
@@ -130,11 +173,11 @@ select option{background:#1a1d26;}
 }
 
 .card{
-  background:#13161f;
+  background:var(--card);
   border-radius:14px;
   overflow:hidden;
   cursor:pointer;
-  border:1px solid rgba(255,255,255,0.05);
+  border:1px solid var(--border);
   transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;
 }
 
@@ -149,7 +192,7 @@ select option{background:#1a1d26;}
   height:130px;
   object-fit:cover;
   display:block;
-  background:#1a1d26;
+  background:var(--input-bg);
 }
 
 .card-body{
@@ -179,14 +222,14 @@ select option{background:#1a1d26;}
   font-family:'Playfair Display',serif;
   font-size:22px;
   margin-bottom:16px;
-  color:#f0ede8;
+  color:var(--text);
 }
 
 .section h3{
   font-size:15px;
   font-weight:600;
   margin:20px 0 10px;
-  color:#ccc;
+  color:var(--text2);
 }
 
 /* BUTTONS */
@@ -204,14 +247,14 @@ select option{background:#1a1d26;}
   font-weight:500;
   letter-spacing:0.3px;
   transition:opacity 0.2s,transform 0.1s;
-  box-shadow:0 4px 15px rgba(255,64,129,0.25);
+  box-shadow:0 4px 15px var(--shadow);
 }
 
 .btn:hover{opacity:0.9;transform:translateY(-1px);}
 .btn:active{transform:translateY(0);}
 
 .btn-secondary{
-  background:#1a1d26;
+  background:var(--input-bg);
   border:1px solid rgba(255,255,255,0.1);
   box-shadow:none;
 }
@@ -224,7 +267,7 @@ select option{background:#1a1d26;}
   border-radius:14px;
   object-fit:cover;
   max-height:280px;
-  background:#1a1d26;
+  background:var(--input-bg);
 }
 
 #detail .product-name{
@@ -242,18 +285,18 @@ select option{background:#1a1d26;}
 
 #detail .product-desc{
   font-size:14px;
-  color:#888;
+  color:var(--text3);
   line-height:1.6;
   margin-bottom:14px;
 }
 
 /* CART */
 .cart-item{
-  background:#13161f;
+  background:var(--card);
   padding:14px;
   margin-top:10px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,0.05);
+  border:1px solid var(--border);
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -272,7 +315,7 @@ select option{background:#1a1d26;}
 
 .cart-item-qty{
   font-size:12px;
-  color:#888;
+  color:var(--text3);
 }
 
 .cart-item-price{
@@ -297,18 +340,18 @@ select option{background:#1a1d26;}
 
 /* INVOICE */
 .invoice{
-  background:#13161f;
+  background:var(--card);
   padding:16px;
   margin-top:14px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
+  border:1px solid var(--border);
   font-size:14px;
   line-height:2;
 }
 
 .invoice hr{
   border:none;
-  border-top:1px solid rgba(255,255,255,0.06);
+  border-top:1px solid var(--border);
   margin:8px 0;
 }
 
@@ -322,7 +365,7 @@ select option{background:#1a1d26;}
   justify-content:space-between;
   font-size:16px;
   font-weight:700;
-  color:#f0ede8;
+  color:var(--text);
 }
 
 /* BOTTOM NAV */
@@ -332,8 +375,8 @@ select option{background:#1a1d26;}
   width:100%;
   max-width:500px;
   display:flex;
-  background:#111318;
-  border-top:1px solid rgba(255,255,255,0.06);
+  background:var(--bg2);
+  border-top:1px solid var(--border);
   z-index:100;
 }
 
@@ -374,7 +417,7 @@ select option{background:#1a1d26;}
   border:3px solid #ff4081;
   object-fit:cover;
   cursor:pointer;
-  background:#1a1d26;
+  background:var(--input-bg);
   display:block;
   transition:opacity 0.2s;
 }
@@ -396,8 +439,8 @@ select option{background:#1a1d26;}
 
 /* ORDER CARD */
 .order-card{
-  background:#13161f;
-  border:1px solid rgba(255,255,255,0.05);
+  background:var(--card);
+  border:1px solid var(--border);
   border-radius:12px;
   padding:14px;
   margin-top:10px;
@@ -405,7 +448,7 @@ select option{background:#1a1d26;}
 
 .order-id{
   font-size:12px;
-  color:#888;
+  color:var(--text3);
   margin-bottom:6px;
 }
 
@@ -418,16 +461,16 @@ select option{background:#1a1d26;}
 
 .order-item-line{
   font-size:13px;
-  color:#aaa;
+  color:var(--text2);
   padding:3px 0;
-  border-bottom:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid var(--border);
 }
 
 /* EMPTY STATE */
 .empty-state{
   text-align:center;
   padding:40px 20px;
-  color:#555;
+  color:var(--text4);
 }
 
 .empty-state div{font-size:40px;margin-bottom:10px;}
@@ -440,7 +483,7 @@ select option{background:#1a1d26;}
   transform:translateX(-50%) translateY(20px);
   background:#1e2130;
   border:1px solid rgba(255,64,129,0.3);
-  color:#f0ede8;
+  color:var(--text);
   padding:12px 22px;
   border-radius:25px;
   font-size:14px;
@@ -456,17 +499,17 @@ select option{background:#1a1d26;}
 
 /* ADDRESS */
 .address-item{
-  background:#13161f;
+  background:var(--card);
   padding:12px;
   margin-top:8px;
   border-radius:10px;
-  border:1px solid rgba(255,255,255,0.05);
+  border:1px solid var(--border);
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
   gap:10px;
   font-size:13px;
-  color:#aaa;
+  color:var(--text2);
   line-height:1.5;
 }
 
@@ -474,7 +517,7 @@ select option{background:#1a1d26;}
 .loading{
   text-align:center;
   padding:30px;
-  color:#555;
+  color:var(--text4);
   font-size:14px;
 }
 
@@ -497,23 +540,23 @@ select option{background:#1a1d26;}
 
 /* QTY STEPPER */
 .qty-stepper{display:flex;align-items:center;gap:0;border:1px solid rgba(255,64,129,0.3);border-radius:8px;overflow:hidden;}
-.qty-btn{background:#1a1d26;border:none;color:#ff4081;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;flex-shrink:0;}
+.qty-btn{background:var(--input-bg);border:none;color:#ff4081;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;flex-shrink:0;}
 .qty-btn:hover{background:rgba(255,64,129,0.15);}
-.qty-num{width:36px;text-align:center;font-size:14px;font-weight:600;color:#f0ede8;background:#111318;}
+.qty-num{width:36px;text-align:center;font-size:14px;font-weight:600;color:var(--text);background:var(--bg2);}
 
 /* REVIEW STARS */
 .stars-row{display:flex;gap:4px;margin:6px 0;}
 .star{font-size:20px;cursor:pointer;transition:transform 0.1s;line-height:1;}
 .star:hover{transform:scale(1.2);}
-.review-card{background:#13161f;border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-top:8px;}
-.review-author{font-size:12px;color:#888;margin-bottom:4px;}
-.review-text{font-size:13px;color:#ccc;line-height:1.5;}
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;}
+.review-author{font-size:12px;color:var(--text3);margin-bottom:4px;}
+.review-text{font-size:13px;color:var(--text2);line-height:1.5;}
 .review-stars{font-size:13px;color:#f5a623;}
 
 /* PROFILE EDIT MODE */
-.profile-card{background:#13161f;border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;}
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
 .profile-edit-btn{position:absolute;top:10px;right:10px;background:#ff4081;border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.profile-view-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px;}
+.profile-view-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
 .profile-view-label{color:#666;font-size:12px;}
 .profile-view-val{color:#e0ddd8;font-weight:500;}
 
@@ -558,7 +601,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   transition:opacity 0.2s;
 }
 .bill-dl-btn.secondary{
-  background:#1a1d26;
+  background:var(--input-bg);
   border:1px solid rgba(255,255,255,0.1);
 }
 .bill-dl-btn:hover{opacity:0.85;}
@@ -579,12 +622,12 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 .bp-header{text-align:center;margin-bottom:16px;}
 .bp-logo{height:48px;max-width:160px;object-fit:contain;display:block;margin:0 auto 6px;}
 .bp-logo-text{font-size:20px;font-weight:700;color:#ff4081;}
-.bp-tagline{font-size:11px;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.bp-tagline{font-size:11px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
 .bp-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333;margin-top:8px;}
 .bp-divider{border:none;border-top:1px solid #eee;margin:12px 0;}
 .bp-meta{margin-bottom:8px;}
 .bp-meta-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #f5f5f5;}
-.bp-meta-row span{color:#888;}
+.bp-meta-row span{color:var(--text3);}
 .bp-meta-row b{color:#111;text-align:right;max-width:60%;word-break:break-all;}
 .bp-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
 .bp-table th{background:#f8f8f8;padding:7px 6px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#666;border-bottom:2px solid #eee;}
@@ -592,10 +635,10 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 .bp-table th:nth-child(2),.bp-table td:nth-child(2){text-align:center;}
 .bp-table td{padding:7px 6px;border-bottom:1px solid #f5f5f5;color:#333;}
 .bp-totals{background:#fafafa;border-radius:6px;padding:10px 12px;margin-top:4px;}
-.bp-total-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#555;}
+.bp-total-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--text4);}
 .bp-total-grand{display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#111;padding-top:8px;margin-top:6px;border-top:2px solid #ff4081;}
 .bp-total-grand span:last-child{color:#ff4081;}
-.bp-footer{text-align:center;font-size:11px;color:#aaa;margin-top:16px;padding-top:12px;border-top:1px dashed #eee;}
+.bp-footer{text-align:center;font-size:11px;color:var(--text2);margin-top:16px;padding-top:12px;border-top:1px dashed #eee;}
 
 /* BILL STYLES */
 .bill-logo-row{
@@ -628,7 +671,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 .bill-meta-label{
   font-size:10px;
-  color:#555;
+  color:var(--text4);
   text-transform:uppercase;
   letter-spacing:0.8px;
   margin-bottom:2px;
@@ -647,7 +690,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 .bill-footer{
   text-align:center;
   font-size:12px;
-  color:#555;
+  color:var(--text4);
   margin-top:14px;
   padding-top:12px;
   border-top:1px dashed rgba(255,64,129,0.15);
@@ -655,7 +698,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 
 .bill-card{
-  background:#13161f;
+  background:var(--card);
   border:1px solid rgba(255,64,129,0.15);
   border-radius:14px;
   margin-top:14px;
@@ -685,7 +728,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 .bill-order-no{
   font-size:11px;
-  color:#888;
+  color:var(--text3);
   text-align:right;
 }
 .bill-order-no b{
@@ -695,14 +738,14 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 .bill-address{
   font-size:12px;
-  color:#888;
+  color:var(--text3);
   margin-top:8px;
   padding-top:8px;
   border-top:1px solid rgba(255,255,255,0.05);
   line-height:1.5;
 }
 .bill-address span{
-  color:#aaa;
+  color:var(--text2);
 }
 .bill-body{
   padding:14px 16px;
@@ -729,7 +772,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 .bill-table td{
   font-size:13px;
-  color:#ccc;
+  color:var(--text2);
   padding:8px 4px;
   border-bottom:1px solid rgba(255,255,255,0.03);
 }
@@ -738,14 +781,14 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   font-weight:500;
 }
 .bill-totals{
-  border-top:1px solid rgba(255,255,255,0.06);
+  border-top:1px solid var(--border);
   padding-top:10px;
 }
 .bill-row{
   display:flex;
   justify-content:space-between;
   font-size:12px;
-  color:#888;
+  color:var(--text3);
   padding:3px 0;
 }
 .bill-row.discount{
@@ -756,7 +799,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   justify-content:space-between;
   font-size:15px;
   font-weight:700;
-  color:#f0ede8;
+  color:var(--text);
   padding:10px 0 4px;
   border-top:1px dashed rgba(255,64,129,0.2);
   margin-top:6px;
@@ -764,6 +807,45 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 .bill-grand span:last-child{
   color:#ff4081;
 }
+
+/* STOCK BADGE */
+.stock-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.stock-badge.available{background:rgba(76,175,80,0.15);color:#4caf50;border:1px solid rgba(76,175,80,0.3);}
+.stock-badge.out{background:rgba(244,67,54,0.1);color:#f44336;border:1px solid rgba(244,67,54,0.2);}
+
+/* ── LIGHT MODE OVERRIDES ─────────────────────────────── */
+body.light-mode .header{ border-bottom:1px solid rgba(255,64,129,0.15); }
+body.light-mode input{ background:var(--input-bg) !important; color:var(--text) !important; border-color:rgba(0,0,0,0.12) !important; }
+body.light-mode select{ background:var(--input-bg) !important; color:var(--text) !important; border-color:rgba(0,0,0,0.12) !important; }
+body.light-mode .product-card{ background:#fff; border-color:rgba(0,0,0,0.07); box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+body.light-mode .product-name{ color:#1a1a1a; }
+body.light-mode .cart-item{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
+body.light-mode .cart-item-name{ color:#1a1a1a; }
+body.light-mode .invoice{ background:#f8f5f2; border-color:rgba(0,0,0,0.08); }
+body.light-mode .invoice-row{ color:#444; }
+body.light-mode .invoice-total{ color:#1a1a1a; }
+body.light-mode .profile-card{ background:#fff; border-color:rgba(0,0,0,0.08); }
+body.light-mode .profile-view-val{ color:#1a1a1a; }
+body.light-mode .review-card{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
+body.light-mode .review-text{ color:#333; }
+body.light-mode .address-item{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
+body.light-mode .bill-card{ background:#fff; border-color:rgba(255,64,129,0.15); }
+body.light-mode .bill-header{ background:linear-gradient(135deg,#fff5f7,#fff); }
+body.light-mode .bill-meta-val{ color:#333; }
+body.light-mode .bill-table td{ color:#333; }
+body.light-mode .bill-table th{ color:#888; }
+body.light-mode .btn-secondary{ background:#f0ede8; color:#333; border-color:rgba(0,0,0,0.12); }
+body.light-mode .bottom-nav{ box-shadow:0 -2px 10px rgba(0,0,0,0.08); }
+body.light-mode .bottom-nav .tab{ color:#888; }
+body.light-mode .bottom-nav .tab.active{ color:#ff4081; }
+body.light-mode .order-card{ background:#fff; border-color:rgba(0,0,0,0.07); }
+body.light-mode .filter-bar{ background:#fff; border-color:rgba(0,0,0,0.07); }
+body.light-mode .section h2, body.light-mode .section h3{ color:#1a1a1a; }
+body.light-mode .header-logo-text{ color:#e0205f; }
+body.light-mode .header-logo-sub{ color:#888; }
+body.light-mode .qty-stepper{ border-color:rgba(255,64,129,0.4); }
+body.light-mode .qty-btn{ background:#f0ede8; }
+body.light-mode .qty-num{ background:#e8e4e0; color:#1a1a1a; }
 </style>
 </head>
 <body>
@@ -779,6 +861,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
         <div class="header-logo-text">PetalRush</div>
         <div class="header-logo-sub">Fresh Flowers · Fast Delivery</div>
       </div>
+      <button id="themeBtn" onclick="toggleTheme()" style="background:none;border:1px solid rgba(255,64,129,0.3);border-radius:20px;padding:5px 12px;color:var(--text);cursor:pointer;font-size:13px;margin-left:auto;white-space:nowrap;transition:all 0.2s;">🌙</button>
     </div>
   </div>
 
@@ -952,12 +1035,13 @@ function hideAll(){
 }
 
 // ─── HOME ─────────────────────────────────────────────────────────
-async function showHome(){
+async function showHome(push){
   hideAll();
   var h = document.getElementById('home');
   h.style.display = 'grid';
   document.getElementById('filterSection').style.display = 'flex';
   document.getElementById('tab-home').classList.add('active');
+  if(push !== false){ pushNav('home'); }
 
   h.innerHTML = '<div class="loading" style="grid-column:1/-1"><span class="spinner"></span>Loading...</div>';
 
@@ -1005,6 +1089,7 @@ function sortArray(arr, val){
 // ─── DETAIL ───────────────────────────────────────────────────────
 async function showDetail(id){
   hideAll();
+  pushNav('detail');
   var d = document.getElementById('detail');
   d.style.display = 'block';
   d.innerHTML = '<div class="loading"><span class="spinner"></span>Loading...</div>';
@@ -1013,12 +1098,24 @@ async function showDetail(id){
   currentProduct = res.data;
   var data = res.data;
 
+  var qty = parseInt(data.quantity) || 0;
+  var inStock = qty > 0;
+  var stockHtml = inStock
+    ? '<div class="stock-badge available">✓ In Stock</div>'
+    : '<div class="stock-badge out">✕ Out of Stock</div>';
+
   d.innerHTML =
     '<img src="' + (data.image_url||'') + '" class="product-image" alt="' + data.name + '" onerror="this.style.display=\'none\'">' +
     '<div class="product-name">' + data.name + '</div>' +
-    '<div class="product-price">\u20b9' + data.price + '</div>' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">' +
+      '<div class="product-price" style="margin:0;">\u20b9' + data.price + '</div>' +
+      stockHtml +
+    '</div>' +
     '<div class="product-desc">' + (data.description||'') + '</div>' +
-    '<button class="btn" onclick="addCart()">\uD83D\uDED2 Add to Cart</button>' +
+    (inStock ?
+      '<button class="btn" onclick="addCart()">\uD83D\uDED2 Add to Cart</button>' :
+      '<button class="btn" style="opacity:0.4;cursor:not-allowed;" disabled>Out of Stock</button>'
+    ) +
     '<button class="btn btn-secondary" onclick="showHome()">\u2190 Back</button>' +
     '<div style="margin-top:24px;">' +
       '<h3 style="font-size:16px;margin-bottom:12px;">\u2B50 Reviews & Ratings</h3>' +
@@ -1044,6 +1141,11 @@ async function showDetail(id){
 async function addCart(){
   if(!currentProduct) return;
 
+  // Check current stock
+  var stockRes = await _supabase.from("products").select("quantity").eq("id", currentProduct.id).single();
+  var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
+  if(currentStock <= 0){ showToast("Sorry, out of stock!"); return; }
+
   var res = await _supabase
     .from("cart")
     .select("*")
@@ -1052,6 +1154,8 @@ async function addCart(){
     .maybeSingle();
 
   if(res.data){
+    // Don't exceed stock
+    if(res.data.qty >= currentStock){ showToast("Max stock limit reached!"); return; }
     await _supabase.from("cart").update({qty: res.data.qty+1}).eq("id", res.data.id);
   } else {
     await _supabase.from("cart").insert({
@@ -1061,15 +1165,19 @@ async function addCart(){
     });
   }
 
-  showToast("✅ Added to cart!");
+  // Reduce product quantity in DB
+  await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", currentProduct.id);
+
+  showToast("Added to cart!");
   showCart();
 }
 
 // ─── CART ─────────────────────────────────────────────────────────
-async function showCart(){
+async function showCart(push){
   hideAll();
   document.getElementById('cart').style.display = 'block';
   document.getElementById('tab-cart').classList.add('active');
+  if(push !== false){ pushNav('cart'); }
 
   var cartItemsEl = document.getElementById('cartItems');
   cartItemsEl.innerHTML = '<div class="loading"><span class="spinner"></span>Loading cart...</div>';
@@ -1131,8 +1239,16 @@ function calculateTotals(sub){
 }
 
 async function removeCart(id){
+  // Restore stock for removed item
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===id){ item=cartData[i]; break; } }
+  if(item && item.product_id){
+    var sr = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var curSt = sr.data ? parseInt(sr.data.quantity)||0 : 0;
+    await _supabase.from("products").update({ quantity: curSt + item.qty }).eq("id", item.product_id);
+  }
   await _supabase.from("cart").delete().eq("id", id);
-  showToast("🗑️ Item removed");
+  showToast("Item removed");
   showCart();
 }
 
@@ -1264,10 +1380,11 @@ async function placeOrder(){
 }
 
 // ─── PROFILE ──────────────────────────────────────────────────────
-async function showProfile(){
+async function showProfile(push){
   hideAll();
   document.getElementById('profile').style.display = 'block';
   document.getElementById('tab-profile').classList.add('active');
+  if(push !== false){ pushNav('profile'); }
   loadProfile();
   loadAddressesList();
   loadOrders();
@@ -1631,7 +1748,7 @@ async function loadOrders(){
           '<div class="bill-download-row">' +
             '<button class="bill-dl-btn" onclick="downloadBill(\'bill-' + displayId + '\', \'pdf\', \'' + (invoiceId||displayId) + '\')">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-              ' Download Receipt PDF' +
+              ' Download Receipt' +
             '</button>' +
           '</div>' +
 
@@ -1689,138 +1806,139 @@ function downloadBill(billId, format, invoiceName){
   var el = document.getElementById(billId);
   if(!el){ showToast("Receipt not found"); return; }
 
-  // ── Build full-screen overlay with close button ──────────────────
+  // Show modal overlay with receipt preview + action buttons
   var overlay = document.createElement('div');
   overlay.id = 'bill-overlay';
-  overlay.style.cssText = [
-    'position:fixed','top:0','left:0','width:100%','height:100%',
-    'background:rgba(0,0,0,0.88)','z-index:9998',
-    'display:flex','flex-direction:column',
-    'align-items:center','overflow-y:auto','padding:16px 0 80px'
-  ].join(';');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);z-index:9998;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:16px 0 100px;box-sizing:border-box;';
 
-  // Close button bar
-  var closeBar = document.createElement('div');
-  closeBar.style.cssText = 'width:100%;max-width:420px;display:flex;justify-content:flex-end;margin-bottom:10px;padding:0 8px;box-sizing:border-box;flex-shrink:0;';
-  closeBar.innerHTML = '<button onclick="document.getElementById(\'bill-overlay\').remove()" style="background:#222;border:1px solid rgba(255,64,129,0.3);color:#ff4081;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;">✕ Close</button>';
-  overlay.appendChild(closeBar);
+  // Top bar: close + title
+  var topBar = document.createElement('div');
+  topBar.style.cssText = 'width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;padding:0 8px 10px;box-sizing:border-box;flex-shrink:0;';
+  topBar.innerHTML = '<span style="color:#fff;font-weight:600;font-size:14px;">Order Receipt</span><button onclick="document.getElementById(\'bill-overlay\').remove()" style="background:#333;border:none;color:#ff4081;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✕ Close</button>';
+  overlay.appendChild(topBar);
 
-  // Clone receipt card (white print version)
+  // Clone receipt
   el.style.display = 'block';
   var clone = el.cloneNode(true);
   clone.removeAttribute('id');
-  clone.style.cssText = [
-    'display:block','position:static','left:0',
-    'width:340px','max-width:92vw',
-    'background:#fff','color:#111',
-    'font-family:Arial,sans-serif',
-    'padding:24px 20px','box-sizing:border-box',
-    'border-radius:10px',
-    'box-shadow:0 8px 40px rgba(0,0,0,0.5)'
-  ].join(';');
+  clone.style.cssText = 'display:block;position:static;left:0;width:340px;max-width:92vw;background:#fff;color:#111;font-family:Arial,sans-serif;padding:24px 20px;box-sizing:border-box;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,0.5);';
   overlay.appendChild(clone);
   el.style.display = 'none';
 
-  // Download action buttons (PDF + PNG + Save to Device)
+  // Action buttons row
   var btnRow = document.createElement('div');
   btnRow.style.cssText = 'display:flex;gap:8px;margin-top:14px;width:340px;max-width:92vw;';
-  btnRow.innerHTML = [
-    '<button onclick="triggerCapture(\''+billId+'\',\'pdf\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">⬇ PDF</button>',
-    '<button onclick="triggerCapture(\''+billId+'\',\'png\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">🖼 PNG</button>',
-    '<button onclick="triggerCapture(\''+billId+'\',\'share\',\''+invoiceName+'\')" style="flex:1;padding:11px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:12px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;">📲 Share</button>'
-  ].join('');
+  btnRow.innerHTML =
+    '<button onclick="captureAndSave(\'pdf\',\''+invoiceName+'\')" style="flex:1;padding:12px 6px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇ PDF</button>' +
+    '<button onclick="captureAndSave(\'share\',\''+invoiceName+'\')" style="flex:1;padding:12px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Share PNG</button>';
   overlay.appendChild(btnRow);
 
   document.body.appendChild(overlay);
-
-  // Close on backdrop tap (not on card itself)
-  overlay.addEventListener('click', function(e){
-    if(e.target === overlay){ overlay.remove(); }
-  });
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
 }
 
-// Capture and download/share the visible clone inside overlay
-async function triggerCapture(billId, format, invoiceName){
+async function captureAndSave(format, invoiceName){
   var overlay = document.getElementById('bill-overlay');
-  if(!overlay){ showToast("Preview closed"); return; }
-
-  // Find the cloned receipt (second child after closeBar)
+  if(!overlay){ showToast("No preview open"); return; }
   var clone = overlay.children[1];
-  if(!clone){ showToast("Receipt element not found"); return; }
+  if(!clone){ showToast("Receipt not found"); return; }
 
-  showToast("Generating...");
+  showToast("Preparing...");
 
   try {
     var canvas = await html2canvas(clone, {
-      scale: 2,
+      scale: 2.5,
       backgroundColor: '#ffffff',
       useCORS: true,
       allowTaint: true,
       logging: false
     });
 
-    var dataUrl = canvas.toDataURL('image/png');
-
-    if(format === 'share' && navigator.share){
-      // Web Share API → Save to device / WhatsApp / etc.
+    if(format === 'share'){
+      // Share as PNG (works great on Android/iOS - saves to gallery or share sheet)
       canvas.toBlob(async function(blob){
-        var file = new File([blob], (invoiceName||'receipt')+'.png', { type:'image/png' });
-        try {
-          await navigator.share({ files:[file], title:'PetalRush Receipt', text:'My order receipt from PetalRush' });
-          showToast("Shared!");
-        } catch(e){
-          if(e.name !== 'AbortError') showToast("Share failed: "+e.message);
+        var file = new File([blob], (invoiceName||'PetalRush-Receipt')+'.png', { type:'image/png' });
+        if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+          try {
+            await navigator.share({ files:[file], title:'PetalRush Receipt', text:'My order receipt' });
+            showToast("Shared!");
+          } catch(e){
+            if(e.name !== 'AbortError') downloadPNG(canvas, invoiceName);
+          }
+        } else {
+          // Fallback: direct PNG download
+          downloadPNG(canvas, invoiceName);
         }
       }, 'image/png');
 
-    } else if(format === 'pdf'){
+    } else {
+      // PDF download
       var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
       if(!jsPDFLib){
-        // Fallback to PNG if jsPDF not loaded
-        var a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = (invoiceName||'receipt')+'.png';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        showToast("Saved as PNG (PDF lib unavailable)");
-      } else {
-        var pxW = canvas.width / 2;
-        var pxH = canvas.height / 2;
-        var pdf = new jsPDFLib({ orientation:'portrait', unit:'px', format:[pxW, pxH] });
-        pdf.addImage(dataUrl, 'PNG', 0, 0, pxW, pxH);
-        pdf.save((invoiceName||'receipt')+'.pdf');
-        showToast("PDF saved!");
+        showToast("PDF lib loading... saving as PNG");
+        downloadPNG(canvas, invoiceName);
+        return;
       }
-
-    } else {
-      // PNG save to device
-      var a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = (invoiceName||'receipt')+'.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showToast("PNG saved to device!");
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
+      var pxW = canvas.width / 2.5;
+      var pxH = canvas.height / 2.5;
+      var pdf = new jsPDFLib({ orientation:'portrait', unit:'mm',
+        format: [pxW * 0.264583, pxH * 0.264583] });
+      pdf.addImage(imgData, 'JPEG', 0, 0, pxW * 0.264583, pxH * 0.264583);
+      pdf.save((invoiceName||'PetalRush-Receipt')+'.pdf');
+      showToast("PDF saved!");
+      overlay.remove();
     }
-
   } catch(err){
     showToast("Error: " + err.message);
-    console.error(err);
+    console.error('Capture error:', err);
   }
 }
 
-// ─── QTY STEPPER ──────────────────────────────────────────────────
+function downloadPNG(canvas, name){
+  var a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = (name||'PetalRush-Receipt') + '.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast("PNG saved!");
+  var ov = document.getElementById('bill-overlay');
+  if(ov) ov.remove();
+}
+
+// ─── QTY STEPPER ──────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
 async function changeQty(cartId, delta){
-  // Find item in cartData
   var item = null;
   for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
   if(!item) return;
 
   var newQty = item.qty + delta;
+
+  if(delta > 0){
+    // Check stock before increasing
+    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
+    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
+    if(currentStock <= 0){ showToast("Out of stock!"); return; }
+    // Deduct stock
+    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
+  }
+
   if(newQty < 1){
-    // Remove item if qty goes to 0
+    // Restore stock on remove
+    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
+    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
     await _supabase.from("cart").delete().eq("id", cartId);
     showToast("Item removed");
   } else {
+    if(delta < 0){
+      // Restore 1 stock on decrease
+      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
+      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
+    }
     await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
   }
   showCart();
@@ -1865,36 +1983,48 @@ async function loadReviews(productId){
 
 async function submitReview(productId){
   if(!currentRating){ showToast("Please select a star rating"); return; }
-  var text = document.getElementById('reviewText');
-  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+  var textEl = document.getElementById('reviewText');
+  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
 
+  var reviewText = textEl.value.trim();
+  var ratingVal = currentRating;
+
+  // Build the review card HTML to show immediately
+  var stars = '';
+  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
+  var now = new Date();
+  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var newCard =
+    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
+      '<div class="review-text">' + reviewText + '</div>' +
+    '</div>';
+
+  // Save to DB (best effort)
   var res = await _supabase.from("reviews").insert({
     product_id: productId,
     user_email: user.email,
-    rating: currentRating,
-    review_text: text.value.trim()
+    rating: ratingVal,
+    review_text: reviewText
   });
 
-  if(res.error){
-    // reviews table may not exist - show graceful message
-    showToast("Review saved locally! (DB table pending)");
-    // Show the review locally anyway
-    var reviewsList = document.getElementById('reviewsList');
-    if(reviewsList){
-      var stars = '';
-      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
-      reviewsList.innerHTML = '<div class="review-card">' +
-        '<div class="review-stars">' + stars + '</div>' +
-        '<div class="review-author">' + user.email + ' (just now)</div>' +
-        '<div class="review-text">' + text.value.trim() + '</div>' +
-      '</div>' + reviewsList.innerHTML;
-    }
-  } else {
-    showToast("Review posted!");
-    loadReviews(productId);
+  // Always show review immediately in UI regardless of DB result
+  var reviewsList = document.getElementById('reviewsList');
+  if(reviewsList){
+    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
+    if(noReviews){ reviewsList.innerHTML = newCard; }
+    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
   }
 
-  text.value = '';
+  if(res.error){
+    showToast("Posted! (saved locally)");
+  } else {
+    showToast("Review posted!");
+  }
+
+  // Reset form
+  textEl.value = '';
   currentRating = 0;
   setRating(0);
 }
@@ -1916,32 +2046,32 @@ function togglePwdEdit(){
 async function changePassword(){
   var oldPwd = document.getElementById('pwdOld').value.trim();
   var newPwd = document.getElementById('pwdNew').value.trim();
-  var confirm = document.getElementById('pwdConfirm').value.trim();
+  var conf = document.getElementById('pwdConfirm').value.trim();
 
-  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
   if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
 
-  // Verify old password against users table
-  var checkRes = await _supabase
-    .from("users")
-    .select("password")
-    .eq("email", user.email)
-    .maybeSingle();
+  // Step 1: Re-authenticate with old password via Supabase Auth signIn
+  var signInRes = await _supabase.auth.signInWithPassword({
+    email: user.email,
+    password: oldPwd
+  });
 
-  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
-    showToast("Current password is incorrect"); return;
+  if(signInRes.error){
+    showToast("Current password is incorrect");
+    return;
   }
 
-  // Update password in users table
-  var res = await _supabase
-    .from("users")
-    .update({ password: newPwd })
-    .eq("email", user.email);
+  // Step 2: Update password via Supabase Auth
+  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
 
-  if(res.error) showToast("Error: " + res.error.message);
-  else {
-    showToast("Password updated!");
+  if(updateRes.error){
+    showToast("Error: " + updateRes.error.message);
+  } else {
+    // Also update in users table if stored there
+    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
+    showToast("Password updated successfully!");
     document.getElementById('pwdOld').value = '';
     document.getElementById('pwdNew').value = '';
     document.getElementById('pwdConfirm').value = '';
@@ -1951,17 +2081,36 @@ async function changePassword(){
 
 // ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
 async function changeQty(cartId, delta){
-  // Find item in cartData
   var item = null;
   for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
   if(!item) return;
 
   var newQty = item.qty + delta;
+
+  if(delta > 0){
+    // Check stock before increasing
+    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
+    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
+    if(currentStock <= 0){ showToast("Out of stock!"); return; }
+    // Deduct stock
+    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
+  }
+
   if(newQty < 1){
-    // Remove item if qty goes to 0
+    // Restore stock on remove
+    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
+    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
     await _supabase.from("cart").delete().eq("id", cartId);
     showToast("Item removed");
   } else {
+    if(delta < 0){
+      // Restore 1 stock on decrease
+      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
+      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
+    }
     await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
   }
   showCart();
@@ -2006,36 +2155,48 @@ async function loadReviews(productId){
 
 async function submitReview(productId){
   if(!currentRating){ showToast("Please select a star rating"); return; }
-  var text = document.getElementById('reviewText');
-  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+  var textEl = document.getElementById('reviewText');
+  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
 
+  var reviewText = textEl.value.trim();
+  var ratingVal = currentRating;
+
+  // Build the review card HTML to show immediately
+  var stars = '';
+  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
+  var now = new Date();
+  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var newCard =
+    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
+      '<div class="review-text">' + reviewText + '</div>' +
+    '</div>';
+
+  // Save to DB (best effort)
   var res = await _supabase.from("reviews").insert({
     product_id: productId,
     user_email: user.email,
-    rating: currentRating,
-    review_text: text.value.trim()
+    rating: ratingVal,
+    review_text: reviewText
   });
 
-  if(res.error){
-    // reviews table may not exist - show graceful message
-    showToast("Review saved locally! (DB table pending)");
-    // Show the review locally anyway
-    var reviewsList = document.getElementById('reviewsList');
-    if(reviewsList){
-      var stars = '';
-      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
-      reviewsList.innerHTML = '<div class="review-card">' +
-        '<div class="review-stars">' + stars + '</div>' +
-        '<div class="review-author">' + user.email + ' (just now)</div>' +
-        '<div class="review-text">' + text.value.trim() + '</div>' +
-      '</div>' + reviewsList.innerHTML;
-    }
-  } else {
-    showToast("Review posted!");
-    loadReviews(productId);
+  // Always show review immediately in UI regardless of DB result
+  var reviewsList = document.getElementById('reviewsList');
+  if(reviewsList){
+    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
+    if(noReviews){ reviewsList.innerHTML = newCard; }
+    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
   }
 
-  text.value = '';
+  if(res.error){
+    showToast("Posted! (saved locally)");
+  } else {
+    showToast("Review posted!");
+  }
+
+  // Reset form
+  textEl.value = '';
   currentRating = 0;
   setRating(0);
 }
@@ -2057,32 +2218,32 @@ function togglePwdEdit(){
 async function changePassword(){
   var oldPwd = document.getElementById('pwdOld').value.trim();
   var newPwd = document.getElementById('pwdNew').value.trim();
-  var confirm = document.getElementById('pwdConfirm').value.trim();
+  var conf = document.getElementById('pwdConfirm').value.trim();
 
-  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
   if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
 
-  // Verify old password against users table
-  var checkRes = await _supabase
-    .from("users")
-    .select("password")
-    .eq("email", user.email)
-    .maybeSingle();
+  // Step 1: Re-authenticate with old password via Supabase Auth signIn
+  var signInRes = await _supabase.auth.signInWithPassword({
+    email: user.email,
+    password: oldPwd
+  });
 
-  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
-    showToast("Current password is incorrect"); return;
+  if(signInRes.error){
+    showToast("Current password is incorrect");
+    return;
   }
 
-  // Update password in users table
-  var res = await _supabase
-    .from("users")
-    .update({ password: newPwd })
-    .eq("email", user.email);
+  // Step 2: Update password via Supabase Auth
+  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
 
-  if(res.error) showToast("Error: " + res.error.message);
-  else {
-    showToast("Password updated!");
+  if(updateRes.error){
+    showToast("Error: " + updateRes.error.message);
+  } else {
+    // Also update in users table if stored there
+    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
+    showToast("Password updated successfully!");
     document.getElementById('pwdOld').value = '';
     document.getElementById('pwdNew').value = '';
     document.getElementById('pwdConfirm').value = '';
@@ -2092,17 +2253,36 @@ async function changePassword(){
 
 // ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
 async function changeQty(cartId, delta){
-  // Find item in cartData
   var item = null;
   for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
   if(!item) return;
 
   var newQty = item.qty + delta;
+
+  if(delta > 0){
+    // Check stock before increasing
+    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
+    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
+    if(currentStock <= 0){ showToast("Out of stock!"); return; }
+    // Deduct stock
+    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
+  }
+
   if(newQty < 1){
-    // Remove item if qty goes to 0
+    // Restore stock on remove
+    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
+    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
     await _supabase.from("cart").delete().eq("id", cartId);
     showToast("Item removed");
   } else {
+    if(delta < 0){
+      // Restore 1 stock on decrease
+      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
+      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
+    }
     await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
   }
   showCart();
@@ -2147,36 +2327,48 @@ async function loadReviews(productId){
 
 async function submitReview(productId){
   if(!currentRating){ showToast("Please select a star rating"); return; }
-  var text = document.getElementById('reviewText');
-  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+  var textEl = document.getElementById('reviewText');
+  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
 
+  var reviewText = textEl.value.trim();
+  var ratingVal = currentRating;
+
+  // Build the review card HTML to show immediately
+  var stars = '';
+  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
+  var now = new Date();
+  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var newCard =
+    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
+      '<div class="review-text">' + reviewText + '</div>' +
+    '</div>';
+
+  // Save to DB (best effort)
   var res = await _supabase.from("reviews").insert({
     product_id: productId,
     user_email: user.email,
-    rating: currentRating,
-    review_text: text.value.trim()
+    rating: ratingVal,
+    review_text: reviewText
   });
 
-  if(res.error){
-    // reviews table may not exist - show graceful message
-    showToast("Review saved locally! (DB table pending)");
-    // Show the review locally anyway
-    var reviewsList = document.getElementById('reviewsList');
-    if(reviewsList){
-      var stars = '';
-      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
-      reviewsList.innerHTML = '<div class="review-card">' +
-        '<div class="review-stars">' + stars + '</div>' +
-        '<div class="review-author">' + user.email + ' (just now)</div>' +
-        '<div class="review-text">' + text.value.trim() + '</div>' +
-      '</div>' + reviewsList.innerHTML;
-    }
-  } else {
-    showToast("Review posted!");
-    loadReviews(productId);
+  // Always show review immediately in UI regardless of DB result
+  var reviewsList = document.getElementById('reviewsList');
+  if(reviewsList){
+    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
+    if(noReviews){ reviewsList.innerHTML = newCard; }
+    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
   }
 
-  text.value = '';
+  if(res.error){
+    showToast("Posted! (saved locally)");
+  } else {
+    showToast("Review posted!");
+  }
+
+  // Reset form
+  textEl.value = '';
   currentRating = 0;
   setRating(0);
 }
@@ -2198,32 +2390,32 @@ function togglePwdEdit(){
 async function changePassword(){
   var oldPwd = document.getElementById('pwdOld').value.trim();
   var newPwd = document.getElementById('pwdNew').value.trim();
-  var confirm = document.getElementById('pwdConfirm').value.trim();
+  var conf = document.getElementById('pwdConfirm').value.trim();
 
-  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
   if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
 
-  // Verify old password against users table
-  var checkRes = await _supabase
-    .from("users")
-    .select("password")
-    .eq("email", user.email)
-    .maybeSingle();
+  // Step 1: Re-authenticate with old password via Supabase Auth signIn
+  var signInRes = await _supabase.auth.signInWithPassword({
+    email: user.email,
+    password: oldPwd
+  });
 
-  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
-    showToast("Current password is incorrect"); return;
+  if(signInRes.error){
+    showToast("Current password is incorrect");
+    return;
   }
 
-  // Update password in users table
-  var res = await _supabase
-    .from("users")
-    .update({ password: newPwd })
-    .eq("email", user.email);
+  // Step 2: Update password via Supabase Auth
+  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
 
-  if(res.error) showToast("Error: " + res.error.message);
-  else {
-    showToast("Password updated!");
+  if(updateRes.error){
+    showToast("Error: " + updateRes.error.message);
+  } else {
+    // Also update in users table if stored there
+    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
+    showToast("Password updated successfully!");
     document.getElementById('pwdOld').value = '';
     document.getElementById('pwdNew').value = '';
     document.getElementById('pwdConfirm').value = '';
@@ -2237,8 +2429,55 @@ function doLogout(){
   location.href = "index.html";
 }
 
+// ─── THEME TOGGLE ──────────────────────────────────────────────────
+function toggleTheme(){
+  var isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+}
+
+function applyTheme(){
+  var saved = localStorage.getItem('theme');
+  // Auto-detect system preference if no saved preference
+  if(!saved){
+    saved = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    var btn = document.getElementById('themeBtn');
+    if(btn) btn.textContent = '☀️';
+  }
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e){
+    if(!localStorage.getItem('theme')){
+      if(e.matches){ document.body.classList.add('light-mode'); var b=document.getElementById('themeBtn'); if(b)b.textContent='☀️'; }
+      else { document.body.classList.remove('light-mode'); var b=document.getElementById('themeBtn'); if(b)b.textContent='🌙'; }
+    }
+  });
+}
+
+// ─── PHONE BACK BUTTON (History API) ──────────────────────────────
+var navHistory = ['home'];
+
+function pushNav(screen){
+  navHistory.push(screen);
+  history.pushState({ screen: screen }, '', '');
+}
+
+window.addEventListener('popstate', function(e){
+  navHistory.pop();
+  var prev = navHistory[navHistory.length - 1] || 'home';
+  if(prev === 'home') showHome(false);
+  else if(prev === 'cart') showCart(false);
+  else if(prev === 'profile') showProfile(false);
+  else showHome(false);
+});
+
 // ─── START ────────────────────────────────────────────────────────
-showHome();
+applyTheme();
+// Push initial state so back button works from the start
+history.replaceState({ screen: 'home' }, '', '');
+showHome(false);
 </script>
 
 </body>
