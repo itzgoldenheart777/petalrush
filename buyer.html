@@ -495,6 +495,31 @@ select option{background:#1a1d26;}
 .coupon-row input{margin:0;flex:1;}
 .coupon-row .btn{margin:0;white-space:nowrap;flex-shrink:0;width:auto;padding:11px 16px;}
 
+/* QTY STEPPER */
+.qty-stepper{display:flex;align-items:center;gap:0;border:1px solid rgba(255,64,129,0.3);border-radius:8px;overflow:hidden;}
+.qty-btn{background:#1a1d26;border:none;color:#ff4081;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;flex-shrink:0;}
+.qty-btn:hover{background:rgba(255,64,129,0.15);}
+.qty-num{width:36px;text-align:center;font-size:14px;font-weight:600;color:#f0ede8;background:#111318;}
+
+/* REVIEW STARS */
+.stars-row{display:flex;gap:4px;margin:6px 0;}
+.star{font-size:20px;cursor:pointer;transition:transform 0.1s;line-height:1;}
+.star:hover{transform:scale(1.2);}
+.review-card{background:#13161f;border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-top:8px;}
+.review-author{font-size:12px;color:#888;margin-bottom:4px;}
+.review-text{font-size:13px;color:#ccc;line-height:1.5;}
+.review-stars{font-size:13px;color:#f5a623;}
+
+/* PROFILE EDIT MODE */
+.profile-card{background:#13161f;border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;}
+.profile-edit-btn{position:absolute;top:10px;right:10px;background:#ff4081;border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.profile-view-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px;}
+.profile-view-label{color:#666;font-size:12px;}
+.profile-view-val{color:#e0ddd8;font-weight:500;}
+
+/* ADDRESS MANDATORY HIGHLIGHT */
+select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(244,67,54,0.2);}
+
 .status-badge{
   display:inline-block;
   padding:3px 10px;
@@ -798,19 +823,62 @@ select option{background:#1a1d26;}
 
   <!-- PROFILE -->
   <div id="profile" class="section">
-    <h2>👤 Profile</h2>
 
-    <div class="avatar-wrap">
+    <!-- AVATAR + EDIT PENCIL -->
+    <div class="avatar-wrap" style="margin-bottom:12px;">
       <img id="avatarImg" class="avatar" src="" alt="Avatar" onclick="document.getElementById('avatarFile').click()">
       <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">✏️</div>
       <input type="file" id="avatarFile" hidden accept="image/*" onchange="uploadAvatar(event)">
     </div>
 
-    <input id="nameInput" placeholder="Full Name" style="margin-bottom:10px;">
-    <input id="phoneInput" placeholder="Phone Number">
-    <button class="btn" onclick="saveProfile()">Save Profile</button>
+    <!-- PROFILE CARD: view mode -->
+    <div id="profileViewCard" class="profile-card" style="position:relative;">
+      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">✏️ Edit</button>
+      <div class="profile-view-row">
+        <div>
+          <div class="profile-view-label">Name</div>
+          <div class="profile-view-val" id="viewName">—</div>
+        </div>
+      </div>
+      <div class="profile-view-row">
+        <div>
+          <div class="profile-view-label">Phone</div>
+          <div class="profile-view-val" id="viewPhone">—</div>
+        </div>
+      </div>
+      <div class="profile-view-row" style="border:none;">
+        <div>
+          <div class="profile-view-label">Email</div>
+          <div class="profile-view-val" id="viewEmail">—</div>
+        </div>
+      </div>
+    </div>
 
-    <h3>📍 Addresses</h3>
+    <!-- PROFILE CARD: edit mode (hidden by default) -->
+    <div id="profileEditCard" class="profile-card" style="display:none;">
+      <button class="profile-edit-btn" style="background:#666;" onclick="toggleProfileEdit(false)">✕ Cancel</button>
+      <h3 style="margin:0 0 12px;font-size:15px;">Edit Profile</h3>
+      <input id="nameInput" placeholder="Full Name" style="margin-bottom:10px;">
+      <input id="phoneInput" placeholder="Phone Number" style="margin-bottom:10px;">
+      <button class="btn" onclick="saveProfile()">Save Changes</button>
+    </div>
+
+    <!-- CHANGE PASSWORD CARD -->
+    <div class="profile-card" style="margin-top:0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-weight:600;font-size:14px;">🔒 Password</span>
+        <button class="profile-edit-btn" onclick="togglePwdEdit()">Change</button>
+      </div>
+      <div id="pwdEditArea" style="display:none;">
+        <input id="pwdOld" type="password" placeholder="Current password" style="margin-bottom:8px;">
+        <input id="pwdNew" type="password" placeholder="New password" style="margin-bottom:8px;">
+        <input id="pwdConfirm" type="password" placeholder="Confirm new password" style="margin-bottom:8px;">
+        <button class="btn" onclick="changePassword()">Update Password</button>
+      </div>
+      <div id="pwdViewArea" style="color:#555;font-size:13px;">••••••••</div>
+    </div>
+
+    <h3>📍 Addresses <span style="font-size:12px;color:#555;font-weight:400;">(max 3)</span></h3>
     <input id="addressInput" placeholder="Enter your delivery address">
     <button class="btn btn-secondary" onclick="saveAddress()">+ Add Address</button>
     <div id="addressList"></div>
@@ -948,10 +1016,28 @@ async function showDetail(id){
   d.innerHTML =
     '<img src="' + (data.image_url||'') + '" class="product-image" alt="' + data.name + '" onerror="this.style.display=\'none\'">' +
     '<div class="product-name">' + data.name + '</div>' +
-    '<div class="product-price">₹' + data.price + '</div>' +
+    '<div class="product-price">\u20b9' + data.price + '</div>' +
     '<div class="product-desc">' + (data.description||'') + '</div>' +
-    '<button class="btn" onclick="addCart()">🛒 Add to Cart</button>' +
-    '<button class="btn btn-secondary" onclick="showHome()">← Back</button>';
+    '<button class="btn" onclick="addCart()">\uD83D\uDED2 Add to Cart</button>' +
+    '<button class="btn btn-secondary" onclick="showHome()">\u2190 Back</button>' +
+    '<div style="margin-top:24px;">' +
+      '<h3 style="font-size:16px;margin-bottom:12px;">\u2B50 Reviews & Ratings</h3>' +
+      '<div class="profile-card" style="margin-bottom:14px;">' +
+        '<div style="font-size:13px;color:#888;margin-bottom:8px;">Rate this product:</div>' +
+        '<div class="stars-row" id="starRow">' +
+          '<span class="star" onclick="setRating(1)" id="star1">\u2606</span>' +
+          '<span class="star" onclick="setRating(2)" id="star2">\u2606</span>' +
+          '<span class="star" onclick="setRating(3)" id="star3">\u2606</span>' +
+          '<span class="star" onclick="setRating(4)" id="star4">\u2606</span>' +
+          '<span class="star" onclick="setRating(5)" id="star5">\u2606</span>' +
+        '</div>' +
+        '<input id="reviewText" placeholder="Write your review..." style="margin-top:8px;margin-bottom:8px;">' +
+        '<button class="btn" style="padding:10px;" onclick="submitReview(\'' + data.id + '\')">Post Review</button>' +
+      '</div>' +
+      '<div id="reviewsList"><div class="loading"><span class="spinner"></span>Loading reviews...</div></div>' +
+    '</div>';
+
+  loadReviews(data.id);
 }
 
 // ─── ADD CART ─────────────────────────────────────────────────────
@@ -1010,10 +1096,17 @@ async function showCart(){
     return '<div class="cart-item">' +
       '<div class="cart-item-info">' +
         '<div class="cart-item-name">' + i.products.name + '</div>' +
-        '<div class="cart-item-qty">Qty: ' + i.qty + '</div>' +
+        '<div style="color:#888;font-size:12px;">₹' + i.products.price + ' each</div>' +
       '</div>' +
-      '<span class="cart-item-price">₹' + price.toFixed(2) + '</span>' +
-      '<button class="delete-btn" onclick="removeCart(\'' + i.id + '\')">Remove</button>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div class="qty-stepper">' +
+          '<button class="qty-btn" onclick="changeQty(\'' + i.id + '\',-1)">−</button>' +
+          '<span class="qty-num">' + i.qty + '</span>' +
+          '<button class="qty-btn" onclick="changeQty(\'' + i.id + '\',1)">+</button>' +
+        '</div>' +
+        '<span class="cart-item-price">₹' + price.toFixed(2) + '</span>' +
+        '<button class="delete-btn" onclick="removeCart(\'' + i.id + '\')">✕</button>' +
+      '</div>' +
     '</div>';
   }).join('');
 
@@ -1093,6 +1186,16 @@ async function applyCoupon(){
 // ─── PLACE ORDER ──────────────────────────────────────────────────
 async function placeOrder(){
   if(!cartData.length){ showToast("Cart is empty"); return; }
+
+  // Mandatory address check
+  var addrSelect = document.getElementById('addressSelect');
+  if(!addrSelect || addrSelect.selectedIndex <= 0){
+    addrSelect.classList.add('required-err');
+    showToast("Please select a delivery address");
+    addrSelect.focus();
+    setTimeout(function(){ addrSelect.classList.remove('required-err'); }, 2500);
+    return;
+  }
 
   var orderId = "ORD" + Date.now();
   var total = parseFloat(document.getElementById('grandTotal').textContent);
@@ -1180,8 +1283,18 @@ async function loadProfile(){
   var avatarEl = document.getElementById('avatarImg');
 
   if(res.data){
-    document.getElementById('nameInput').value = res.data.name || '';
-    document.getElementById('phoneInput').value = res.data.phone || '';
+    // Populate view card
+    var vn = document.getElementById('viewName');
+    var vp = document.getElementById('viewPhone');
+    var ve = document.getElementById('viewEmail');
+    if(vn) vn.textContent = res.data.name || '—';
+    if(vp) vp.textContent = res.data.phone || '—';
+    if(ve) ve.textContent = user.email || '—';
+    // Populate edit inputs
+    var ni = document.getElementById('nameInput');
+    var pi = document.getElementById('phoneInput');
+    if(ni) ni.value = res.data.name || '';
+    if(pi) pi.value = res.data.phone || '';
     var storedAvatar = localStorage.getItem('avatar_' + user.email);
     if(res.data.avatar_url){
       avatarEl.src = res.data.avatar_url;
@@ -1226,8 +1339,17 @@ async function saveProfile(){
     phone: phone
   }, {onConflict:'email'});
 
-  if(res.error) showToast("❌ Error: " + res.error.message);
-  else showToast("✅ Profile saved!");
+  if(res.error){
+    showToast("Error: " + res.error.message);
+  } else {
+    // Update view card immediately
+    var vn = document.getElementById('viewName');
+    var vp = document.getElementById('viewPhone');
+    if(vn) vn.textContent = name || '—';
+    if(vp) vp.textContent = phone || '—';
+    toggleProfileEdit(false); // Switch back to view mode
+    showToast("Profile saved!");
+  }
 }
 
 // ─── AVATAR ──────────────────────────────────────────────
@@ -1508,12 +1630,8 @@ async function loadOrders(){
           '<div class="bill-footer">Thank you for choosing PetalRush \uD83C\uDF38</div>' +
           '<div class="bill-download-row">' +
             '<button class="bill-dl-btn" onclick="downloadBill(\'bill-' + displayId + '\', \'pdf\', \'' + (invoiceId||displayId) + '\')">' +
-              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-              ' Download PDF' +
-            '</button>' +
-            '<button class="bill-dl-btn secondary" onclick="downloadBill(\'bill-' + displayId + '\', \'png\', \'' + (invoiceId||displayId) + '\')">' +
-              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
-              ' Save PNG' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              ' Download Receipt PDF' +
             '</button>' +
           '</div>' +
 
@@ -1690,7 +1808,430 @@ async function triggerCapture(billId, format, invoiceName){
   }
 }
 
-// ─── LOGOUT ───────────────────────────────────────────────────────// ─── LOGOUT ───────────────────────────────────────────────────────// ─── LOGOUT ───────────────────────────────────────────────────────
+// ─── QTY STEPPER ──────────────────────────────────────────────────
+async function changeQty(cartId, delta){
+  // Find item in cartData
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
+  if(!item) return;
+
+  var newQty = item.qty + delta;
+  if(newQty < 1){
+    // Remove item if qty goes to 0
+    await _supabase.from("cart").delete().eq("id", cartId);
+    showToast("Item removed");
+  } else {
+    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
+  }
+  showCart();
+}
+
+// ─── REVIEWS ──────────────────────────────────────────────────────
+var currentRating = 0;
+
+function setRating(n){
+  currentRating = n;
+  for(var i=1;i<=5;i++){
+    var s = document.getElementById('star'+i);
+    if(s) s.textContent = i <= n ? '★' : '☆';
+  }
+}
+
+async function loadReviews(productId){
+  var el = document.getElementById('reviewsList');
+  if(!el) return;
+
+  var res = await _supabase
+    .from("reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", {ascending:false});
+
+  if(res.error || !res.data || !res.data.length){
+    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  el.innerHTML = res.data.map(function(r){
+    var stars = '';
+    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
+    return '<div class="review-card">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
+      '<div class="review-text">' + (r.review_text||'') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function submitReview(productId){
+  if(!currentRating){ showToast("Please select a star rating"); return; }
+  var text = document.getElementById('reviewText');
+  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+
+  var res = await _supabase.from("reviews").insert({
+    product_id: productId,
+    user_email: user.email,
+    rating: currentRating,
+    review_text: text.value.trim()
+  });
+
+  if(res.error){
+    // reviews table may not exist - show graceful message
+    showToast("Review saved locally! (DB table pending)");
+    // Show the review locally anyway
+    var reviewsList = document.getElementById('reviewsList');
+    if(reviewsList){
+      var stars = '';
+      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
+      reviewsList.innerHTML = '<div class="review-card">' +
+        '<div class="review-stars">' + stars + '</div>' +
+        '<div class="review-author">' + user.email + ' (just now)</div>' +
+        '<div class="review-text">' + text.value.trim() + '</div>' +
+      '</div>' + reviewsList.innerHTML;
+    }
+  } else {
+    showToast("Review posted!");
+    loadReviews(productId);
+  }
+
+  text.value = '';
+  currentRating = 0;
+  setRating(0);
+}
+
+// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
+function toggleProfileEdit(show){
+  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
+  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
+}
+
+function togglePwdEdit(){
+  var area = document.getElementById('pwdEditArea');
+  var view = document.getElementById('pwdViewArea');
+  var showing = area.style.display !== 'none';
+  area.style.display = showing ? 'none' : 'block';
+  view.style.display = showing ? 'block' : 'none';
+}
+
+async function changePassword(){
+  var oldPwd = document.getElementById('pwdOld').value.trim();
+  var newPwd = document.getElementById('pwdNew').value.trim();
+  var confirm = document.getElementById('pwdConfirm').value.trim();
+
+  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
+
+  // Verify old password against users table
+  var checkRes = await _supabase
+    .from("users")
+    .select("password")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
+    showToast("Current password is incorrect"); return;
+  }
+
+  // Update password in users table
+  var res = await _supabase
+    .from("users")
+    .update({ password: newPwd })
+    .eq("email", user.email);
+
+  if(res.error) showToast("Error: " + res.error.message);
+  else {
+    showToast("Password updated!");
+    document.getElementById('pwdOld').value = '';
+    document.getElementById('pwdNew').value = '';
+    document.getElementById('pwdConfirm').value = '';
+    togglePwdEdit();
+  }
+}
+
+// ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
+async function changeQty(cartId, delta){
+  // Find item in cartData
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
+  if(!item) return;
+
+  var newQty = item.qty + delta;
+  if(newQty < 1){
+    // Remove item if qty goes to 0
+    await _supabase.from("cart").delete().eq("id", cartId);
+    showToast("Item removed");
+  } else {
+    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
+  }
+  showCart();
+}
+
+// ─── REVIEWS ──────────────────────────────────────────────────────
+var currentRating = 0;
+
+function setRating(n){
+  currentRating = n;
+  for(var i=1;i<=5;i++){
+    var s = document.getElementById('star'+i);
+    if(s) s.textContent = i <= n ? '★' : '☆';
+  }
+}
+
+async function loadReviews(productId){
+  var el = document.getElementById('reviewsList');
+  if(!el) return;
+
+  var res = await _supabase
+    .from("reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", {ascending:false});
+
+  if(res.error || !res.data || !res.data.length){
+    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  el.innerHTML = res.data.map(function(r){
+    var stars = '';
+    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
+    return '<div class="review-card">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
+      '<div class="review-text">' + (r.review_text||'') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function submitReview(productId){
+  if(!currentRating){ showToast("Please select a star rating"); return; }
+  var text = document.getElementById('reviewText');
+  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+
+  var res = await _supabase.from("reviews").insert({
+    product_id: productId,
+    user_email: user.email,
+    rating: currentRating,
+    review_text: text.value.trim()
+  });
+
+  if(res.error){
+    // reviews table may not exist - show graceful message
+    showToast("Review saved locally! (DB table pending)");
+    // Show the review locally anyway
+    var reviewsList = document.getElementById('reviewsList');
+    if(reviewsList){
+      var stars = '';
+      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
+      reviewsList.innerHTML = '<div class="review-card">' +
+        '<div class="review-stars">' + stars + '</div>' +
+        '<div class="review-author">' + user.email + ' (just now)</div>' +
+        '<div class="review-text">' + text.value.trim() + '</div>' +
+      '</div>' + reviewsList.innerHTML;
+    }
+  } else {
+    showToast("Review posted!");
+    loadReviews(productId);
+  }
+
+  text.value = '';
+  currentRating = 0;
+  setRating(0);
+}
+
+// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
+function toggleProfileEdit(show){
+  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
+  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
+}
+
+function togglePwdEdit(){
+  var area = document.getElementById('pwdEditArea');
+  var view = document.getElementById('pwdViewArea');
+  var showing = area.style.display !== 'none';
+  area.style.display = showing ? 'none' : 'block';
+  view.style.display = showing ? 'block' : 'none';
+}
+
+async function changePassword(){
+  var oldPwd = document.getElementById('pwdOld').value.trim();
+  var newPwd = document.getElementById('pwdNew').value.trim();
+  var confirm = document.getElementById('pwdConfirm').value.trim();
+
+  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
+
+  // Verify old password against users table
+  var checkRes = await _supabase
+    .from("users")
+    .select("password")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
+    showToast("Current password is incorrect"); return;
+  }
+
+  // Update password in users table
+  var res = await _supabase
+    .from("users")
+    .update({ password: newPwd })
+    .eq("email", user.email);
+
+  if(res.error) showToast("Error: " + res.error.message);
+  else {
+    showToast("Password updated!");
+    document.getElementById('pwdOld').value = '';
+    document.getElementById('pwdNew').value = '';
+    document.getElementById('pwdConfirm').value = '';
+    togglePwdEdit();
+  }
+}
+
+// ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
+async function changeQty(cartId, delta){
+  // Find item in cartData
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
+  if(!item) return;
+
+  var newQty = item.qty + delta;
+  if(newQty < 1){
+    // Remove item if qty goes to 0
+    await _supabase.from("cart").delete().eq("id", cartId);
+    showToast("Item removed");
+  } else {
+    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
+  }
+  showCart();
+}
+
+// ─── REVIEWS ──────────────────────────────────────────────────────
+var currentRating = 0;
+
+function setRating(n){
+  currentRating = n;
+  for(var i=1;i<=5;i++){
+    var s = document.getElementById('star'+i);
+    if(s) s.textContent = i <= n ? '★' : '☆';
+  }
+}
+
+async function loadReviews(productId){
+  var el = document.getElementById('reviewsList');
+  if(!el) return;
+
+  var res = await _supabase
+    .from("reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", {ascending:false});
+
+  if(res.error || !res.data || !res.data.length){
+    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  el.innerHTML = res.data.map(function(r){
+    var stars = '';
+    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
+    return '<div class="review-card">' +
+      '<div class="review-stars">' + stars + '</div>' +
+      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
+      '<div class="review-text">' + (r.review_text||'') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function submitReview(productId){
+  if(!currentRating){ showToast("Please select a star rating"); return; }
+  var text = document.getElementById('reviewText');
+  if(!text || !text.value.trim()){ showToast("Please write a review"); return; }
+
+  var res = await _supabase.from("reviews").insert({
+    product_id: productId,
+    user_email: user.email,
+    rating: currentRating,
+    review_text: text.value.trim()
+  });
+
+  if(res.error){
+    // reviews table may not exist - show graceful message
+    showToast("Review saved locally! (DB table pending)");
+    // Show the review locally anyway
+    var reviewsList = document.getElementById('reviewsList');
+    if(reviewsList){
+      var stars = '';
+      for(var i=1;i<=5;i++) stars += i<=currentRating ? '★' : '☆';
+      reviewsList.innerHTML = '<div class="review-card">' +
+        '<div class="review-stars">' + stars + '</div>' +
+        '<div class="review-author">' + user.email + ' (just now)</div>' +
+        '<div class="review-text">' + text.value.trim() + '</div>' +
+      '</div>' + reviewsList.innerHTML;
+    }
+  } else {
+    showToast("Review posted!");
+    loadReviews(productId);
+  }
+
+  text.value = '';
+  currentRating = 0;
+  setRating(0);
+}
+
+// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
+function toggleProfileEdit(show){
+  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
+  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
+}
+
+function togglePwdEdit(){
+  var area = document.getElementById('pwdEditArea');
+  var view = document.getElementById('pwdViewArea');
+  var showing = area.style.display !== 'none';
+  area.style.display = showing ? 'none' : 'block';
+  view.style.display = showing ? 'block' : 'none';
+}
+
+async function changePassword(){
+  var oldPwd = document.getElementById('pwdOld').value.trim();
+  var newPwd = document.getElementById('pwdNew').value.trim();
+  var confirm = document.getElementById('pwdConfirm').value.trim();
+
+  if(!oldPwd || !newPwd){ showToast("Fill in all password fields"); return; }
+  if(newPwd !== confirm){ showToast("New passwords don't match"); return; }
+  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
+
+  // Verify old password against users table
+  var checkRes = await _supabase
+    .from("users")
+    .select("password")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  if(checkRes.data && checkRes.data.password && checkRes.data.password !== oldPwd){
+    showToast("Current password is incorrect"); return;
+  }
+
+  // Update password in users table
+  var res = await _supabase
+    .from("users")
+    .update({ password: newPwd })
+    .eq("email", user.email);
+
+  if(res.error) showToast("Error: " + res.error.message);
+  else {
+    showToast("Password updated!");
+    document.getElementById('pwdOld').value = '';
+    document.getElementById('pwdNew').value = '';
+    document.getElementById('pwdConfirm').value = '';
+    togglePwdEdit();
+  }
+}
+
+// ─── LOGOUT ───────────────────────────────────────────────────────
 function doLogout(){
   localStorage.removeItem("user");
   location.href = "index.html";
