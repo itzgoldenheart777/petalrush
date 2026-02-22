@@ -995,13 +995,13 @@ body.light-mode input::placeholder{ color:#aaa; }
     <!-- AVATAR + EDIT PENCIL -->
     <div class="avatar-wrap" style="margin-bottom:12px;">
       <img id="avatarImg" class="avatar" src="" alt="Avatar" onclick="document.getElementById('avatarFile').click()">
-      <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">✏️</div>
+      <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">&#128100;</div>
       <input type="file" id="avatarFile" hidden accept="image/*" onchange="uploadAvatar(event)">
     </div>
 
     <!-- PROFILE CARD: view mode -->
     <div id="profileViewCard" class="profile-card" style="position:relative;">
-      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">✏️ Edit</button>
+      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">Edit</button>
       <div class="profile-view-row">
         <div>
           <div class="profile-view-label">Name</div>
