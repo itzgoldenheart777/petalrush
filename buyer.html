@@ -20,7 +20,7 @@
   --border:rgba(255,255,255,0.06);
   --border2:rgba(255,255,255,0.08);
   --text:#f0ede8;
-  --text2:#ccc;
+  --text2:#c8c4be;
   --text3:#888;
   --text4:#555;
   --accent:#ff4081;
@@ -30,21 +30,30 @@
   --header-bg:linear-gradient(135deg,#1a0a0f 0%,#0d0f14 100%);
   --bottom-bg:#111318;
   --shadow:rgba(255,64,129,0.25);
+  --toast-bg:#1e2130;
+  --star-empty:#555;
 }
 
 body.light-mode{
-  --bg:#f7f4f2;
+  --bg:#f0ede8;
   --bg2:#ffffff;
-  --bg3:#faf7f5;
-  --bg4:#f1ece9;
-  --border:rgba(0,0,0,0.08);
+  --bg3:#fafafa;
+  --bg4:#e8e4df;
+  --border:rgba(0,0,0,0.09);
   --border2:rgba(0,0,0,0.12);
   --text:#1a1a1a;
-  --text2:#333333;
-  --text3:#666666;
-  --text4:#999999;
+  --text2:#3a3a3a;
+  --text3:#606060;
+  --text4:#909090;
+  --accent:#e0205f;
+  --accent2:#c41a54;
   --card:#ffffff;
-  --input-bg:#f3efec;
+  --input-bg:#f5f2ef;
+  --header-bg:linear-gradient(135deg,#fff5f7 0%,#ffffff 100%);
+  --bottom-bg:#ffffff;
+  --shadow:rgba(224,32,95,0.18);
+  --toast-bg:#ffffff;
+  --star-empty:#bbb;
 }
 
 body{
@@ -197,7 +206,7 @@ select option{background:var(--input-bg);}
 .card-name{
   font-size:13px;
   font-weight:500;
-  color:#e0ddd8;
+  color:var(--text);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -304,7 +313,7 @@ select option{background:var(--input-bg);}
 .cart-item-name{
   font-size:14px;
   font-weight:500;
-  color:#e0ddd8;
+  color:var(--text);
   margin-bottom:4px;
 }
 
@@ -381,7 +390,7 @@ select option{background:var(--input-bg);}
   padding:14px 0 12px;
   cursor:pointer;
   font-size:12px;
-  color:#666;
+  color:var(--text3);
   transition:color 0.2s;
   display:flex;
   flex-direction:column;
@@ -476,7 +485,7 @@ select option{background:var(--input-bg);}
   bottom:90px;
   left:50%;
   transform:translateX(-50%) translateY(20px);
-  background:#1e2130;
+  background:var(--bg4);
   border:1px solid rgba(255,64,129,0.3);
   color:var(--text);
   padding:12px 22px;
@@ -541,19 +550,19 @@ select option{background:var(--input-bg);}
 
 /* REVIEW STARS */
 .stars-row{display:flex;gap:4px;margin:6px 0;}
-.star{font-size:20px;cursor:pointer;transition:transform 0.1s;line-height:1;}
+.star{font-size:22px;cursor:pointer;transition:transform 0.1s;line-height:1;color:var(--star-empty);}
 .star:hover{transform:scale(1.2);}
 .review-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;}
 .review-author{font-size:12px;color:var(--text3);margin-bottom:4px;}
 .review-text{font-size:13px;color:var(--text2);line-height:1.5;}
-.review-stars{font-size:13px;color:#f5a623;}
+.review-stars{font-size:14px;color:#f5a623;letter-spacing:1px;}
 
 /* PROFILE EDIT MODE */
 .profile-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
 .profile-edit-btn{position:absolute;top:10px;right:10px;background:#ff4081;border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .profile-view-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
-.profile-view-label{color:#666;font-size:12px;}
-.profile-view-val{color:#e0ddd8;font-weight:500;}
+.profile-view-label{color:var(--text3);font-size:12px;}
+.profile-view-val{color:var(--text);font-weight:500;}
 
 /* ADDRESS MANDATORY HIGHLIGHT */
 select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(244,67,54,0.2);}
@@ -673,7 +682,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 .bill-meta-val{
   font-size:12px;
-  color:#bbb;
+  color:var(--text2);
   word-break:break-all;
   line-height:1.3;
 }
@@ -700,7 +709,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   overflow:hidden;
 }
 .bill-header{
-  background:linear-gradient(135deg,#1a0a0f,#1e0e16);
+  background:var(--header-bg);
   padding:14px 16px;
   border-bottom:1px solid rgba(255,64,129,0.1);
 }
@@ -714,7 +723,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   font-family:'Playfair Display',serif;
   font-size:15px;
   font-weight:700;
-  color:#ffb3c6;
+  color:var(--accent);
 }
 .bill-sub{
   font-size:11px;
@@ -772,7 +781,7 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
   border-bottom:1px solid rgba(255,255,255,0.03);
 }
 .bill-table td:first-child{
-  color:#e0ddd8;
+  color:var(--text);
   font-weight:500;
 }
 .bill-totals{
@@ -808,50 +817,120 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 .stock-badge.available{background:rgba(76,175,80,0.15);color:#4caf50;border:1px solid rgba(76,175,80,0.3);}
 .stock-badge.out{background:rgba(244,67,54,0.1);color:#f44336;border:1px solid rgba(244,67,54,0.2);}
 
-/* ── LIGHT MODE OVERRIDES ─────────────────────────────── */
-body.light-mode .header{ border-bottom:1px solid rgba(255,64,129,0.15); }
-body.light-mode input{ background:var(--input-bg) !important; color:var(--text) !important; border-color:rgba(0,0,0,0.12) !important; }
-body.light-mode select{ background:var(--input-bg) !important; color:var(--text) !important; border-color:rgba(0,0,0,0.12) !important; }
-body.light-mode .product-card{ background:#fff; border-color:rgba(0,0,0,0.07); box-shadow:0 2px 10px rgba(0,0,0,0.06); }
-body.light-mode .product-name{ color:#1a1a1a; }
-body.light-mode .cart-item{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
+/* DETAIL QTY ROW */
+.detail-qty-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:14px 0 10px;
+}
+.detail-qty-label{
+  font-size:14px;
+  color:var(--text3);
+  font-weight:500;
+}
+.detail-stock-hint{
+  font-size:12px;
+  color:var(--text4);
+}
+body.light-mode .detail-stock-hint{ color:#909090; }
+
+/* ── LIGHT MODE OVERRIDES ────────────────────────────────────── */
+body.light-mode .header{
+  border-bottom:1px solid rgba(224,32,95,0.15);
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+}
+body.light-mode .card{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+body.light-mode .card:hover{
+  box-shadow:0 8px 24px rgba(224,32,95,0.12);
+}
+body.light-mode .card-name{ color:#1a1a1a; }
+body.light-mode .card img{ background:#f0ede8; }
+body.light-mode .cart-item{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
 body.light-mode .cart-item-name{ color:#1a1a1a; }
-body.light-mode .invoice{ background:#f8f5f2; border-color:rgba(0,0,0,0.08); }
-body.light-mode .invoice-row{ color:#444; }
+body.light-mode .invoice{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
+body.light-mode .invoice-row{ color:#3a3a3a; }
 body.light-mode .invoice-total{ color:#1a1a1a; }
-body.light-mode .profile-card{ background:#fff; border-color:rgba(0,0,0,0.08); }
+body.light-mode .profile-card{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
 body.light-mode .profile-view-val{ color:#1a1a1a; }
-body.light-mode .review-card{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
-body.light-mode .review-text{ color:#333; }
-body.light-mode .address-item{ background:#f8f5f2; border-color:rgba(0,0,0,0.07); }
-body.light-mode .bill-card{ background:#fff; border-color:rgba(255,64,129,0.15); }
-body.light-mode .bill-header{ background:linear-gradient(135deg,#fff5f7,#fff); }
-body.light-mode .bill-meta-val{ color:#333; }
-body.light-mode .bill-table td{ color:#333; }
-body.light-mode .bill-table th{ color:#888; }
-body.light-mode .btn-secondary{ background:#f0ede8; color:#333; border-color:rgba(0,0,0,0.12); }
-body.light-mode .bottom-nav{ box-shadow:0 -2px 10px rgba(0,0,0,0.08); }
-body.light-mode .bottom-nav .tab{ color:#888; }
-body.light-mode .bottom-nav .tab.active{ color:#ff4081; }
-body.light-mode .order-card{ background:#fff; border-color:rgba(0,0,0,0.07); }
-body.light-mode .filter-bar{ background:#fff; border-color:rgba(0,0,0,0.07); }
-body.light-mode .section h2, body.light-mode .section h3{ color:#1a1a1a; }
-body.light-mode .header-logo-text{ color:#e0205f; }
-body.light-mode .header-logo-sub{ color:#888; }
-body.light-mode .qty-stepper{ border-color:rgba(255,64,129,0.4); }
-body.light-mode .qty-btn{ background:#f0ede8; }
-body.light-mode .qty-num{ background:#e8e4e0; color:#1a1a1a; }
-body.light-mode .card-name{
-  color:#222 !important;
+body.light-mode .profile-view-label{ color:#606060; }
+body.light-mode .review-card{
+  background:#f8f5f2;
+  border-color:rgba(0,0,0,0.07);
 }
-
-body.light-mode .product-name{
-  color:#1a1a1a !important;
+body.light-mode .review-text{ color:#3a3a3a; }
+body.light-mode .review-author{ color:#606060; }
+body.light-mode .address-item{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
 }
-
-body.light-mode .product-desc{
-  color:#444 !important;
+body.light-mode .bill-card{
+  background:#fff;
+  border-color:rgba(224,32,95,0.15);
 }
+body.light-mode .bill-header{
+  background:linear-gradient(135deg,#fff0f4 0%,#fff 100%) !important;
+  border-bottom-color:rgba(224,32,95,0.12);
+}
+body.light-mode .bill-meta-val{ color:#2a2a2a; }
+body.light-mode .bill-meta-label{ color:#909090; }
+body.light-mode .bill-table td{ color:#2a2a2a; }
+body.light-mode .bill-table td:first-child{ color:#1a1a1a; font-weight:500; }
+body.light-mode .bill-table th{ color:#606060; background:#f8f5f2; }
+body.light-mode .bill-row{ color:#606060; }
+body.light-mode .bill-grand{ color:#1a1a1a; }
+body.light-mode .bill-deliver-row{ border-top-color:rgba(0,0,0,0.06); }
+body.light-mode .bill-logo-row{ border-bottom-color:rgba(224,32,95,0.12); }
+body.light-mode .bill-footer{ color:#909090; }
+body.light-mode .bottom{
+  box-shadow:0 -2px 10px rgba(0,0,0,0.08);
+  border-top-color:rgba(0,0,0,0.08);
+}
+body.light-mode .bottom-tab{ color:#909090; }
+body.light-mode .bottom-tab.active{ color:var(--accent); }
+body.light-mode .toast{
+  background:#fff;
+  color:#1a1a1a;
+  border-color:rgba(224,32,95,0.25);
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+}
+body.light-mode .btn-secondary{
+  background:#e8e4df;
+  color:#1a1a1a;
+  border-color:rgba(0,0,0,0.12);
+}
+body.light-mode .section h2,
+body.light-mode .section h3{ color:#1a1a1a; }
+body.light-mode #detail .product-name{ color:#1a1a1a; }
+body.light-mode #detail .product-desc{ color:#555; }
+body.light-mode .stock-badge.available{ background:rgba(56,142,60,0.1); color:#2e7d32; }
+body.light-mode .qty-stepper{ border-color:rgba(224,32,95,0.35); }
+body.light-mode .qty-btn{ background:#e8e4df; color:var(--accent); }
+body.light-mode .qty-num{ background:#f5f2ef; color:#1a1a1a; }
+body.light-mode .delete-btn{
+  background:rgba(224,32,95,0.07);
+  border-color:rgba(224,32,95,0.2);
+  color:var(--accent);
+}
+body.light-mode .empty-state{ color:#909090; }
+body.light-mode .loading{ color:#909090; }
+body.light-mode .order-card{ background:#fff; border-color:rgba(0,0,0,0.08); }
+body.light-mode .status-badge{ background:rgba(224,32,95,0.08); }
+body.light-mode .header-logo-sub{ color:#909090; }
+body.light-mode input::placeholder{ color:#aaa; }
 </style>
 </head>
 <body>
@@ -1119,6 +1198,15 @@ async function showDetail(id){
     '</div>' +
     '<div class="product-desc">' + (data.description||'') + '</div>' +
     (inStock ?
+      '<div class="detail-qty-row">' +
+        '<div class="detail-qty-label">Quantity</div>' +
+        '<div class="qty-stepper">' +
+          '<button class="qty-btn" onclick="detailQtyChange(-1)">\u2212</button>' +
+          '<span class="qty-num" id="detailQtyNum">1</span>' +
+          '<button class="qty-btn" onclick="detailQtyChange(1)">+</button>' +
+        '</div>' +
+        '<span class="detail-stock-hint">of ' + qty + ' available</span>' +
+      '</div>' +
       '<button class="btn" onclick="addCart()">\uD83D\uDED2 Add to Cart</button>' :
       '<button class="btn" style="opacity:0.4;cursor:not-allowed;" disabled>Out of Stock</button>'
     ) +
@@ -1126,7 +1214,7 @@ async function showDetail(id){
     '<div style="margin-top:24px;">' +
       '<h3 style="font-size:16px;margin-bottom:12px;">\u2B50 Reviews & Ratings</h3>' +
       '<div class="profile-card" style="margin-bottom:14px;">' +
-        '<div style="font-size:13px;color:#888;margin-bottom:8px;">Rate this product:</div>' +
+        '<div style="font-size:13px;color:var(--text3);margin-bottom:8px;">Rate this product:</div>' +
         '<div class="stars-row" id="starRow">' +
           '<span class="star" onclick="setRating(1)" id="star1">\u2606</span>' +
           '<span class="star" onclick="setRating(2)" id="star2">\u2606</span>' +
@@ -1143,14 +1231,32 @@ async function showDetail(id){
   loadReviews(data.id);
 }
 
+// ─── DETAIL QTY STEPPER ──────────────────────────────────────────
+function detailQtyChange(delta){
+  var el = document.getElementById('detailQtyNum');
+  if(!el) return;
+  var max = parseInt(document.getElementById('detailMaxQty') ? document.getElementById('detailMaxQty').textContent : '999') || 999;
+  // Read max from currentProduct
+  if(currentProduct) max = parseInt(currentProduct.quantity) || 0;
+  var cur = parseInt(el.textContent) || 1;
+  var next = cur + delta;
+  if(next < 1) next = 1;
+  if(next > max) { showToast('Only ' + max + ' in stock'); next = max; }
+  el.textContent = next;
+}
+
 // ─── ADD CART ─────────────────────────────────────────────────────
 async function addCart(){
   if(!currentProduct) return;
+
+  // Get selected qty from detail stepper (default 1)
+  var selectedQty = parseInt((document.getElementById('detailQtyNum')||{}).textContent) || 1;
 
   // Check current stock
   var stockRes = await _supabase.from("products").select("quantity").eq("id", currentProduct.id).single();
   var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
   if(currentStock <= 0){ showToast("Sorry, out of stock!"); return; }
+  if(selectedQty > currentStock){ showToast("Only " + currentStock + " in stock!"); return; }
 
   var res = await _supabase
     .from("cart")
@@ -1160,22 +1266,22 @@ async function addCart(){
     .maybeSingle();
 
   if(res.data){
-    // Don't exceed stock
-    if(res.data.qty >= currentStock){ showToast("Max stock limit reached!"); return; }
-    await _supabase.from("cart").update({qty: res.data.qty+1}).eq("id", res.data.id);
+    var newCartQty = res.data.qty + selectedQty;
+    if(newCartQty > currentStock){ showToast("Max stock limit reached!"); return; }
+    await _supabase.from("cart").update({qty: newCartQty}).eq("id", res.data.id);
   } else {
     await _supabase.from("cart").insert({
       user_email: user.email,
       product_id: currentProduct.id,
-      qty: 1
+      qty: selectedQty
     });
   }
 
-  // Reduce product quantity in DB
-  await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", currentProduct.id);
+  // Reduce stock by selected qty
+  await _supabase.from("products").update({ quantity: currentStock - selectedQty }).eq("id", currentProduct.id);
 
-  showToast("Added to cart!");
-  showCart();
+  showToast("Added " + selectedQty + " to cart!");
+  showCart(false);
 }
 
 // ─── CART ─────────────────────────────────────────────────────────
@@ -1210,7 +1316,7 @@ async function showCart(push){
     return '<div class="cart-item">' +
       '<div class="cart-item-info">' +
         '<div class="cart-item-name">' + i.products.name + '</div>' +
-        '<div style="color:#888;font-size:12px;">₹' + i.products.price + ' each</div>' +
+        '<div style="color:var(--text3);font-size:12px;">₹' + i.products.price + ' each</div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:10px;">' +
         '<div class="qty-stepper">' +
@@ -1577,16 +1683,28 @@ async function deleteAddress(id){
 // ─── ORDERS ──────────────────────────────────────────────
 async function loadOrders(){
   var el = document.getElementById('ordersList');
+  if(!el) return;
   el.innerHTML = '<div class="loading"><span class="spinner"></span>Loading orders...</div>';
 
-  var res = await _supabase
-    .from("orders")
-    .select("id,order_id,flower_name,price,total_amount,status,delivery_address")
-    .eq("user_email", user.email)
-    .order("order_id", {ascending:false});
+  var res;
+  try {
+    res = await _supabase
+      .from("orders")
+      .select("id,order_id,flower_name,price,total_amount,status,delivery_address")
+      .eq("user_email", user.email)
+      .order("order_id", {ascending:false})
+      .limit(50);
+  } catch(fetchErr) {
+    el.innerHTML = '<div class="empty-state"><div>📦</div>Network error loading orders.<br>' +
+      '<small style="font-size:11px;color:var(--text4);">Check your connection and try again.</small>' +
+      '<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
+    return;
+  }
 
   if(res.error){
-    el.innerHTML = '<div class="empty-state"><div>📦</div>Could not load orders.<br><small style="font-size:11px;color:#555;">' + res.error.message + '</small></div>';
+    el.innerHTML = '<div class="empty-state"><div>📦</div>Could not load orders.<br>' +
+      '<small style="font-size:11px;color:var(--text4);">' + (res.error.message||'Unknown error') + '</small>' +
+      '<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
     return;
   }
 
@@ -1685,7 +1803,7 @@ async function loadOrders(){
       addrHtml =
         '<div class="bill-deliver-row">' +
           '<div class="bill-meta-label">Deliver To</div>' +
-          '<div class="bill-meta-val" style="color:#ccc;">' + addrVal + '</div>' +
+          '<div class="bill-meta-val">' + addrVal + '</div>' +
         '</div>';
     }
 
@@ -1846,118 +1964,146 @@ function downloadBill(billId, format, invoiceName){
 async function captureAndSave(format, invoiceName){
   var overlay = document.getElementById('bill-overlay');
   if(!overlay){ showToast("No preview open"); return; }
-  var clone = overlay.children[1];
-  if(!clone){ showToast("Receipt not found"); return; }
 
-  showToast("Preparing...");
+  // The receipt clone is children[1] (children[0] = top bar, [1] = clone, [2] = buttons)
+  var clone = overlay.children[1];
+  if(!clone || clone.tagName === 'DIV' && clone.children.length === 0){
+    showToast("Receipt not found"); return;
+  }
+
+  showToast("Generating...");
+
+  // Ensure clone is visible and properly sized for capture
+  var origStyle = clone.style.cssText;
+  clone.style.cssText = origStyle +
+    ';visibility:visible;opacity:1;display:block;position:static;';
 
   try {
-   var canvas = await html2canvas(clone, {
-     scale: window.devicePixelRatio > 1 ? 3 : 2,
-     backgroundColor: '#ffffff',
-     useCORS: true,
-     allowTaint: false
-   });
+    var canvas = await html2canvas(clone, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      removeContainer: true
+    });
 
-   if(format === 'share'){
-  canvas.toBlob(async function(blob){
+    var fname = (invoiceName || 'PetalRush-Receipt').replace(/[^a-zA-Z0-9\-_]/g, '-');
 
-    const file = new File(
-      [blob],
-      (invoiceName || 'PetalRush-Receipt') + '.png',
-      { type: 'image/png' }
-    );
-
-    if(navigator.canShare && navigator.canShare({ files: [file] })){
-      try{
-        await navigator.share({
-          files: [file],
-          title: 'PetalRush Receipt',
-          text: 'My order receipt'
-        });
-        showToast("Shared successfully!");
-        overlay.remove();
-      }catch(e){
-        if(e.name !== 'AbortError'){
-          downloadPNG(canvas, invoiceName);
+    if(format === 'share'){
+      canvas.toBlob(async function(blob){
+        if(!blob){ downloadPNG(canvas, fname); return; }
+        var file = new File([blob], fname+'.png', { type:'image/png' });
+        var canShareFile = navigator.share &&
+          typeof navigator.canShare === 'function' &&
+          navigator.canShare({ files:[file] });
+        if(canShareFile){
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'PetalRush Receipt',
+              text: 'My order receipt from PetalRush'
+            });
+            showToast("Shared!");
+          } catch(shareErr){
+            if(shareErr.name !== 'AbortError') downloadPNG(canvas, fname);
+          }
+        } else {
+          // Fallback: PNG download
+          downloadPNG(canvas, fname);
         }
-      }
-    } else {
-      downloadPNG(canvas, invoiceName);
-    }
+      }, 'image/png', 0.95);
 
-  }, 'image/png');
-   }else {
-      // PDF download
-      var jsPDFLib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+    } else {
+      // PDF: use jsPDF
+      var jsPDFLib = null;
+      if(window.jspdf && window.jspdf.jsPDF) jsPDFLib = window.jspdf.jsPDF;
+      else if(window.jsPDF) jsPDFLib = window.jsPDF;
+
       if(!jsPDFLib){
-        showToast("PDF lib loading... saving as PNG");
-        downloadPNG(canvas, invoiceName);
+        showToast("PDF lib unavailable - saving PNG");
+        downloadPNG(canvas, fname);
         return;
       }
-      var imgData = canvas.toDataURL('image/jpeg', 0.95);
-      var pxW = canvas.width / 2.5;
-      var pxH = canvas.height / 2.5;
-      var pdf = new jsPDFLib({ orientation:'portrait', unit:'mm',
-        format: [pxW * 0.264583, pxH * 0.264583] });
-      pdf.addImage(imgData, 'JPEG', 0, 0, pxW * 0.264583, pxH * 0.264583);
-      pdf.save((invoiceName||'PetalRush-Receipt')+'.pdf');
+
+      // A4 portrait at 72dpi effective
+      var SCALE = 3;
+      var pxW = canvas.width / SCALE;
+      var pxH = canvas.height / SCALE;
+      var mmW = pxW * 0.2646;
+      var mmH = pxH * 0.2646;
+
+      var pdf = new jsPDFLib({
+        orientation: mmH > mmW ? 'portrait' : 'landscape',
+        unit: 'mm',
+        format: [mmW, mmH]
+      });
+
+      var imgData = canvas.toDataURL('image/jpeg', 0.92);
+      pdf.addImage(imgData, 'JPEG', 0, 0, mmW, mmH, undefined, 'FAST');
+      pdf.save(fname + '.pdf');
       showToast("PDF saved!");
-      overlay.remove();
+
+      // Small delay then close overlay
+      setTimeout(function(){
+        var ov = document.getElementById('bill-overlay');
+        if(ov) ov.remove();
+      }, 600);
     }
   } catch(err){
     showToast("Error: " + err.message);
-    console.error('Capture error:', err);
+    console.error("captureAndSave error:", err);
   }
 }
 
 function downloadPNG(canvas, name){
-  var a = document.createElement('a');
-  a.href = canvas.toDataURL('image/png');
-  a.download = (name||'PetalRush-Receipt') + '.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast("PNG saved!");
-  var ov = document.getElementById('bill-overlay');
-  if(ov) ov.remove();
+  try {
+    var fname = (name || 'PetalRush-Receipt').replace(/[^a-zA-Z0-9\-_]/g, '-');
+    var dataUrl = canvas.toDataURL('image/png');
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fname + '.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); }, 100);
+    showToast("PNG saved!");
+  } catch(e){
+    showToast("Save failed: " + e.message);
+  }
+  setTimeout(function(){
+    var ov = document.getElementById('bill-overlay');
+    if(ov) ov.remove();
+  }, 400);
 }
 
-// ─── QTY STEPPER ──────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
+// ─── QTY STEPPER IN CART ──────────────────────────────────────────
 async function changeQty(cartId, delta){
   var item = null;
   for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
   if(!item) return;
-
   var newQty = item.qty + delta;
-
   if(delta > 0){
-    // Check stock before increasing
-    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
-    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
-    if(currentStock <= 0){ showToast("Out of stock!"); return; }
-    // Deduct stock
-    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
+    var sr = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+    var stock = sr.data ? parseInt(sr.data.quantity)||0 : 0;
+    if(stock <= 0){ showToast("Out of stock!"); return; }
+    await _supabase.from("products").update({quantity:stock-1}).eq("id",item.product_id);
   }
-
   if(newQty < 1){
-    // Restore stock on remove
-    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
-    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
-    await _supabase.from("cart").delete().eq("id", cartId);
+    var sr2 = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+    var st2 = sr2.data ? parseInt(sr2.data.quantity)||0 : 0;
+    await _supabase.from("products").update({quantity:st2+item.qty}).eq("id",item.product_id);
+    await _supabase.from("cart").delete().eq("id",cartId);
     showToast("Item removed");
   } else {
     if(delta < 0){
-      // Restore 1 stock on decrease
-      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
-      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
+      var sr3 = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+      var st3 = sr3.data ? parseInt(sr3.data.quantity)||0 : 0;
+      await _supabase.from("products").update({quantity:st3+1}).eq("id",item.product_id);
     }
-    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
+    await _supabase.from("cart").update({qty:newQty}).eq("id",cartId);
   }
-  showCart();
+  showCart(false);
 }
 
 // ─── REVIEWS ──────────────────────────────────────────────────────
@@ -1967,7 +2113,7 @@ function setRating(n){
   currentRating = n;
   for(var i=1;i<=5;i++){
     var s = document.getElementById('star'+i);
-    if(s) s.textContent = i <= n ? '★' : '☆';
+    if(s) s.textContent = i<=n ? '★' : '☆';
   }
 }
 
@@ -1977,22 +2123,34 @@ async function loadReviews(productId){
 
   var res = await _supabase
     .from("reviews")
-    .select("*")
+    .select("rating,review_text,user_email,created_at")
     .eq("product_id", productId)
-    .order("created_at", {ascending:false});
+    .order("created_at", {ascending:false})
+    .limit(50);
 
-  if(res.error || !res.data || !res.data.length){
-    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+  // Handle RLS or table-missing gracefully
+  if(res.error){
+    // If reviews table blocked by RLS or doesn't exist, show empty state silently
+    el.innerHTML = '<div style="color:var(--text4);font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  if(!res.data || !res.data.length){
+    el.innerHTML = '<div style="color:var(--text4);font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
     return;
   }
 
   el.innerHTML = res.data.map(function(r){
-    var stars = '';
-    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
+    var filled = Math.max(0, Math.min(5, parseInt(r.rating)||0));
+    var stars = '★'.repeat(filled) + '☆'.repeat(5-filled);
+    var d = r.created_at ? new Date(r.created_at) : null;
+    var ds = d ? (d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()) : '';
+    var email = (r.user_email||'Anonymous');
+    var shortEmail = email.length > 24 ? email.substring(0,12)+'...'+email.split('@')[1] : email;
     return '<div class="review-card">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
-      '<div class="review-text">' + (r.review_text||'') + '</div>' +
+      '<div class="review-stars">'+stars+'</div>' +
+      '<div class="review-author">'+shortEmail+(ds?' &middot; '+ds:'')+'</div>' +
+      '<div class="review-text">'+((r.review_text||'').replace(/</g,'&lt;'))+'</div>' +
     '</div>';
   }).join('');
 }
@@ -2005,19 +2163,31 @@ async function submitReview(productId){
   var reviewText = textEl.value.trim();
   var ratingVal = currentRating;
 
-  // Build the review card HTML to show immediately
-  var stars = '';
-  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
+  // Immediately render review card in UI (optimistic update)
+  var stars = '★'.repeat(ratingVal) + '☆'.repeat(5-ratingVal);
   var now = new Date();
-  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var ds = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var email = user.email || 'You';
+  var shortEmail = email.length > 24 ? email.substring(0,12)+'...'+email.split('@')[1] : email;
   var newCard =
-    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
-      '<div class="review-text">' + reviewText + '</div>' +
+    '<div class="review-card" style="border-left:3px solid var(--accent);">' +
+      '<div class="review-stars">'+stars+'</div>' +
+      '<div class="review-author">'+shortEmail+' &middot; '+ds+'</div>' +
+      '<div class="review-text">'+reviewText.replace(/</g,'&lt;')+'</div>' +
     '</div>';
 
-  // Save to DB (best effort)
+  var rl = document.getElementById('reviewsList');
+  if(rl){
+    if(rl.textContent.includes('No reviews yet')) rl.innerHTML = newCard;
+    else rl.innerHTML = newCard + rl.innerHTML;
+  }
+
+  // Reset form immediately so user feels it worked
+  textEl.value = '';
+  currentRating = 0;
+  setRating(0);
+
+  // Persist to Supabase
   var res = await _supabase.from("reviews").insert({
     product_id: productId,
     user_email: user.email,
@@ -2025,24 +2195,15 @@ async function submitReview(productId){
     review_text: reviewText
   });
 
-  // Always show review immediately in UI regardless of DB result
-  var reviewsList = document.getElementById('reviewsList');
-  if(reviewsList){
-    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
-    if(noReviews){ reviewsList.innerHTML = newCard; }
-    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
-  }
-
   if(res.error){
-    showToast("Posted! (saved locally)");
+    // Review already shown - just warn silently
+    console.warn("Review insert error:", res.error.message);
+    showToast("Review shown (sync pending)");
   } else {
     showToast("Review posted!");
+    // Reload from DB to get server timestamp and ensure consistency
+    setTimeout(function(){ loadReviews(productId); }, 800);
   }
-
-  // Reset form
-  textEl.value = '';
-  currentRating = 0;
-  setRating(0);
 }
 
 // ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
@@ -2062,396 +2223,28 @@ function togglePwdEdit(){
 async function changePassword(){
   var oldPwd = document.getElementById('pwdOld').value.trim();
   var newPwd = document.getElementById('pwdNew').value.trim();
-  var conf = document.getElementById('pwdConfirm').value.trim();
+  var conf  = document.getElementById('pwdConfirm').value.trim();
+  if(!oldPwd||!newPwd||!conf){ showToast("Fill in all password fields"); return; }
+  if(newPwd!==conf){ showToast("New passwords don't match"); return; }
+  if(newPwd.length<6){ showToast("Password must be at least 6 characters"); return; }
 
-  if(!oldPwd || !newPwd || !conf){
-    showToast("Fill in all password fields");
-    return;
-  }
+  // Re-authenticate
+  var signInRes = await _supabase.auth.signInWithPassword({ email:user.email, password:oldPwd });
+  if(signInRes.error){ showToast("Current password is incorrect"); return; }
 
-  if(newPwd !== conf){
-    showToast("New passwords don't match");
-    return;
-  }
-
-  if(newPwd.length < 6){
-    showToast("Password must be at least 6 characters");
-    return;
-  }
-
-  // Step 1: Verify old password
-  const { error: signInError } = await _supabase.auth.signInWithPassword({
-    email: user.email,
-    password: oldPwd
-  });
-
-  if(signInError){
-    showToast("Current password is incorrect");
-    return;
-  }
-
-  // Step 2: Update password securely
-  const { error: updateError } = await _supabase.auth.updateUser({
-    password: newPwd
-  });
-
-  if(updateError){
-    showToast(updateError.message);
-    return;
-  }
-
-  showToast("Password updated successfully!");
-
-  document.getElementById('pwdOld').value = '';
-  document.getElementById('pwdNew').value = '';
-  document.getElementById('pwdConfirm').value = '';
-  togglePwdEdit();
-}
-}
-
-// ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
-async function changeQty(cartId, delta){
-  var item = null;
-  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
-  if(!item) return;
-
-  var newQty = item.qty + delta;
-
-  if(delta > 0){
-    // Check stock before increasing
-    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
-    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
-    if(currentStock <= 0){ showToast("Out of stock!"); return; }
-    // Deduct stock
-    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
-  }
-
-  if(newQty < 1){
-    // Restore stock on remove
-    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
-    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
-    await _supabase.from("cart").delete().eq("id", cartId);
-    showToast("Item removed");
-  } else {
-    if(delta < 0){
-      // Restore 1 stock on decrease
-      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
-      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
-    }
-    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
-  }
-  showCart();
-}
-
-// ─── REVIEWS ──────────────────────────────────────────────────────
-var currentRating = 0;
-
-function setRating(n){
-  currentRating = n;
-  for(var i=1;i<=5;i++){
-    var s = document.getElementById('star'+i);
-    if(s) s.textContent = i <= n ? '★' : '☆';
-  }
-}
-
-async function loadReviews(productId){
-  var el = document.getElementById('reviewsList');
-  if(!el) return;
-
-  var res = await _supabase
-    .from("reviews")
-    .select("*")
-    .eq("product_id", productId)
-    .order("created_at", {ascending:false});
-
-  if(res.error || !res.data || !res.data.length){
-    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
-    return;
-  }
-
-  el.innerHTML = res.data.map(function(r){
-    var stars = '';
-    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
-    return '<div class="review-card">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
-      '<div class="review-text">' + (r.review_text||'') + '</div>' +
-    '</div>';
-  }).join('');
-}
-
-async function submitReview(productId){
-  if(!currentRating){ showToast("Please select a star rating"); return; }
-  var textEl = document.getElementById('reviewText');
-  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
-
-  var reviewText = textEl.value.trim();
-  var ratingVal = currentRating;
-
-  // Build the review card HTML to show immediately
-  var stars = '';
-  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
-  var now = new Date();
-  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
-  var newCard =
-    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
-      '<div class="review-text">' + reviewText + '</div>' +
-    '</div>';
-
-  // Save to DB (best effort)
-  var res = await _supabase.from("reviews").insert({
-    product_id: productId,
-    user_email: user.email,
-    rating: ratingVal,
-    review_text: reviewText
-  });
-
-  // Always show review immediately in UI regardless of DB result
-  var reviewsList = document.getElementById('reviewsList');
-  if(reviewsList){
-    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
-    if(noReviews){ reviewsList.innerHTML = newCard; }
-    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
-  }
-
-  if(res.error){
-    showToast("Posted! (saved locally)");
-  } else {
-    showToast("Review posted!");
-  }
-
-  // Reset form
-  textEl.value = '';
-  currentRating = 0;
-  setRating(0);
-}
-
-// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
-function toggleProfileEdit(show){
-  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
-  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
-}
-
-function togglePwdEdit(){
-  var area = document.getElementById('pwdEditArea');
-  var view = document.getElementById('pwdViewArea');
-  var showing = area.style.display !== 'none';
-  area.style.display = showing ? 'none' : 'block';
-  view.style.display = showing ? 'block' : 'none';
-}
-
-async function changePassword(){
-  var oldPwd = document.getElementById('pwdOld').value.trim();
-  var newPwd = document.getElementById('pwdNew').value.trim();
-  var conf = document.getElementById('pwdConfirm').value.trim();
-
-  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
-  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
-
-  // Step 1: Re-authenticate with old password via Supabase Auth signIn
-  var signInRes = await _supabase.auth.signInWithPassword({
-    email: user.email,
-    password: oldPwd
-  });
-
-  if(signInRes.error){
-    showToast("Current password is incorrect");
-    return;
-  }
-
-  // Step 2: Update password via Supabase Auth
-  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
-
+  // Update via Supabase Auth (do NOT store in users table)
+  var updateRes = await _supabase.auth.updateUser({ password:newPwd });
   if(updateRes.error){
     showToast("Error: " + updateRes.error.message);
   } else {
-    // Also update in users table if stored there
-    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
-    showToast("Password updated successfully!");
-    document.getElementById('pwdOld').value = '';
-    document.getElementById('pwdNew').value = '';
-    document.getElementById('pwdConfirm').value = '';
+    showToast("Password updated!");
+    document.getElementById('pwdOld').value='';
+    document.getElementById('pwdNew').value='';
+    document.getElementById('pwdConfirm').value='';
     togglePwdEdit();
   }
 }
 
-// ─── LOGOUT ───────────────────────────────────────────────────────// ─── QTY STEPPER ──────────────────────────────────────────────────
-async function changeQty(cartId, delta){
-  var item = null;
-  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
-  if(!item) return;
-
-  var newQty = item.qty + delta;
-
-  if(delta > 0){
-    // Check stock before increasing
-    var stockRes = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
-    if(newQty > item.qty + currentStock){ showToast("Not enough stock!"); return; }
-    if(currentStock <= 0){ showToast("Out of stock!"); return; }
-    // Deduct stock
-    await _supabase.from("products").update({ quantity: currentStock - 1 }).eq("id", item.product_id);
-  }
-
-  if(newQty < 1){
-    // Restore stock on remove
-    var stockRes2 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-    var st2 = stockRes2.data ? parseInt(stockRes2.data.quantity)||0 : 0;
-    await _supabase.from("products").update({ quantity: st2 + item.qty }).eq("id", item.product_id);
-    await _supabase.from("cart").delete().eq("id", cartId);
-    showToast("Item removed");
-  } else {
-    if(delta < 0){
-      // Restore 1 stock on decrease
-      var stockRes3 = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
-      var st3 = stockRes3.data ? parseInt(stockRes3.data.quantity)||0 : 0;
-      await _supabase.from("products").update({ quantity: st3 + 1 }).eq("id", item.product_id);
-    }
-    await _supabase.from("cart").update({qty: newQty}).eq("id", cartId);
-  }
-  showCart();
-}
-
-// ─── REVIEWS ──────────────────────────────────────────────────────
-var currentRating = 0;
-
-function setRating(n){
-  currentRating = n;
-  for(var i=1;i<=5;i++){
-    var s = document.getElementById('star'+i);
-    if(s) s.textContent = i <= n ? '★' : '☆';
-  }
-}
-
-async function loadReviews(productId){
-  var el = document.getElementById('reviewsList');
-  if(!el) return;
-
-  var res = await _supabase
-    .from("reviews")
-    .select("*")
-    .eq("product_id", productId)
-    .order("created_at", {ascending:false});
-
-  if(res.error || !res.data || !res.data.length){
-    el.innerHTML = '<div style="color:#555;font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
-    return;
-  }
-
-  el.innerHTML = res.data.map(function(r){
-    var stars = '';
-    for(var i=1;i<=5;i++) stars += i<=r.rating ? '★' : '☆';
-    return '<div class="review-card">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (r.user_email||'Anonymous') + '</div>' +
-      '<div class="review-text">' + (r.review_text||'') + '</div>' +
-    '</div>';
-  }).join('');
-}
-
-async function submitReview(productId){
-  if(!currentRating){ showToast("Please select a star rating"); return; }
-  var textEl = document.getElementById('reviewText');
-  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
-
-  var reviewText = textEl.value.trim();
-  var ratingVal = currentRating;
-
-  // Build the review card HTML to show immediately
-  var stars = '';
-  for(var i=1;i<=5;i++) stars += i<=ratingVal ? '★' : '☆';
-  var now = new Date();
-  var dateStr = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
-  var newCard =
-    '<div class="review-card" style="border:1px solid rgba(255,64,129,0.2);">' +
-      '<div class="review-stars">' + stars + '</div>' +
-      '<div class="review-author">' + (user.email||'You') + ' · ' + dateStr + '</div>' +
-      '<div class="review-text">' + reviewText + '</div>' +
-    '</div>';
-
-  // Save to DB (best effort)
-  var res = await _supabase.from("reviews").insert({
-    product_id: productId,
-    user_email: user.email,
-    rating: ratingVal,
-    review_text: reviewText
-  });
-
-  // Always show review immediately in UI regardless of DB result
-  var reviewsList = document.getElementById('reviewsList');
-  if(reviewsList){
-    var noReviews = reviewsList.querySelector('[style*="No reviews"]') || reviewsList.textContent.includes('No reviews');
-    if(noReviews){ reviewsList.innerHTML = newCard; }
-    else { reviewsList.innerHTML = newCard + reviewsList.innerHTML; }
-  }
-
-  if(res.error){
-    showToast("Posted! (saved locally)");
-  } else {
-    showToast("Review posted!");
-  }
-
-  // Reset form
-  textEl.value = '';
-  currentRating = 0;
-  setRating(0);
-}
-
-// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
-function toggleProfileEdit(show){
-  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
-  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
-}
-
-function togglePwdEdit(){
-  var area = document.getElementById('pwdEditArea');
-  var view = document.getElementById('pwdViewArea');
-  var showing = area.style.display !== 'none';
-  area.style.display = showing ? 'none' : 'block';
-  view.style.display = showing ? 'block' : 'none';
-}
-
-async function changePassword(){
-  var oldPwd = document.getElementById('pwdOld').value.trim();
-  var newPwd = document.getElementById('pwdNew').value.trim();
-  var conf = document.getElementById('pwdConfirm').value.trim();
-
-  if(!oldPwd || !newPwd || !conf){ showToast("Fill in all password fields"); return; }
-  if(newPwd !== conf){ showToast("New passwords don't match"); return; }
-  if(newPwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
-
-  // Step 1: Re-authenticate with old password via Supabase Auth signIn
-  var signInRes = await _supabase.auth.signInWithPassword({
-    email: user.email,
-    password: oldPwd
-  });
-
-  if(signInRes.error){
-    showToast("Current password is incorrect");
-    return;
-  }
-
-  // Step 2: Update password via Supabase Auth
-  var updateRes = await _supabase.auth.updateUser({ password: newPwd });
-
-  if(updateRes.error){
-    showToast("Error: " + updateRes.error.message);
-  } else {
-    // Also update in users table if stored there
-    await _supabase.from("users").update({ password: newPwd }).eq("email", user.email);
-    showToast("Password updated successfully!");
-    document.getElementById('pwdOld').value = '';
-    document.getElementById('pwdNew').value = '';
-    document.getElementById('pwdConfirm').value = '';
-    togglePwdEdit();
-  }
-}
 
 // ─── LOGOUT ───────────────────────────────────────────────────────
 function doLogout(){
