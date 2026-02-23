@@ -276,7 +276,14 @@ body.light-mode select option{background:#fff;color:#1a1a1a;}
 <div id="app">
 
 <!-- ═══ LOGIN ═══════════════════════════════════════════════ -->
-<div id="loginScreen">
+<div id="loginScreen" style="display:none;">
+  <!-- SPLASH shown until auth check completes -->
+  <div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;">
+    <div style="font-size:52px;animation:float 3s ease-in-out infinite;">&#x1F338;</div>
+    <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,#ff4081,#ff8fab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">PetalRush</div>
+    <div style="font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Seller Panel</div>
+    <div style="margin-top:8px;"><span class="spinner"></span></div>
+  </div>
   <div class="login-hero">
     <div class="login-brand-icon">&#x1F338;</div>
     <div class="login-title">PetalRush</div>
@@ -684,33 +691,79 @@ var expandedOrderId = null;
 var allCategories = [];
 
 /* ════ INIT ════════════════════════════════════════════════ */
+var _booted = false;
+
+function hideSplash(){
+  var s = document.getElementById("splashScreen");
+  if(s) s.style.display = "none";
+}
+
 window.addEventListener("load", async function(){
   applyTheme();
+
+  // ── 1. Try localStorage cache first (instant - no flash) ──
+  try {
+    var cached = JSON.parse(localStorage.getItem("prSellerUser"));
+    if(cached && cached.id && cached.email){
+      user = cached;
+      hideSplash();
+      bootApp();
+      // Still verify with Supabase in background to refresh token
+    }
+  } catch(e){}
+
+  // ── 2. Verify/refresh with Supabase ──
   var s = await _supabase.auth.getSession();
   if(s.data && s.data.session && s.data.session.user){
     user = s.data.session.user;
-    bootApp();
+    localStorage.setItem("prSellerUser", JSON.stringify({ id: user.id, email: user.email, user_metadata: user.user_metadata }));
+    hideSplash();
+    if(!_booted) bootApp();
+  } else if(!_booted){
+    // No session at all — show login
+    hideSplash();
+    showLoginScreen();
   }
 });
 
 _supabase.auth.onAuthStateChange(function(event, session){
   if(event === "SIGNED_IN" && session){
     user = session.user;
-    bootApp();
+    localStorage.setItem("prSellerUser", JSON.stringify({ id: user.id, email: user.email, user_metadata: user.user_metadata }));
+    hideSplash();
+    if(!_booted) bootApp();
   } else if(event === "SIGNED_OUT"){
     user = null;
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("mainApp").style.display = "none";
+    _booted = false;
+    localStorage.removeItem("prSellerUser");
+    hideSplash();
+    showLoginScreen();
+  } else if(event === "TOKEN_REFRESHED" && session){
+    user = session.user;
+    localStorage.setItem("prSellerUser", JSON.stringify({ id: user.id, email: user.email, user_metadata: user.user_metadata }));
   }
 });
 
+function showLoginScreen(){
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("mainApp").style.display = "none";
+}
+
 function bootApp(){
+  if(_booted) return; // guard against double call
+  _booted = true;
   document.getElementById("loginScreen").style.display = "none";
   var ma = document.getElementById("mainApp");
   ma.style.display = "flex";
   ma.style.flexDirection = "column";
   updateGreeting();
   loadDashboard();
+  // Set up phone back button
+  history.replaceState({ tab: "dash" }, "", "");
+  window.addEventListener("popstate", function(e){
+    var tab = (e.state && e.state.tab) || "dash";
+    showTabNoHistory(tab);
+  });
 }
 
 function updateGreeting(){
@@ -719,7 +772,7 @@ function updateGreeting(){
   var el = document.getElementById("dashGreeting");
   var meta = (user && user.user_metadata) || {};
   var name = meta.full_name || meta.name || (user ? user.email.split("@")[0] : "Seller");
-  if(el) el.textContent = g + ", " + name.split(" ")[0];
+  if(el) el.textContent = g + ", " + name.split(" ")[0] + " \uD83C\uDF38";
 }
 
 /* ════ THEME ═══════════════════════════════════════════════ */
@@ -737,9 +790,12 @@ async function doLogin(){
   var email = document.getElementById("loginEmail").value.trim();
   var pwd = document.getElementById("loginPwd").value;
   if(!email || !pwd){ showToast("Enter email and password"); return; }
-  showToast("Signing in...");
-  var r = await _supabase.auth.signInWithPassword({ email, password: pwd });
-  if(r.error) showToast("Error: " + r.error.message);
+  var btn = document.querySelector("#loginForm .btn");
+  if(btn){ btn.textContent = "Signing in..."; btn.disabled = true; }
+  var r = await _supabase.auth.signInWithPassword({ email: email, password: pwd });
+  if(btn){ btn.textContent = "Sign In as Seller"; btn.disabled = false; }
+  if(r.error){ showToast("Error: " + r.error.message); return; }
+  // onAuthStateChange will call bootApp
 }
 async function doSignup(){
   var name = document.getElementById("signupName").value.trim();
@@ -752,7 +808,12 @@ async function doSignup(){
   if(r.error) showToast("Error: " + r.error.message);
   else { showToast("Check email to verify!"); switchLoginTab("login"); }
 }
-async function doLogout(){ await _supabase.auth.signOut(); showToast("Signed out"); }
+async function doLogout(){
+  localStorage.removeItem("prSellerUser");
+  _booted = false;
+  await _supabase.auth.signOut();
+  showToast("Signed out");
+}
 
 /* ════ TOAST ════════════════════════════════════════════════ */
 var toastTimer = null;
@@ -766,9 +827,15 @@ function showToast(msg, dur){
 
 /* ════ NAVIGATION ══════════════════════════════════════════ */
 function showTab(tab){
+  showTabNoHistory(tab);
+  history.pushState({ tab: tab }, "", "");
+}
+
+function showTabNoHistory(tab){
   document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
   document.querySelectorAll(".bottom-tab").forEach(function(t){ t.classList.remove("active"); });
-  document.getElementById("scr" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+  var scr = document.getElementById("scr" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if(scr) scr.classList.add("active");
   var bt = document.getElementById("tab-" + tab);
   if(bt) bt.classList.add("active");
   currentTab = tab;
@@ -815,8 +882,8 @@ function filterOrdersByDate(orders, filter){
 async function loadDashboard(){
   try {
     var [pR, oR, rR] = await Promise.all([
-      _supabase.from("products").select("id,name,quantity,price,created_at"),
-      _supabase.from("orders").select("id,order_id,price,total_amount,status,flower_name,user_email,delivery_address"),
+      _supabase.from("products").select("id,name,quantity,price,created_at").eq("seller_email", user.email),
+      _supabase.from("orders").select("id,order_id,price,total_amount,status,flower_name,user_email,delivery_address").eq("seller_email", user.email),
       _supabase.from("reviews").select("rating,product_id")
     ]);
     allProducts = pR.data || [];
@@ -901,7 +968,10 @@ function buildRecentOrders(){
 async function loadProducts(){
   var el = document.getElementById("productsList");
   el.innerHTML = "<div class=\"loading\"><span class=\"spinner\"></span>Loading...</div>";
-  var res = await _supabase.from("products").select("*, category:category_id(id,name)").order("created_at",{ascending:false});
+  var res = await _supabase.from("products")
+    .select("*, category:category_id(id,name)")
+    .eq("seller_email", user.email)
+    .order("created_at",{ascending:false});
   if(res.error){ el.innerHTML = "<div class=\"empty-state\"><div class=\"empty-icon\">&#x1F338;</div>Error: " + res.error.message + "</div>"; return; }
   allProducts = res.data || [];
   allProducts.forEach(function(p){ productMap[p.id] = p.name; });
@@ -1021,8 +1091,10 @@ async function saveProduct(){
   if(!name){ showToast("Product name required"); return; }
   if(!price || price <= 0){ showToast("Enter a valid price"); return; }
   var btn = document.getElementById("saveProductBtn"); btn.textContent = "Saving..."; btn.disabled = true;
-  var payload = { name, price, description: desc, quantity: qty, category_id: cat || null, image_url: imgUrl, pickup_location: pickup, hsn_code: hsn || null, gst_rate: gst || null, delivery_charge: delivery || null };
-  var res = editId ? await _supabase.from("products").update(payload).eq("id", editId) : await _supabase.from("products").insert(payload);
+  var payload = { name: name, price: price, description: desc, quantity: qty, category_id: cat || null, image_url: imgUrl, pickup_location: pickup, hsn_code: hsn || null, gst_rate: gst || null, delivery_charge: delivery || null, seller_email: user.email };
+  var res = editId
+    ? await _supabase.from("products").update(payload).eq("id", editId).eq("seller_email", user.email)
+    : await _supabase.from("products").insert(payload);
   btn.textContent = "Save"; btn.disabled = false;
   if(res.error){ showToast("Error: " + res.error.message); return; }
   showToast(editId ? "Product updated!" : "Product added!");
@@ -1034,7 +1106,7 @@ function promptDelete(id, name){ deleteTargetId = id; document.getElementById("d
 function closeDeleteModal(){ document.getElementById("deleteModal").style.display = "none"; }
 async function confirmDelete(){
   if(!deleteTargetId) return;
-  var res = await _supabase.from("products").delete().eq("id", deleteTargetId);
+  var res = await _supabase.from("products").delete().eq("id", deleteTargetId).eq("seller_email", user.email);
   if(res.error){ showToast("Error: " + res.error.message); return; }
   showToast("Product deleted"); closeDeleteModal(); deleteTargetId = null; await loadProducts();
 }
@@ -1059,6 +1131,7 @@ async function loadOrders(){
   try {
     var res = await _supabase.from("orders")
       .select("id,order_id,flower_name,price,total_amount,status,delivery_address,user_email")
+      .eq("seller_email", user.email)
       .order("order_id",{ascending:false}).limit(200);
     allOrders = res.data || [];
     allOrders.forEach(function(o){
@@ -1265,7 +1338,21 @@ async function loadReviews(){
   var el = document.getElementById("reviewsList");
   el.innerHTML = "<div class=\"loading\"><span class=\"spinner\"></span>Loading...</div>";
   try {
-    var res = await _supabase.from("reviews").select("rating,review_text,user_email,created_at,product_id").order("created_at",{ascending:false}).limit(200);
+    // Get IDs of seller's own products first, then fetch reviews for those
+    var myProductIds = allProducts.map(function(p){ return p.id; });
+    if(!myProductIds.length){
+      // No products loaded yet - load them first
+      var pRes = await _supabase.from("products").select("id").eq("seller_email", user.email);
+      myProductIds = (pRes.data||[]).map(function(p){ return p.id; });
+    }
+    if(!myProductIds.length){
+      el.innerHTML = "<div class=\"empty-state\"><div class=\"empty-icon\">&#x2B50;</div>No products yet — reviews will appear here</div>";
+      allReviews = []; renderReviews(); return;
+    }
+    var res = await _supabase.from("reviews")
+      .select("rating,review_text,user_email,created_at,product_id")
+      .in("product_id", myProductIds)
+      .order("created_at",{ascending:false}).limit(200);
     allReviews = res.data || [];
     renderReviews();
   } catch(e){ el.innerHTML = "<div class=\"empty-state\"><div class=\"empty-icon\">&#x2B50;</div>Could not load reviews</div>"; }
@@ -1329,9 +1416,10 @@ async function uploadAvatar(input){
     var av = document.getElementById("profileAvatar");
     av.innerHTML = "<img src=\""+base64+"\" style=\"width:80px;height:80px;border-radius:50%;object-fit:cover;\">";
     var res = await _supabase.auth.updateUser({ data: { avatar_url: base64 } });
-    if(res.error){ showToast("Error: " + res.error.message); }
-    else { user = res.data.user; showToast("Avatar updated!"); }
-    // Also save to users table
+    if(res.error){ showToast("Error: " + res.error.message); return; }
+    user = res.data.user;
+    localStorage.setItem("prSellerUser", JSON.stringify({ id: user.id, email: user.email, user_metadata: user.user_metadata }));
+    showToast("Avatar updated!");
     await _supabase.from("users").upsert({ email: user.email, avatar_url: base64 }, { onConflict: "email" });
   };
   reader.readAsDataURL(input.files[0]);
@@ -1343,13 +1431,13 @@ async function saveProfile(){
   var shop = document.getElementById("profShopInput").value.trim();
   var bio = document.getElementById("profBioInput").value.trim();
   if(!name){ showToast("Name cannot be empty"); return; }
-  var res = await _supabase.auth.updateUser({ data: { full_name: name, phone, shop_name: shop, bio } });
+  var res = await _supabase.auth.updateUser({ data: { full_name: name, phone: phone, shop_name: shop, bio: bio } });
   if(res.error){ showToast("Error: " + res.error.message); return; }
   user = res.data.user;
+  localStorage.setItem("prSellerUser", JSON.stringify({ id: user.id, email: user.email, user_metadata: user.user_metadata }));
   document.getElementById("profileName").textContent = name;
   updateGreeting();
-  // Save to seller_profiles table
-  await _supabase.from("seller_profiles").upsert({ seller_email: user.email, full_name: name, phone, shop_name: shop }, { onConflict: "seller_email" });
+  await _supabase.from("seller_profiles").upsert({ seller_email: user.email, full_name: name, phone: phone, shop_name: shop }, { onConflict: "seller_email" });
   showToast("Profile saved!");
 }
 
