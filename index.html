@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PetalRush</title>
+
+<link rel="stylesheet" href="css/index.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
+</script>
+</head>
+<body>
+
+<!-- ── THEME TOGGLE ─────────────────────────────────────── -->
+<button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle dark/light mode">🌙</button>
+
+<div class="screen-wrap">
+
+  <!-- ══ LOADING ══════════════════════════════════════════ -->
+  <div id="loading">
+    <div class="loading-flower">🌸</div>
+    <div class="loading-title">PetalRush</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- ══ SPLASH ═══════════════════════════════════════════ -->
+  <div id="splash" class="hidden">
+    <!-- Decorative background flowers -->
+    <div class="splash-flowers">
+      <span class="sf">🌸</span><span class="sf">🌺</span>
+      <span class="sf">🌹</span><span class="sf">🌷</span><span class="sf">🌻</span>
+    </div>
+
+    <img src="logo.png" class="logo" alt="PetalRush"
+         onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block';">
+    <div class="logo-fallback">🌸</div>
+
+    <h1>PetalRush</h1>
+    <p>Order Flowers Like Never Before</p>
+
+    <button onclick="showAuth()">Get Started →</button>
+  </div>
+
+  <!-- ══ AUTH OPTIONS ══════════════════════════════════════ -->
+  <div id="auth" class="hidden">
+    <div class="auth-brand">🌸</div>
+    <h2>Welcome Back</h2>
+    <p class="auth-sub">Fresh flowers, delivered fast</p>
+
+    <div class="auth-choice-grid">
+      <button class="auth-choice-btn" onclick="showLogin()">
+        <span class="auth-choice-icon">🔑</span>
+        <span class="auth-choice-label">Login</span>
+        <span class="auth-choice-sub">Sign in to your account</span>
+      </button>
+      <button class="auth-choice-btn" onclick="showSignup()">
+        <span class="auth-choice-icon">✨</span>
+        <span class="auth-choice-label">Signup</span>
+        <span class="auth-choice-sub">Create a new account</span>
+      </button>
+    </div>
+
+    <button class="auth-back" onclick="backSplash()">← Back</button>
+  </div>
+
+  <!-- ══ LOGIN ═════════════════════════════════════════════ -->
+  <div id="login" class="form-screen hidden">
+    <div class="form-header">
+      <div class="form-header-icon">🔑</div>
+      <h2>Sign In</h2>
+      <p class="form-header-sub">Welcome back to PetalRush</p>
+    </div>
+    <div class="form-body">
+      <button class="btn-back" onclick="backAuth()">Auth options</button>
+
+      <div class="field">
+        <label for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+      </div>
+
+      <div id="loginMsg" class="msg"></div>
+
+      <button class="btn-primary" id="loginBtn" onclick="login()">Login</button>
+
+      <button class="btn-ghost" onclick="forgot()" style="margin-top:14px;">Forgot Password?</button>
+
+      <div class="form-footer">
+        Don't have an account? <a onclick="showSignup()">Sign up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SIGNUP ════════════════════════════════════════════ -->
+  <div id="signup" class="form-screen hidden">
+    <div class="form-header">
+      <div class="form-header-icon">✨</div>
+      <h2>Create Account</h2>
+      <p class="form-header-sub">Join PetalRush today</p>
+    </div>
+    <div class="form-body">
+      <button class="btn-back" onclick="backAuth()">Auth options</button>
+
+      <!-- Role Toggle -->
+      <div class="field">
+        <label>I am a</label>
+        <div class="role-toggle" id="roleToggle">
+          <button class="role-pill active" id="roleBuyer" onclick="selectRole('buyer')">
+            <span class="role-pill-icon">🛍️</span>
+            <span class="role-pill-text">Buyer</span>
+          </button>
+          <button class="role-pill" id="roleSeller" onclick="selectRole('seller')">
+            <span class="role-pill-icon">🌸</span>
+            <span class="role-pill-text">Seller</span>
+          </button>
+        </div>
+        <!-- Hidden select to store the role value (read by index.js) -->
+        <select id="role" style="display:none;">
+          <option value="buyer" selected>Buyer</option>
+          <option value="seller">Seller</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="signupEmail">Email Address</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      </div>
+      <div class="field">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" placeholder="Min 6 characters" autocomplete="new-password">
+      </div>
+
+      <div id="signupMsg" class="msg"></div>
+
+      <button class="btn-primary" id="signupBtn" onclick="signup()">Create Account</button>
+
+      <div class="form-footer">
+        Already have an account? <a onclick="showLogin()">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FORGOT PASSWORD ════════════════════════════════════ -->
+  <div id="forgot" class="form-screen hidden">
+    <div class="form-header">
+      <div class="form-header-icon">🔐</div>
+      <h2>Reset Password</h2>
+      <p class="form-header-sub">We'll send you a reset link</p>
+    </div>
+    <div class="form-body">
+      <button class="btn-back" onclick="showLogin()">Back to login</button>
+
+      <div class="field">
+        <label for="forgotEmail">Email Address</label>
+        <input type="email" id="forgotEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      </div>
+
+      <div id="forgotMsg" class="msg"></div>
+
+      <button class="btn-primary" id="forgotBtn" onclick="forgotPassword()">Send Reset Link</button>
+    </div>
+  </div>
+
+</div><!-- /screen-wrap -->
+
+<script>
+/* ── THEME TOGGLE ──────────────────────────────────────── */
+function toggleTheme(){
+  var isLight = document.body.classList.toggle("light-mode");
+  localStorage.setItem("prTheme", isLight ? "light" : "dark");
+  document.getElementById("themeToggle").textContent = isLight ? "☀️" : "🌙";
+}
+
+/* Apply saved theme on load (before FOUC) */
+(function(){
+  var t = localStorage.getItem("prTheme") ||
+          (window.matchMedia("(prefers-color-scheme:light)").matches ? "light" : "dark");
+  if(t === "light"){
+    document.body.classList.add("light-mode");
+    document.addEventListener("DOMContentLoaded", function(){
+      var btn = document.getElementById("themeToggle");
+      if(btn) btn.textContent = "☀️";
+    });
+  }
+})();
+
+/* ── ROLE PILL TOGGLE ────────────────────────────────────── */
+function selectRole(role){
+  document.getElementById("role").value = role;
+  document.getElementById("roleBuyer").classList.toggle("active", role === "buyer");
+  document.getElementById("roleSeller").classList.toggle("active", role === "seller");
+}
+</script>
+
+<script src="js/index.js"></script>
+</body>
+</html>
