@@ -399,12 +399,7 @@ body.light-mode .sp-delivered{background:rgba(39,174,96,0.1);}
       <div class="form-group"><label class="form-label">Stock Qty *</label><input type="number" id="pQty" placeholder="50" min="0"></div>
     </div>
     <div class="form-group"><label class="form-label">Category</label>
-      <select id="pCategory">
-        <option value="">Select category</option>
-        <option>Roses</option><option>Seasonal</option><option>Bouquets</option>
-        <option>Mixed</option><option>Orchids</option><option>Lilies</option>
-        <option>Succulents</option><option>Other</option>
-      </select>
+      <select id="pCategory"><option value="">Loading categories...</option></select>
     </div>
     <div class="form-group"><label class="form-label">Description</label><textarea id="pDesc" placeholder="Describe this product..."></textarea></div>
     <div class="form-group">
@@ -702,7 +697,7 @@ function buildRecentOrders(){
 async function loadProducts(){
   var el = document.getElementById('productsList');
   el.innerHTML = '<div class="loading"><span class="spinner"></span>Loading...</div>';
-  var res = await _supabase.from('products').select('*').order('created_at', {ascending:false});
+  var res = await _supabase.from('products').select('*, category:category_id(id,name)').order('created_at', {ascending:false});
   if(res.error){ el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1F338;</div>Error: '+res.error.message+'</div>'; return; }
   allProducts = res.data || [];
   allProducts.forEach(function(p){ productMap[p.id] = p.name; });
@@ -730,7 +725,7 @@ function renderProducts(){
     var imgHtml = p.image_url
       ? '<img src="'+p.image_url+'" class="prod-thumb" onerror="this.style.display=\'none\'">'
       : '<div class="prod-thumb-ph">&#x1F338;</div>';
-    return '<div class="prod-item">'+imgHtml+'<div class="prod-info"><div class="prod-name">'+escHtml(p.name)+'</div><div class="prod-price">\u20B9'+parseFloat(p.price).toLocaleString('en-IN')+'</div><div class="prod-stock '+sc+'">'+sl+'</div></div><div class="prod-actions"><div class="act-btn edit" onclick="openEditProduct(\''+p.id+'\')" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="act-btn del" onclick="promptDelete(\''+p.id+'\',\''+escAttr(p.name)+'\')" title="Delete"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></div></div></div>';
+    return '<div class="prod-item">'+imgHtml+'<div class="prod-info"><div class="prod-name">'+escHtml(p.name)+'</div><div class="prod-price">\u20B9'+parseFloat(p.price).toLocaleString('en-IN')+(p.category&&p.category.name?' <small style="color:var(--text4);font-size:10px;">'+escHtml(p.category.name)+'</small>':'')+'</div><div class="prod-stock '+sc+'">'+sl+'</div></div><div class="prod-actions"><div class="act-btn edit" onclick="openEditProduct(\''+p.id+'\')" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="act-btn del" onclick="promptDelete(\''+p.id+'\',\''+escAttr(p.name)+'\')" title="Delete"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></div></div></div>';
   }).join('');
 }
 
@@ -742,18 +737,19 @@ function filterTab(val, el){
 }
 function filterProducts(){ renderProducts(); }
 
-function openAddProduct(){
+async function openAddProduct(){
   document.getElementById('productModalTitle').textContent = 'Add Product';
   document.getElementById('editProductId').value = '';
   ['pName','pPrice','pDesc','pImageUrl'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('pQty').value = '';
-  document.getElementById('pCategory').value = '';
   document.getElementById('imgPreviewEl').style.display = 'none';
   document.getElementById('imgPlaceholder').style.display = 'block';
   document.getElementById('productModal').style.display = 'flex';
+  await loadCategories();
+  populateCategorySelect(null);
 }
 
-function openEditProduct(id){
+async function openEditProduct(id){
   var p = allProducts.find(function(x){ return x.id === id; });
   if(!p) return;
   document.getElementById('productModalTitle').textContent = 'Edit Product';
@@ -762,7 +758,6 @@ function openEditProduct(id){
   document.getElementById('pPrice').value = p.price || '';
   document.getElementById('pDesc').value = p.description || '';
   document.getElementById('pQty').value = p.quantity || 0;
-  document.getElementById('pCategory').value = p.category || '';
   document.getElementById('pImageUrl').value = p.image_url || '';
   if(p.image_url){
     document.getElementById('imgPreviewEl').src = p.image_url;
@@ -773,6 +768,8 @@ function openEditProduct(id){
     document.getElementById('imgPlaceholder').style.display = 'block';
   }
   document.getElementById('productModal').style.display = 'flex';
+  await loadCategories();
+  populateCategorySelect(p.category_id || null);
 }
 
 function closeProductModal(){ document.getElementById('productModal').style.display = 'none'; }
@@ -815,7 +812,7 @@ async function saveProduct(){
   btn.textContent = 'Saving...';
   btn.disabled = true;
 
-  var payload = { name: name, price: price, description: desc, quantity: qty, category: cat, image_url: imgUrl };
+  var payload = { name: name, price: price, description: desc, quantity: qty, category_id: cat || null, image_url: imgUrl };
 
   var res;
   if(editId){
@@ -1050,6 +1047,25 @@ function escHtml(s){
 }
 function escAttr(s){
   return (s||'').toString().replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+}
+
+/* ═══ CATEGORIES ════════════════════════════════════════════════ */
+var allCategories = [];
+
+async function loadCategories(){
+  if(allCategories.length) return; // cached
+  var res = await _supabase.from('category').select('id,name').eq('is_active', true).order('name');
+  allCategories = (res.data || []);
+}
+
+function populateCategorySelect(selectedId){
+  var sel = document.getElementById('pCategory');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">No category</option>' +
+    allCategories.map(function(cat){
+      var sel2 = selectedId && cat.id === selectedId ? ' selected' : '';
+      return '<option value="'+escAttr(cat.id)+'"'+sel2+'>'+escHtml(cat.name)+'</option>';
+    }).join('');
 }
 </script>
 </body>
