@@ -2311,7 +2311,7 @@ async function loadOrders(){
     var detailId='ord-detail-'+j;
 
     el.innerHTML+=
-      '<div class="ord-card" id="ord-card-'+j+'" onclick="toggleOrderDetail(''+detailId+'','+j+')">' +
+      '<div class="ord-card" id="ord-card-'+j+'" onclick="toggleOrderDetail('+j+')">' +
         '<div class="ord-card-main">' +
           '<div class="ord-logo-wrap">' +
             '<img src="Headerlogo.png" class="ord-logo-img" alt="PR" onerror="this.style.display=' + "'" + 'none' + "'" + ';this.nextElementSibling.style.display=' + "'" + 'flex' + "'" + ';">' +
@@ -2336,7 +2336,7 @@ async function loadOrders(){
       '<div class="ord-detail" id="'+detailId+'">' +
         '<div class="ord-detail-header">' +
           '<div class="ord-invoice-brand">' +
-            '<img src="Headerlogo.png" class="ord-brand-logo" onerror="this.style.display='none';">' +
+            '<img src="Headerlogo.png" class="ord-brand-logo" onerror="this.onerror=null;this.remove()">' +
             '<div class="ord-brand-name">\uD83C\uDF38 PetalRush</div>' +
           '</div>' +
           '<span class="ord-status-pill lg" style="background:'+sBg+';color:'+sColor+';">'+(order.status||'Placed')+'</span>' +
@@ -2368,7 +2368,7 @@ async function loadOrders(){
         '</div>' +
       '</div>' +
       '<div id="bill-'+displayId+'" class="bill-printable">' +
-        '<div class="bp-header"><img src="Headerlogo.png" class="bp-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="bp-logo-text" style="display:none">PetalRush</span><div class="bp-tagline">Fresh Flowers \u00B7 Fast Delivery</div><div class="bp-title">ORDER RECEIPT</div></div>' +
+        '<div class="bp-header"><img src="Headerlogo.png" class="bp-logo" onerror="this.onerror=null;this.remove()"><span class="bp-logo-text">PetalRush</span><div class="bp-tagline">Fresh Flowers \u00B7 Fast Delivery</div><div class="bp-title">ORDER RECEIPT</div></div>' +
         '<div class="bp-divider"></div>' +
         '<div class="bp-meta">' +
           '<div class="bp-meta-row"><span>Invoice No.</span><b>'+(invoiceId||displayId)+'</b></div>' +
@@ -2392,7 +2392,8 @@ async function loadOrders(){
   }
 }
 
-function toggleOrderDetail(detailId, idx){
+function toggleOrderDetail(idx){
+  var detailId = 'ord-detail-' + idx;
   var detail = document.getElementById(detailId);
   var card   = document.getElementById('ord-card-'+idx);
   var chev   = document.getElementById('ord-chev-'+idx);
