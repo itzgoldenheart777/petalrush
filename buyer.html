@@ -835,245 +835,6 @@ select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(24
 }
 body.light-mode .detail-stock-hint{ color:#909090; }
 
-/* ── COLLAPSIBLE ORDER CARDS ──────────────────────────────────── */
-.ord-card{
-  background:var(--card);
-  border:1px solid var(--border2);
-  border-radius:14px;
-  padding:14px 16px;
-  margin-bottom:10px;
-  cursor:pointer;
-  transition:border-color 0.2s, box-shadow 0.2s, border-radius 0.2s;
-  user-select:none;
-  -webkit-user-select:none;
-}
-.ord-card:hover{
-  border-color:rgba(255,64,129,0.35);
-  box-shadow:0 4px 16px rgba(255,64,129,0.08);
-}
-.ord-card.expanded{
-  border-color:rgba(255,64,129,0.45);
-  border-bottom-left-radius:0;
-  border-bottom-right-radius:0;
-  border-bottom-color:transparent;
-  margin-bottom:0;
-  box-shadow:none;
-}
-/* MAIN ROW: logo + info block */
-.ord-card-main{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.ord-logo-wrap{
-  flex-shrink:0;
-  width:44px;
-  height:44px;
-  border-radius:10px;
-  overflow:hidden;
-  background:var(--bg4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.ord-logo-img{
-  width:44px;
-  height:44px;
-  object-fit:contain;
-}
-.ord-logo-fallback{
-  font-size:20px;
-  width:44px;
-  height:44px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-/* INFO BLOCK: 3 rows */
-.ord-card-info{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-/* ROW 1: order ID + status pill */
-.ord-card-row1{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-.ord-card-id{
-  font-size:13px;
-  font-weight:700;
-  color:var(--text);
-  letter-spacing:0.2px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.ord-status-pill{
-  font-size:11px;
-  font-weight:600;
-  padding:3px 10px;
-  border-radius:20px;
-  white-space:nowrap;
-  flex-shrink:0;
-}
-.ord-status-pill.lg{
-  font-size:13px;
-  padding:5px 14px;
-}
-/* ROW 2: items preview + total */
-.ord-card-row2{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-.ord-card-items{
-  font-size:12px;
-  color:var(--text3);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  flex:1;
-}
-.ord-card-total{
-  font-size:14px;
-  font-weight:700;
-  color:var(--accent);
-  flex-shrink:0;
-}
-/* ROW 3: date + chevron */
-.ord-card-row3{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding-top:5px;
-  border-top:1px solid var(--border);
-}
-.ord-card-date{
-  font-size:11px;
-  color:var(--text4);
-}
-.ord-chevron{
-  font-size:16px;
-  color:var(--text4);
-  line-height:1;
-  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  display:inline-block;
-}
-
-/* EXPANDED DETAIL PANEL */
-.ord-detail{
-  display:none;
-  background:var(--bg3);
-  border:1px solid rgba(255,64,129,0.45);
-  border-top:none;
-  border-radius:0 0 14px 14px;
-  overflow:hidden;
-  margin-bottom:14px;
-}
-.ord-detail.open{
-  display:block;
-  animation:slideDown 0.25s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes slideDown{
-  from{opacity:0;transform:translateY(-10px);}
-  to{opacity:1;transform:translateY(0);}
-}
-/* DETAIL: top header with brand + status */
-.ord-detail-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 16px 12px;
-  border-bottom:1px solid var(--border);
-  background:var(--header-bg);
-}
-.ord-invoice-brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.ord-brand-logo{
-  height:32px;
-  max-width:110px;
-  object-fit:contain;
-}
-.ord-brand-name{
-  font-family:'Playfair Display',serif;
-  font-size:15px;
-  font-weight:700;
-  color:var(--accent);
-}
-/* DETAIL: order info grid (invoice no, order id, date, time, billed-to) */
-.ord-meta-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px 16px;
-  padding:14px 16px 12px;
-  border-bottom:1px solid var(--border);
-}
-.ord-meta-cell{ min-width:0; }
-.ord-meta-cell.ord-meta-full{ grid-column:1/-1; }
-.ord-meta-lbl{
-  font-size:10px;
-  color:var(--text4);
-  text-transform:uppercase;
-  letter-spacing:0.8px;
-  margin-bottom:3px;
-  font-weight:600;
-}
-.ord-meta-val{
-  font-size:13px;
-  color:var(--text2);
-  font-weight:500;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-/* DETAIL: delivery address */
-.ord-detail-row{
-  padding:12px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.ord-detail-lbl{
-  font-size:10px;
-  color:var(--text4);
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-  font-weight:600;
-}
-.ord-detail-val{
-  font-size:13px;
-  color:var(--text2);
-  line-height:1.4;
-}
-/* DETAIL: items table + totals */
-.ord-items-wrap{ padding:14px 16px; }
-.ord-detail-footer{
-  text-align:center;
-  font-size:12px;
-  color:var(--text4);
-  padding:10px 16px 14px;
-  border-top:1px dashed rgba(255,64,129,0.2);
-  font-style:italic;
-}
-
-/* LIGHT MODE ORDER CARDS */
-body.light-mode .ord-card{background:#fff;border-color:rgba(0,0,0,0.09);}
-body.light-mode .ord-card:hover{border-color:rgba(224,32,95,0.3);}
-body.light-mode .ord-card.expanded{border-color:rgba(224,32,95,0.4);}
-body.light-mode .ord-detail{background:#fafafa;border-color:rgba(224,32,95,0.3);}
-body.light-mode .ord-detail-header{background:linear-gradient(135deg,#fff0f4,#fff);}
-body.light-mode .ord-logo-wrap{background:#f0ede8;}
-
 /* ── LIGHT MODE OVERRIDES ────────────────────────────────────── */
 body.light-mode .header{
   border-bottom:1px solid rgba(224,32,95,0.15);
@@ -1174,80 +935,6 @@ body.light-mode input::placeholder{ color:#aaa; }
 </head>
 <body>
 
-<!-- ══ BUYER SPLASH (shown during auth check) ══════════════ -->
-<div id="buyerSplash" style="position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:18px;">
-  <div style="font-size:54px;animation:float 2.5s ease-in-out infinite;">🌸</div>
-  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,#ff4081,#ff8fab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">PetalRush</div>
-  <div style="font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Shop Fresh Flowers</div>
-  <span class="spinner"></span>
-  <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
-</div>
-
-<!-- ══ BUYER LOGIN SCREEN ═══════════════════════════════════ -->
-<div id="buyerLoginScreen" style="display:none;min-height:100vh;background:var(--bg);overflow-y:auto;">
-  <div style="max-width:420px;margin:0 auto;">
-    <!-- Hero -->
-    <div style="background:linear-gradient(135deg,rgba(255,64,129,0.08),transparent);padding:52px 24px 32px;text-align:center;border-bottom:1px solid var(--border);">
-      <div style="font-size:52px;margin-bottom:14px;animation:float 3s ease-in-out infinite;">🌸</div>
-      <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:700;background:linear-gradient(135deg,#ff4081,#ff8fab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;">PetalRush</div>
-      <div style="font-size:12px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Fresh Flowers · Fast Delivery</div>
-    </div>
-
-    <!-- Tabs -->
-    <div style="padding:24px 20px 0;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;background:var(--input-bg);border-radius:12px;padding:4px;margin-bottom:20px;">
-        <div id="bltabLogin" style="padding:10px;text-align:center;font-size:14px;font-weight:500;cursor:pointer;border-radius:9px;background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.2s;" onclick="switchBuyerTab('login')">Sign In</div>
-        <div id="bltabSignup" style="padding:10px;text-align:center;font-size:14px;font-weight:500;cursor:pointer;border-radius:9px;color:var(--text3);transition:all 0.2s;" onclick="switchBuyerTab('signup')">Sign Up</div>
-      </div>
-
-      <!-- Error/Status message -->
-      <div id="buyerLoginMsg" style="display:none;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;border:1px solid;line-height:1.5;font-weight:500;"></div>
-
-      <!-- LOGIN FORM -->
-      <div id="buyerLoginForm">
-        <div style="margin-bottom:14px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Email</div>
-          <input type="email" id="bLoginEmail" placeholder="your@email.com" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')doBuyerLogin()" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
-        </div>
-        <div style="margin-bottom:6px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Password</div>
-          <input type="password" id="bLoginPwd" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doBuyerLogin()" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
-        </div>
-        <button id="bLoginBtn" onclick="doBuyerLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(255,64,129,0.3);transition:opacity 0.2s;">Sign In</button>
-        <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3);">Don't have an account? <span style="color:#ff4081;cursor:pointer;font-weight:500;" onclick="switchBuyerTab('signup')">Sign up</span></div>
-      </div>
-
-      <!-- SIGNUP FORM -->
-      <div id="buyerSignupForm" style="display:none;">
-        <div style="margin-bottom:14px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Full Name</div>
-          <input type="text" id="bSignupName" placeholder="Your name" autocomplete="name" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
-        </div>
-        <div style="margin-bottom:14px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Email</div>
-          <input type="email" id="bSignupEmail" placeholder="your@email.com" autocomplete="email" inputmode="email" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
-        </div>
-        <div style="margin-bottom:6px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Password</div>
-          <input type="password" id="bSignupPwd" placeholder="Min 6 characters" autocomplete="new-password" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
-        </div>
-        <button id="bSignupBtn" onclick="doBuyerSignup()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(255,64,129,0.3);">Create Buyer Account</button>
-        <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3);">Already have an account? <span style="color:#ff4081;cursor:pointer;font-weight:500;" onclick="switchBuyerTab('login')">Sign in</span></div>
-      </div>
-
-      <!-- Seller portal link -->
-      <div style="text-align:center;margin-top:24px;padding:14px;background:var(--input-bg);border-radius:12px;border:1px solid var(--border);">
-        <div style="font-size:12px;color:var(--text3);">Are you a seller?</div>
-        <a href="seller.html" style="font-size:13px;color:#ff4081;font-weight:500;text-decoration:none;">Go to Seller Portal →</a>
-      </div>
-
-      <div style="padding-bottom:40px;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ BUYER APP ═════════════════════════════════════════════ -->
-<div id="buyerApp" style="display:none;">
 <div class="container">
 
   <!-- HEADER -->
@@ -1308,13 +995,13 @@ body.light-mode input::placeholder{ color:#aaa; }
     <!-- AVATAR + EDIT PENCIL -->
     <div class="avatar-wrap" style="margin-bottom:12px;">
       <img id="avatarImg" class="avatar" src="" alt="Avatar" onclick="document.getElementById('avatarFile').click()">
-      <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">✏️</div>
+      <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">&#128100;</div>
       <input type="file" id="avatarFile" hidden accept="image/*" onchange="uploadAvatar(event)">
     </div>
 
     <!-- PROFILE CARD: view mode -->
     <div id="profileViewCard" class="profile-card" style="position:relative;">
-      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">✏️ Edit</button>
+      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">Edit</button>
       <div class="profile-view-row">
         <div>
           <div class="profile-view-label">Name</div>
@@ -1391,9 +1078,6 @@ body.light-mode input::placeholder{ color:#aaa; }
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-</div><!-- /buyerApp container -->
-</div><!-- /buyerApp -->
-
 <script>
 // ─── SUPABASE INIT (single instance, no duplicate declaration) ─────
 const _supabase = window.supabase.createClient(
@@ -1401,201 +1085,10 @@ const _supabase = window.supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
 );
 
-// ─── AUTH STATE ───────────────────────────────────────────────────
+// ─── AUTH CHECK ────────────────────────────────────────────────────
 let user = null;
-let _buyerBooted = false;
-let _buyerInitDone = false;
-
-/* ─ BUYER AUTH INIT ──────────────────────────────────────────────
-   1. Show splash instantly
-   2. Check localStorage cache → boot immediately if valid buyer
-   3. Verify Supabase session in background → role-gate
-   4. If no session → show built-in login screen
-──────────────────────────────────────────────────────────────── */
-window.addEventListener("load", async function(){
-  applyTheme();
-  // Show splash
-  document.getElementById("buyerSplash").style.display = "flex";
-  document.getElementById("buyerLoginScreen").style.display = "none";
-  document.getElementById("buyerApp").style.display = "none";
-
-  // 1. Try cached user
-  try {
-    var _cached = JSON.parse(localStorage.getItem("user") || localStorage.getItem("prUser") || "null");
-    if(_cached && _cached.email && _cached.role === "buyer"){
-      user = _cached;
-      hideBuyerSplash();
-      bootBuyerApp();
-    } else if(_cached && _cached.email && _cached.role === "seller"){
-      // Seller trying buyer app
-      hideBuyerSplash();
-      showBuyerLogin();
-      showBuyerError("⚠️ This is a Seller account. Please use the Seller app.");
-      return;
-    }
-  } catch(e){}
-
-  // 2. Verify with Supabase
-  var s = await _supabase.auth.getSession();
-  if(s.data && s.data.session && s.data.session.user){
-    var authUser = s.data.session.user;
-    var ok = await verifyBuyerRole(authUser);
-    if(ok && !_buyerBooted){
-      hideBuyerSplash();
-      bootBuyerApp();
-    }
-  } else if(!_buyerBooted){
-    hideBuyerSplash();
-    showBuyerLogin();
-  }
-  _buyerInitDone = true;
-});
-
-_supabase.auth.onAuthStateChange(async function(event, session){
-  if(event === "SIGNED_IN" && session){
-    var ok = await verifyBuyerRole(session.user);
-    if(ok && !_buyerBooted){
-      hideBuyerSplash();
-      bootBuyerApp();
-    }
-  } else if(event === "SIGNED_OUT"){
-    user = null; _buyerBooted = false;
-    localStorage.removeItem("user"); localStorage.removeItem("prUser");
-    showBuyerLogin();
-  } else if(event === "TOKEN_REFRESHED" && session){
-    user = session.user;
-  }
-});
-
-async function verifyBuyerRole(authUser){
-  var roleRes = await _supabase.from("users").select("role,name,avatar_url").eq("email", authUser.email).maybeSingle();
-  var role = roleRes.data ? roleRes.data.role : "buyer";
-  if(role === "seller"){
-    await _supabase.auth.signOut();
-    localStorage.removeItem("user"); localStorage.removeItem("prUser");
-    hideBuyerSplash();
-    showBuyerLogin();
-    setTimeout(function(){
-      showBuyerError("⚠️ This is a Seller account. Please use the Seller app.");
-    }, 100);
-    return false;
-  }
-  user = {
-    id: authUser.id,
-    email: authUser.email,
-    role: "buyer",
-    name: (roleRes.data && roleRes.data.name) || (authUser.user_metadata && authUser.user_metadata.full_name) || authUser.email.split("@")[0],
-    avatar_url: (roleRes.data && roleRes.data.avatar_url) || ""
-  };
-  localStorage.setItem("user", JSON.stringify(user));
-  localStorage.setItem("prUser", JSON.stringify(user));
-  if(!roleRes.data){
-    await _supabase.from("users").upsert({ email: authUser.email, role: "buyer" }, { onConflict: "email" });
-  }
-  return true;
-}
-
-function hideBuyerSplash(){ var s = document.getElementById("buyerSplash"); if(s) s.style.display = "none"; }
-function showBuyerLogin(){
-  document.getElementById("buyerSplash").style.display = "none";
-  document.getElementById("buyerLoginScreen").style.display = "flex";
-  document.getElementById("buyerApp").style.display = "none";
-}
-function bootBuyerApp(){
-  if(_buyerBooted) return;
-  _buyerBooted = true;
-  document.getElementById("buyerSplash").style.display = "none";
-  document.getElementById("buyerLoginScreen").style.display = "none";
-  document.getElementById("buyerApp").style.display = "block";
-  applyTheme();
-  history.replaceState({ screen: "home" }, "", "");
-  window.addEventListener("popstate", function(e){
-    var prev = navHistory[navHistory.length - 2] || "home";
-    navHistory.pop();
-    if(prev === "home") showHome(false);
-    else if(prev === "cart") showCart(false);
-    else if(prev === "profile") showProfile(false);
-    else showHome(false);
-  });
-  showHome(false);
-}
-
-/* ── BUYER LOGIN / SIGNUP ──────────────────────────────────────── */
-function switchBuyerTab(tab){
-  document.getElementById("buyerLoginForm").style.display = tab === "login" ? "block" : "none";
-  document.getElementById("buyerSignupForm").style.display = tab === "signup" ? "block" : "none";
-  document.getElementById("bltabLogin").classList.toggle("active", tab === "login");
-  document.getElementById("bltabSignup").classList.toggle("active", tab === "signup");
-  clearBuyerError();
-}
-
-async function doBuyerLogin(){
-  var email = (document.getElementById("bLoginEmail").value || "").trim().toLowerCase();
-  var pwd = document.getElementById("bLoginPwd").value;
-  if(!email || !pwd){ showBuyerError("Enter your email and password"); return; }
-  var btn = document.getElementById("bLoginBtn");
-  if(btn){ btn.textContent = "Signing in..."; btn.disabled = true; }
-  clearBuyerError();
-
-  var r = await _supabase.auth.signInWithPassword({ email: email, password: pwd });
-  if(btn){ btn.textContent = "Sign In"; btn.disabled = false; }
-  if(r.error){
-    var msg = r.error.message;
-    if(msg.includes("Invalid login")) msg = "Incorrect email or password.";
-    showBuyerError(msg); return;
-  }
-  // Role check happens in onAuthStateChange → verifyBuyerRole
-}
-
-async function doBuyerSignup(){
-  var name = (document.getElementById("bSignupName").value || "").trim();
-  var email = (document.getElementById("bSignupEmail").value || "").trim().toLowerCase();
-  var pwd = document.getElementById("bSignupPwd").value;
-  if(!name || !email || !pwd){ showBuyerError("Please fill all fields"); return; }
-  if(pwd.length < 6){ showBuyerError("Password must be at least 6 characters"); return; }
-  var btn = document.getElementById("bSignupBtn");
-  if(btn){ btn.textContent = "Creating..."; btn.disabled = true; }
-  clearBuyerError();
-
-  // Check if email is already a seller
-  var existingRes = await _supabase.from("users").select("role").eq("email", email).maybeSingle();
-  if(existingRes.data && existingRes.data.role === "seller"){
-    if(btn){ btn.textContent = "Create Account"; btn.disabled = false; }
-    showBuyerError("⚠️ This email is registered as a Seller. Use a different email or use the Seller app.");
-    return;
-  }
-
-  var r = await _supabase.auth.signUp({ email: email, password: pwd, options: { data: { full_name: name, role: "buyer" } } });
-  if(btn){ btn.textContent = "Create Account"; btn.disabled = false; }
-  if(r.error){ showBuyerError("Error: " + r.error.message); return; }
-
-  await _supabase.from("users").upsert({ email: email, role: "buyer", name: name }, { onConflict: "email" });
-
-  if(r.data && r.data.user && !r.data.session){
-    showBuyerError("✅ Account created! Check your email to verify, then sign in.", true);
-    switchBuyerTab("login");
-  } else if(r.data && r.data.user){
-    showBuyerError("✅ Welcome to PetalRush! Loading...", true);
-  }
-}
-
-function showBuyerError(msg, isOk){
-  var el = document.getElementById("buyerLoginMsg");
-  if(!el) return;
-  el.textContent = msg; el.style.display = "block";
-  el.style.background = isOk ? "rgba(46,204,113,0.12)" : "rgba(231,76,60,0.12)";
-  el.style.borderColor = isOk ? "rgba(46,204,113,0.3)" : "rgba(231,76,60,0.3)";
-  el.style.color = isOk ? "#2ecc71" : "#e74c3c";
-}
-function clearBuyerError(){ var el = document.getElementById("buyerLoginMsg"); if(el){ el.textContent = ""; el.style.display = "none"; } }
-
-/* ─── LOGOUT ─────────────────────────────────────────────────── */
-async function doLogout(){
-  localStorage.removeItem("user"); localStorage.removeItem("prUser");
-  try { await _supabase.auth.signOut(); } catch(e){}
-  showBuyerLogin();
-  clearBuyerError();
-}
+try { user = JSON.parse(localStorage.getItem("user")); } catch(e){}
+if(!user){ location.href = "index.html"; }
 
 // ─── STATE ────────────────────────────────────────────────────────
 let cartData = [];
@@ -1803,7 +1296,7 @@ async function showCart(push){
 
   var res = await _supabase
     .from("cart")
-    .select("id,qty,product_id,products(name,price,seller_email)")
+    .select("id,qty,product_id,products(name,price)")
     .eq("user_email", user.email);
 
   cartData = res.data || [];
@@ -1959,43 +1452,15 @@ async function placeOrder(){
   });
 
   // orders table: id=uuid(auto), order_id=text, user_email, flower_name, price, total_amount, status, delivery_address
-  // Group cart items by seller — create one order per seller
-  var sellerGroups = {};
-  cartData.forEach(function(item){
-    var sellerEmail = (item.products && item.products.seller_email) || "__shared__";
-    if(!sellerGroups[sellerEmail]) sellerGroups[sellerEmail] = [];
-    sellerGroups[sellerEmail].push(item);
+  var res = await _supabase.from("orders").insert({
+    order_id: orderId,
+    user_email: user.email,
+    flower_name: itemsJson,
+    price: total,
+    total_amount: total,
+    status: "Placed",
+    delivery_address: addr
   });
-
-  var sellers = Object.keys(sellerGroups);
-  var res = null;
-
-  for(var si = 0; si < sellers.length; si++){
-    var sellerEmail = sellers[si];
-    var sellerItems = sellerGroups[sellerEmail];
-    // Pro-rate total if multiple sellers
-    var groupTotal = sellers.length === 1 ? total :
-      parseFloat((sellerItems.reduce(function(s,it){ return s + it.qty*it.products.price; }, 0)).toFixed(2));
-
-    var groupItemsJson = "JSON::" + JSON.stringify({
-      items: sellerItems.map(function(i){ return { name: i.products.name, qty: i.qty, price: i.products.price }; }),
-      date: orderDate,
-      time: orderTime,
-      invoiceId: invoiceId
-    });
-
-    res = await _supabase.from("orders").insert({
-      order_id: orderId + (sellers.length > 1 ? "_" + (si+1) : ""),
-      user_email: user.email,
-      seller_email: sellerEmail !== "__shared__" ? sellerEmail : null,
-      flower_name: groupItemsJson,
-      price: groupTotal,
-      total_amount: sellers.length === 1 ? total : groupTotal,
-      status: "Placed",
-      delivery_address: addr
-    });
-    if(res.error){ showToast("Order failed: " + res.error.message); return; }
-  }
 
   if(res.error){ showToast("Order failed: " + res.error.message); return; }
 
@@ -2230,186 +1695,235 @@ async function loadOrders(){
       .order("order_id", {ascending:false})
       .limit(50);
   } catch(fetchErr) {
-    el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>Network error.<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
+    el.innerHTML = '<div class="empty-state"><div>📦</div>Network error loading orders.<br>' +
+      '<small style="font-size:11px;color:var(--text4);">Check your connection and try again.</small>' +
+      '<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
     return;
   }
 
   if(res.error){
-    el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>Could not load orders.<br><small style="color:var(--text4);">' + (res.error.message||'Unknown error') + '</small><br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
+    el.innerHTML = '<div class="empty-state"><div>📦</div>Could not load orders.<br>' +
+      '<small style="font-size:11px;color:var(--text4);">' + (res.error.message||'Unknown error') + '</small>' +
+      '<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
     return;
   }
 
   var orders = res.data || [];
-  orders.sort(function(a,b){
-    return (parseInt((b.order_id||'').replace('ORD',''))||0) - (parseInt((a.order_id||'').replace('ORD',''))||0);
+
+  // Sort newest first: extract timestamp from order_id like "ORD1771674712168"
+  orders.sort(function(a, b){
+    var aId = a.order_id || a.id || '';
+    var bId = b.order_id || b.id || '';
+    var aTs = parseInt(aId.replace('ORD','')) || 0;
+    var bTs = parseInt(bId.replace('ORD','')) || 0;
+    return bTs - aTs; // descending = newest first
   });
 
-  if(!orders.length){ el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>No orders yet</div>'; return; }
+  if(!orders.length){
+    el.innerHTML = '<div class="empty-state"><div>📦</div>No orders yet</div>';
+    return;
+  }
+
   el.innerHTML = '';
 
-  for(var j=0;j<orders.length;j++){
-    var order=orders[j];
-    var displayId=order.order_id||order.id||'';
-    var grandTotal=parseFloat(order.total_amount||order.price||0);
+  for(var j=0; j<orders.length; j++){
+    var order = orders[j];
+    var displayId = order.order_id || order.id;
+    var grandTotal = parseFloat(order.total_amount || order.price || 0);
 
-    var items=[],orderDate='',orderTime='',invoiceId='';
-    var fn=order.flower_name||'';
-    if(fn.indexOf('JSON::')===0){
-      try{
-        var parsed=JSON.parse(fn.substring(6));
-        if(parsed.items){items=parsed.items;orderDate=parsed.date||'';orderTime=parsed.time||'';invoiceId=parsed.invoiceId||'';}
-        else if(Array.isArray(parsed)){items=parsed;}
-      }catch(e){items=[];}
-    }else if(fn){
-      items=fn.split(', ').map(function(n){return{name:n.trim(),qty:null,price:null};});
+    // Parse items + metadata from flower_name column
+    var items = [];
+    var orderDate = '';
+    var orderTime = '';
+    var invoiceId = '';
+    var fn = order.flower_name || '';
+
+    if(fn.indexOf('JSON::') === 0){
+      try {
+        var parsed = JSON.parse(fn.substring(6));
+        // New format: {items:[], date, time, invoiceId}
+        if(parsed.items){
+          items = parsed.items;
+          orderDate = parsed.date || '';
+          orderTime = parsed.time || '';
+          invoiceId = parsed.invoiceId || '';
+        } else if(Array.isArray(parsed)){
+          // Old JSON format: [{name,qty,price}]
+          items = parsed;
+        }
+      } catch(e){ items = []; }
+    } else if(fn){
+      items = fn.split(', ').map(function(n){ return { name:n.trim(), qty:null, price:null }; });
     }
 
-    if(!invoiceId&&displayId){
-      var ts=displayId.replace('ORD','');
-      if(ts&&!isNaN(ts)){
-        var dd=new Date(parseInt(ts));
-        var pad=function(n){return n<10?'0'+n:''+n;};
-        invoiceId='INV-'+dd.getFullYear()+pad(dd.getMonth()+1)+pad(dd.getDate())+'-'+pad(dd.getHours())+pad(dd.getMinutes())+pad(dd.getSeconds());
-        if(!orderDate)orderDate=dd.getFullYear()+'-'+pad(dd.getMonth()+1)+'-'+pad(dd.getDate());
-        if(!orderTime)orderTime=pad(dd.getHours())+':'+pad(dd.getMinutes());
+    // Auto-generate invoiceId from order_id if missing
+    if(!invoiceId && displayId){
+      var ts = displayId.replace('ORD','');
+      if(ts && !isNaN(ts)){
+        var d = new Date(parseInt(ts));
+        var pad = function(n){ return n<10?'0'+n:''+n; };
+        invoiceId = 'INV-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+        if(!orderDate) orderDate = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+        if(!orderTime) orderTime = pad(d.getHours()) + ':' + pad(d.getMinutes());
       }
     }
 
-    var itemNames=items.length?items.slice(0,3).map(function(it){return it.name;}).join(', ')+(items.length>3?' +' + (items.length-3)+' more':''):(fn||'Order');
-
-    var sColor='#ff4081',sBg='rgba(255,64,129,0.12)';
-    if(order.status==='Delivered'){sColor='#4caf50';sBg='rgba(76,175,80,0.12)';}
-    else if(order.status==='Cancelled'){sColor='#f44336';sBg='rgba(244,67,54,0.12)';}
-    else if(order.status==='Shipped'){sColor='#ff9800';sBg='rgba(255,152,0,0.12)';}
-    else if(order.status==='Confirmed'){sColor='#2196f3';sBg='rgba(33,150,243,0.12)';}
-
-    var itemRowsHtml='',itemSubtotal=0;
-    if(items.length>0){
-      for(var k=0;k<items.length;k++){
-        var it=items[k];
-        var hasD=it.qty!==null&&it.qty!==undefined&&it.price!==null&&it.price!==undefined;
-        var itT=hasD?it.qty*it.price:null;
-        if(itT)itemSubtotal+=itT;
-        itemRowsHtml+='<tr><td>'+it.name+'</td><td>'+(hasD?it.qty:'-')+'</td><td>'+(hasD?'\u20B9'+parseFloat(it.price).toFixed(2):'-')+'</td><td>'+(itT?'\u20B9'+itT.toFixed(2):'-')+'</td></tr>';
+    // Build items table rows
+    var itemRowsHtml = '';
+    var itemSubtotal = 0;
+    if(items.length > 0){
+      for(var k=0; k<items.length; k++){
+        var it = items[k];
+        var hasDetail = it.qty !== null && it.qty !== undefined && it.price !== null && it.price !== undefined;
+        var itTotal = hasDetail ? it.qty * it.price : null;
+        if(itTotal) itemSubtotal += itTotal;
+        itemRowsHtml +=
+          '<tr>' +
+            '<td>' + it.name + '</td>' +
+            '<td>' + (hasDetail ? it.qty : '-') + '</td>' +
+            '<td>' + (hasDetail ? 'Rs.' + parseFloat(it.price).toFixed(2) : '-') + '</td>' +
+            '<td>' + (itTotal ? 'Rs.' + itTotal.toFixed(2) : '-') + '</td>' +
+          '</tr>';
       }
-      if(itemSubtotal===0)itemSubtotal=grandTotal;
-    }else{
-      itemRowsHtml='<tr><td colspan="4" style="color:var(--text4);text-align:center;padding:10px;">No item details</td></tr>';
-      itemSubtotal=grandTotal;
+      if(itemSubtotal === 0) itemSubtotal = grandTotal;
+    } else {
+      itemRowsHtml = '<tr><td colspan="4" style="color:#555;text-align:center;padding:10px;">No item details</td></tr>';
+      itemSubtotal = grandTotal;
     }
 
-    var delivery=itemSubtotal>0?50:0;
-    var gst=parseFloat((itemSubtotal*0.05).toFixed(2));
-    var discount=parseFloat(Math.max(0,itemSubtotal+delivery+gst-grandTotal).toFixed(2));
+    // Billing breakdown
+    var delivery = itemSubtotal > 0 ? 50 : 0;
+    var gst = parseFloat((itemSubtotal * 0.05).toFixed(2));
+    var discount = parseFloat(Math.max(0, itemSubtotal + delivery + gst - grandTotal).toFixed(2));
 
-    var addrVal=order.delivery_address||'';
-    var addrHtml='';
-    if(addrVal&&addrVal.indexOf('Select delivery')===-1&&addrVal.trim()){
-      addrHtml='<div class="ord-detail-row"><span class="ord-detail-lbl">\uD83D\uDCCD Deliver To</span><span class="ord-detail-val">'+addrVal+'</span></div>';
+    // Delivery address
+    var addrVal = order.delivery_address || '';
+    var addrHtml = '';
+    if(addrVal && addrVal.indexOf('Select delivery') === -1 && addrVal.trim()){
+      addrHtml =
+        '<div class="bill-deliver-row">' +
+          '<div class="bill-meta-label">Deliver To</div>' +
+          '<div class="bill-meta-val">' + addrVal + '</div>' +
+        '</div>';
     }
 
-    var detailId='ord-detail-'+j;
+    // Status color
+    var statusColor = '#ff4081';
+    if(order.status === 'Delivered') statusColor = '#4caf50';
+    else if(order.status === 'Cancelled') statusColor = '#f44336';
+    else if(order.status === 'Shipped') statusColor = '#ff9800';
 
-    el.innerHTML+=
-      '<div class="ord-card" id="ord-card-'+j+'" onclick="toggleOrderDetail('+j+')">' +
-        '<div class="ord-card-main">' +
-          '<div class="ord-logo-wrap">' +
-            '<img src="Headerlogo.png" class="ord-logo-img" alt="PR" onerror="this.style.display=' + "'" + 'none' + "'" + ';this.nextElementSibling.style.display=' + "'" + 'flex' + "'" + ';">' +
-            '<div class="ord-logo-fallback" style="display:none;">\uD83C\uDF38</div>' +
+    el.innerHTML +=
+      '<div class="bill-card">' +
+
+        // ── Bill Header with logo ──────────────────────────────
+        '<div class="bill-header">' +
+
+          '<div class="bill-logo-row">' +
+            '<img src="Headerlogo.png" class="bill-logo-img" alt="PetalRush" ' +
+              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">' +
+            '<span class="bill-logo-fallback" style="display:none;">🌸 PetalRush</span>' +
+            '<span class="status-badge" style="background:' + statusColor + '22;color:' + statusColor + ';border-color:' + statusColor + '44;margin-left:auto;">' + (order.status || 'Placed') + '</span>' +
           '</div>' +
-          '<div class="ord-card-info">' +
-            '<div class="ord-card-row1">' +
-              '<div class="ord-card-id">' + (displayId.length > 14 ? displayId.substring(0,14)+'\u2026' : displayId) + '</div>' +
-              '<span class="ord-status-pill" style="background:' + sBg + ';color:' + sColor + ';">' + (order.status||'Placed') + '</span>' +
+
+          '<div class="bill-meta-grid">' +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Invoice No.</div>' +
+              '<div class="bill-meta-val">' + (invoiceId || displayId) + '</div>' +
             '</div>' +
-            '<div class="ord-card-row2">' +
-              '<div class="ord-card-items">' + itemNames + '</div>' +
-              '<div class="ord-card-total">\u20B9' + grandTotal.toLocaleString('en-IN') + '</div>' +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Order ID</div>' +
+              '<div class="bill-meta-val">' + displayId + '</div>' +
             '</div>' +
-            '<div class="ord-card-row3">' +
-              '<span class="ord-card-date">' + (orderDate||'') + (orderTime ? ' \u00B7 ' + orderTime : '') + '</span>' +
-              '<span class="ord-chevron" id="ord-chev-' + j + '">\u203A</span>' +
+
+            (orderDate ? '<div class="bill-meta-block"><div class="bill-meta-label">Date</div><div class="bill-meta-val">' + orderDate + '</div></div>' : '') +
+            (orderTime ? '<div class="bill-meta-block"><div class="bill-meta-label">Time</div><div class="bill-meta-val">' + orderTime + '</div></div>' : '') +
+
+            '<div class="bill-meta-block">' +
+              '<div class="bill-meta-label">Billed To</div>' +
+              '<div class="bill-meta-val">' + (user.email || '-') + '</div>' +
             '</div>' +
+
           '</div>' +
+
+          addrHtml +
+
         '</div>' +
-      '</div>' +
-      '<div class="ord-detail" id="'+detailId+'">' +
-        '<div class="ord-detail-header">' +
-          '<div class="ord-invoice-brand">' +
-            '<img src="Headerlogo.png" class="ord-brand-logo" onerror="this.onerror=null;this.remove()">' +
-            '<div class="ord-brand-name">\uD83C\uDF38 PetalRush</div>' +
-          '</div>' +
-          '<span class="ord-status-pill lg" style="background:'+sBg+';color:'+sColor+';">'+(order.status||'Placed')+'</span>' +
-        '</div>' +
-        '<div class="ord-meta-grid">' +
-          '<div class="ord-meta-cell"><div class="ord-meta-lbl">Invoice No.</div><div class="ord-meta-val">'+(invoiceId||displayId)+'</div></div>' +
-          '<div class="ord-meta-cell"><div class="ord-meta-lbl">Order ID</div><div class="ord-meta-val">'+displayId+'</div></div>' +
-          (orderDate?'<div class="ord-meta-cell"><div class="ord-meta-lbl">Date</div><div class="ord-meta-val">'+orderDate+'</div></div>':'') +
-          (orderTime?'<div class="ord-meta-cell"><div class="ord-meta-lbl">Time</div><div class="ord-meta-val">'+orderTime+'</div></div>':'') +
-          '<div class="ord-meta-cell ord-meta-full"><div class="ord-meta-lbl">Billed To</div><div class="ord-meta-val">'+(user.email||'-')+'</div></div>' +
-        '</div>' +
-        addrHtml +
-        '<div class="ord-items-wrap">' +
-          '<table class="bill-table"><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+itemRowsHtml+'</tbody></table>' +
+
+        // ── Items Table ────────────────────────────────────────
+        '<div class="bill-body">' +
+          '<table class="bill-table">' +
+            '<thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>' +
+            '<tbody>' + itemRowsHtml + '</tbody>' +
+          '</table>' +
+
+          // ── Totals ──────────────────────────────────────────
           '<div class="bill-totals">' +
-            '<div class="bill-row"><span>Item Total</span><span>\u20B9'+itemSubtotal.toFixed(2)+'</span></div>' +
-            '<div class="bill-row"><span>Delivery Fee</span><span>'+(delivery>0?'\u20B9'+delivery.toFixed(2):'FREE')+'</span></div>' +
-            '<div class="bill-row"><span>GST (5%)</span><span>\u20B9'+gst.toFixed(2)+'</span></div>' +
-            (discount>1?'<div class="bill-row discount"><span>Discount</span><span>- \u20B9'+discount.toFixed(2)+'</span></div>':'') +
-            '<div class="bill-grand"><span>Order Total</span><span>\u20B9'+grandTotal.toFixed(2)+'</span></div>' +
+            '<div class="bill-row"><span>Item Total</span><span>Rs.' + itemSubtotal.toFixed(2) + '</span></div>' +
+            '<div class="bill-row"><span>Delivery Fee</span><span>' + (delivery > 0 ? 'Rs.' + delivery.toFixed(2) : 'FREE') + '</span></div>' +
+            '<div class="bill-row"><span>GST (5%)</span><span>Rs.' + gst.toFixed(2) + '</span></div>' +
+            (discount > 1 ? '<div class="bill-row discount"><span>Discount Applied</span><span>- Rs.' + discount.toFixed(2) + '</span></div>' : '') +
+            '<div class="bill-grand"><span>Order Total</span><span>Rs.' + grandTotal.toFixed(2) + '</span></div>' +
           '</div>' +
+
+          '<div class="bill-footer">Thank you for choosing PetalRush \uD83C\uDF38</div>' +
+          '<div class="bill-download-row">' +
+            '<button class="bill-dl-btn" onclick="downloadBill(\'bill-' + displayId + '\', \'pdf\', \'' + (invoiceId||displayId) + '\')">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              ' Download Receipt' +
+            '</button>' +
+          '</div>' +
+
         '</div>' +
-        '<div class="ord-detail-footer">Thank you for choosing PetalRush \uD83C\uDF38</div>' +
-        '<div class="bill-download-row">' +
-          '<button class="bill-dl-btn" onclick="event.stopPropagation();downloadBill(\'bill-'+displayId+'\',\'pdf\',\''+(invoiceId||displayId)+'\')">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-            ' Download Receipt' +
-          '</button>' +
+
+        '<div id="bill-' + displayId + '" class="bill-printable">' +
+
+          '<div class="bp-header">' +
+            '<img src="Headerlogo.png" class="bp-logo" alt="PetalRush" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' +
+            '<span class="bp-logo-text" style="display:none">PetalRush</span>' +
+            '<div class="bp-tagline">Fresh Flowers · Fast Delivery</div>' +
+            '<div class="bp-title">ORDER RECEIPT</div>' +
+          '</div>' +
+
+          '<div class="bp-divider"></div>' +
+
+          '<div class="bp-meta">' +
+            '<div class="bp-meta-row"><span>Invoice No.</span><b>' + (invoiceId||displayId) + '</b></div>' +
+            '<div class="bp-meta-row"><span>Order ID</span><b>' + displayId + '</b></div>' +
+            (orderDate ? '<div class="bp-meta-row"><span>Date</span><b>' + orderDate + '</b></div>' : '') +
+            (orderTime ? '<div class="bp-meta-row"><span>Time</span><b>' + orderTime + '</b></div>' : '') +
+            '<div class="bp-meta-row"><span>Billed To</span><b>' + (user.email||'-') + '</b></div>' +
+            (addrVal && addrVal.indexOf('Select')===-1 ? '<div class="bp-meta-row"><span>Deliver To</span><b>' + addrVal + '</b></div>' : '') +
+            '<div class="bp-meta-row"><span>Status</span><b style="color:' + statusColor + '">' + (order.status||'Placed') + '</b></div>' +
+          '</div>' +
+
+          '<div class="bp-divider"></div>' +
+
+          '<table class="bp-table">' +
+            '<thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>' +
+            '<tbody>' + itemRowsHtml.replace(/Rs\./g,'Rs.') + '</tbody>' +
+          '</table>' +
+
+          '<div class="bp-divider"></div>' +
+
+          '<div class="bp-totals">' +
+            '<div class="bp-total-row"><span>Item Total</span><span>Rs.' + itemSubtotal.toFixed(2) + '</span></div>' +
+            '<div class="bp-total-row"><span>Delivery Fee</span><span>' + (delivery>0?'Rs.'+delivery.toFixed(2):'FREE') + '</span></div>' +
+            '<div class="bp-total-row"><span>GST (5%)</span><span>Rs.' + gst.toFixed(2) + '</span></div>' +
+            (discount>1 ? '<div class="bp-total-row" style="color:#27ae60"><span>Discount</span><span>- Rs.' + discount.toFixed(2) + '</span></div>' : '') +
+            '<div class="bp-total-grand"><span>Order Total</span><span>Rs.' + grandTotal.toFixed(2) + '</span></div>' +
+          '</div>' +
+
+          '<div class="bp-footer">Thank you for choosing PetalRush 🌸 | petalrush.com</div>' +
+
         '</div>' +
-      '</div>' +
-      '<div id="bill-'+displayId+'" class="bill-printable">' +
-        '<div class="bp-header"><img src="Headerlogo.png" class="bp-logo" onerror="this.onerror=null;this.remove()"><span class="bp-logo-text">PetalRush</span><div class="bp-tagline">Fresh Flowers \u00B7 Fast Delivery</div><div class="bp-title">ORDER RECEIPT</div></div>' +
-        '<div class="bp-divider"></div>' +
-        '<div class="bp-meta">' +
-          '<div class="bp-meta-row"><span>Invoice No.</span><b>'+(invoiceId||displayId)+'</b></div>' +
-          '<div class="bp-meta-row"><span>Order ID</span><b>'+displayId+'</b></div>' +
-          (orderDate?'<div class="bp-meta-row"><span>Date</span><b>'+orderDate+'</b></div>':'') +
-          (orderTime?'<div class="bp-meta-row"><span>Time</span><b>'+orderTime+'</b></div>':'') +
-          '<div class="bp-meta-row"><span>Billed To</span><b>'+(user.email||'-')+'</b></div>' +
-          (addrVal?'<div class="bp-meta-row"><span>Deliver To</span><b>'+addrVal+'</b></div>':'') +
-        '</div>' +
-        '<div class="bp-divider"></div>' +
-        '<table class="bp-table"><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+itemRowsHtml+'</tbody></table>' +
-        '<div class="bp-totals">' +
-          '<div class="bp-total-row"><span>Item Total</span><span>\u20B9'+itemSubtotal.toFixed(2)+'</span></div>' +
-          '<div class="bp-total-row"><span>Delivery Fee</span><span>'+(delivery>0?'\u20B9'+delivery.toFixed(2):'FREE')+'</span></div>' +
-          '<div class="bp-total-row"><span>GST (5%)</span><span>\u20B9'+gst.toFixed(2)+'</span></div>' +
-          (discount>1?'<div class="bp-total-row" style="color:#4caf50"><span>Discount</span><span>- \u20B9'+discount.toFixed(2)+'</span></div>':'') +
-          '<div class="bp-total-grand"><span>Order Total</span><span>\u20B9'+grandTotal.toFixed(2)+'</span></div>' +
-        '</div>' +
-        '<div class="bp-footer">Thank you for choosing PetalRush \uD83C\uDF38 | petalrush.com</div>' +
+
       '</div>';
   }
 }
 
-function toggleOrderDetail(idx){
-  var detailId = 'ord-detail-' + idx;
-  var detail = document.getElementById(detailId);
-  var card   = document.getElementById('ord-card-'+idx);
-  var chev   = document.getElementById('ord-chev-'+idx);
-  if(!detail) return;
-  var isOpen = detail.classList.contains('open');
-  // Close all first
-  document.querySelectorAll('.ord-detail.open').forEach(function(d){d.classList.remove('open');});
-  document.querySelectorAll('.ord-card.expanded').forEach(function(c){c.classList.remove('expanded');});
-  document.querySelectorAll('.ord-chevron').forEach(function(ch){ch.style.transform='rotate(0deg)';});
-  if(!isOpen){
-    detail.classList.add('open');
-    if(card)card.classList.add('expanded');
-    if(chev)chev.style.transform='rotate(90deg)';
-    setTimeout(function(){detail.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
-  }
-}
 
 // ─── DOWNLOAD BILL ────────────────────────────────────────────────
 function downloadBill(billId, format, invoiceName){
@@ -2732,6 +2246,12 @@ async function changePassword(){
 }
 
 
+// ─── LOGOUT ───────────────────────────────────────────────────────
+function doLogout(){
+  localStorage.removeItem("user");
+  location.href = "index.html";
+}
+
 // ─── THEME TOGGLE ──────────────────────────────────────────────────
 function toggleTheme(){
   var isLight = document.body.classList.toggle('light-mode');
@@ -2778,6 +2298,9 @@ window.addEventListener('popstate', function(e){
 
 // ─── START ────────────────────────────────────────────────────────
 applyTheme();
+// Push initial state so back button works from the start
+history.replaceState({ screen: 'home' }, '', '');
+showHome(false);
 </script>
 
 </body>
