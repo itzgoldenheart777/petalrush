@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PetalRush Buyer</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+/* ── THEME VARIABLES ───────────────────────────── */
+:root{
+  --bg:#0d0f14;
+  --bg2:#111318;
+  --bg3:#13161f;
+  --bg4:#1a1d26;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.08);
+  --text:#f0ede8;
+  --text2:#c8c4be;
+  --text3:#888;
+  --text4:#555;
+  --accent:#ff4081;
+  --accent2:#e0205f;
+  --card:#13161f;
+  --input-bg:#1a1d26;
+  --header-bg:linear-gradient(135deg,#1a0a0f 0%,#0d0f14 100%);
+  --bottom-bg:#111318;
+  --shadow:rgba(255,64,129,0.25);
+  --toast-bg:#1e2130;
+  --star-empty:#555;
+}
+
+body.light-mode{
+  --bg:#f0ede8;
+  --bg2:#ffffff;
+  --bg3:#fafafa;
+  --bg4:#e8e4df;
+  --border:rgba(0,0,0,0.09);
+  --border2:rgba(0,0,0,0.12);
+  --text:#1a1a1a;
+  --text2:#3a3a3a;
+  --text3:#606060;
+  --text4:#909090;
+  --accent:#e0205f;
+  --accent2:#c41a54;
+  --card:#ffffff;
+  --input-bg:#f5f2ef;
+  --header-bg:linear-gradient(135deg,#fff5f7 0%,#ffffff 100%);
+  --bottom-bg:#ffffff;
+  --shadow:rgba(224,32,95,0.18);
+  --toast-bg:#ffffff;
+  --star-empty:#bbb;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  transition:background 0.3s,color 0.3s;
+}
+
+.container{
+  max-width:500px;
+  margin:auto;
+  padding-bottom:85px;
+  position:relative;
+}
+
+/* HEADER */
+.header{
+  background:var(--header-bg);
+  padding:14px 20px;
+  text-align:center;
+  border-bottom:1px solid rgba(255,80,100,0.15);
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(10px);
+}
+
+.header-logo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.header-logo-icon{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,#ff4081,#ff6b6b);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 4px 15px rgba(255,64,129,0.4);
+}
+
+.header-logo-text{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(135deg,#ff4081,#ffb3c6);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:0.5px;
+}
+
+.header-logo-sub{
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:-2px;
+}
+
+.header-img-logo{
+  height:44px;
+  max-width:150px;
+  object-fit:contain;
+  display:block;
+  flex-shrink:0;
+}
+
+.header-logo-combined{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  width:100%;
+}
+
+.header-logo-text-block{
+  text-align:left;
+}
+
+/* FILTER BAR */
+.filter-bar{
+  padding:12px 14px;
+  background:var(--bg2);
+  display:flex;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+}
+
+input,select{
+  flex:1;
+  padding:11px 14px;
+  border-radius:10px;
+  border:1px solid var(--border2);
+  background:var(--input-bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  outline:none;
+  transition:border 0.2s;
+}
+
+input:focus,select:focus{
+  border-color:rgba(255,64,129,0.4);
+}
+
+input::placeholder{color:var(--text4);}
+
+select option{background:var(--input-bg);}
+
+/* PRODUCTS GRID */
+#home{
+  display:none;
+  padding:14px;
+  gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
+}
+
+.card{
+  background:var(--card);
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  border:1px solid var(--border);
+  transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(255,64,129,0.15);
+  border-color:rgba(255,64,129,0.2);
+}
+
+.card img{
+  width:100%;
+  height:130px;
+  object-fit:cover;
+  display:block;
+  background:var(--input-bg);
+}
+
+.card-body{
+  padding:10px;
+}
+
+.card-name{
+  font-size:13px;
+  font-weight:500;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-bottom:4px;
+}
+
+.card-price{
+  font-size:14px;
+  font-weight:600;
+  color:#ff4081;
+}
+
+/* SECTIONS */
+.section{display:none;padding:14px;}
+
+.section h2{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  margin-bottom:16px;
+  color:var(--text);
+}
+
+.section h3{
+  font-size:15px;
+  font-weight:600;
+  margin:20px 0 10px;
+  color:var(--text2);
+}
+
+/* BUTTONS */
+.btn{
+  background:linear-gradient(135deg,#ff4081,#e0205f);
+  border:none;
+  padding:13px;
+  width:100%;
+  border-radius:10px;
+  color:white;
+  margin-top:10px;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:0.3px;
+  transition:opacity 0.2s,transform 0.1s;
+  box-shadow:0 4px 15px var(--shadow);
+}
+
+.btn:hover{opacity:0.9;transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+
+.btn-secondary{
+  background:var(--input-bg);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:none;
+}
+
+.btn-secondary:hover{border-color:rgba(255,64,129,0.3);opacity:1;}
+
+/* DETAIL */
+#detail .product-image{
+  width:100%;
+  border-radius:14px;
+  object-fit:cover;
+  max-height:280px;
+  background:var(--input-bg);
+}
+
+#detail .product-name{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  margin:14px 0 6px;
+}
+
+#detail .product-price{
+  font-size:20px;
+  font-weight:600;
+  color:#ff4081;
+  margin-bottom:6px;
+}
+
+#detail .product-desc{
+  font-size:14px;
+  color:var(--text3);
+  line-height:1.6;
+  margin-bottom:14px;
+}
+
+/* CART */
+.cart-item{
+  background:var(--card);
+  padding:14px;
+  margin-top:10px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.cart-item-info{
+  flex:1;
+}
+
+.cart-item-name{
+  font-size:14px;
+  font-weight:500;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.cart-item-qty{
+  font-size:12px;
+  color:var(--text3);
+}
+
+.cart-item-price{
+  font-size:15px;
+  font-weight:600;
+  color:#ff4081;
+  margin-right:10px;
+}
+
+.delete-btn{
+  background:rgba(255,64,81,0.1);
+  border:1px solid rgba(255,64,81,0.2);
+  color:#ff4081;
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:12px;
+  transition:background 0.2s;
+}
+
+.delete-btn:hover{background:rgba(255,64,81,0.2);}
+
+/* INVOICE */
+.invoice{
+  background:var(--card);
+  padding:16px;
+  margin-top:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  font-size:14px;
+  line-height:2;
+}
+
+.invoice hr{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:8px 0;
+}
+
+.invoice-row{
+  display:flex;
+  justify-content:space-between;
+}
+
+.invoice-total{
+  display:flex;
+  justify-content:space-between;
+  font-size:16px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* BOTTOM NAV */
+.bottom{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  max-width:500px;
+  display:flex;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  z-index:100;
+}
+
+.bottom-tab{
+  flex:1;
+  text-align:center;
+  padding:14px 0 12px;
+  cursor:pointer;
+  font-size:12px;
+  color:var(--text3);
+  transition:color 0.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+
+.bottom-tab.active{color:#ff4081;}
+
+.bottom-tab svg{
+  width:22px;height:22px;
+}
+
+/* AVATAR */
+.avatar-wrap{
+  display:flex;
+  justify-content:center;
+  margin-bottom:20px;
+  position:relative;
+  width:fit-content;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.avatar{
+  width:110px;height:110px;
+  border-radius:50%;
+  border:3px solid #ff4081;
+  object-fit:cover;
+  cursor:pointer;
+  background:var(--input-bg);
+  display:block;
+  transition:opacity 0.2s;
+}
+
+.avatar:hover{opacity:0.85;}
+
+.avatar-edit{
+  position:absolute;
+  bottom:4px;
+  right:0px;
+  background:#ff4081;
+  border-radius:50%;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+  font-size:13px;
+}
+
+/* ORDER CARD */
+.order-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.order-id{
+  font-size:12px;
+  color:var(--text3);
+  margin-bottom:6px;
+}
+
+.order-total{
+  font-size:16px;
+  font-weight:700;
+  color:#ff4081;
+  margin-bottom:10px;
+}
+
+.order-item-line{
+  font-size:13px;
+  color:var(--text2);
+  padding:3px 0;
+  border-bottom:1px solid var(--border);
+}
+
+/* EMPTY STATE */
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--text4);
+}
+
+.empty-state div{font-size:40px;margin-bottom:10px;}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:90px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg4);
+  border:1px solid rgba(255,64,129,0.3);
+  color:var(--text);
+  padding:12px 22px;
+  border-radius:25px;
+  font-size:14px;
+  z-index:999;
+  opacity:0;
+  transition:all 0.3s;
+  white-space:nowrap;
+  max-width:90vw;
+  pointer-events:none;
+}
+
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ADDRESS */
+.address-item{
+  background:var(--card);
+  padding:12px;
+  margin-top:8px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  font-size:13px;
+  color:var(--text2);
+  line-height:1.5;
+}
+
+/* LOADING */
+.loading{
+  text-align:center;
+  padding:30px;
+  color:var(--text4);
+  font-size:14px;
+}
+
+.spinner{
+  display:inline-block;
+  width:20px;height:20px;
+  border:2px solid rgba(255,64,129,0.2);
+  border-top-color:#ff4081;
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+  margin-right:8px;
+  vertical-align:middle;
+}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.coupon-row{display:flex;gap:8px;margin-top:10px;}
+.coupon-row input{margin:0;flex:1;}
+.coupon-row .btn{margin:0;white-space:nowrap;flex-shrink:0;width:auto;padding:11px 16px;}
+
+/* QTY STEPPER */
+.qty-stepper{display:flex;align-items:center;gap:0;border:1px solid rgba(255,64,129,0.3);border-radius:8px;overflow:hidden;}
+.qty-btn{background:var(--input-bg);border:none;color:#ff4081;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;flex-shrink:0;}
+.qty-btn:hover{background:rgba(255,64,129,0.15);}
+.qty-num{width:36px;text-align:center;font-size:14px;font-weight:600;color:var(--text);background:var(--bg2);}
+
+/* REVIEW STARS */
+.stars-row{display:flex;gap:4px;margin:6px 0;}
+.star{font-size:22px;cursor:pointer;transition:transform 0.1s;line-height:1;color:var(--star-empty);}
+.star:hover{transform:scale(1.2);}
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;}
+.review-author{font-size:12px;color:var(--text3);margin-bottom:4px;}
+.review-text{font-size:13px;color:var(--text2);line-height:1.5;}
+.review-stars{font-size:14px;color:#f5a623;letter-spacing:1px;}
+
+/* PROFILE EDIT MODE */
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
+.profile-edit-btn{position:absolute;top:10px;right:10px;background:#ff4081;border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.profile-view-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.profile-view-label{color:var(--text3);font-size:12px;}
+.profile-view-val{color:var(--text);font-weight:500;}
+
+/* ADDRESS MANDATORY HIGHLIGHT */
+select.required-err{border-color:#f44336 !important;box-shadow:0 0 0 2px rgba(244,67,54,0.2);}
+
+.status-badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  background:rgba(255,64,129,0.1);
+  color:#ff4081;
+  border:1px solid rgba(255,64,129,0.2);
+  margin-bottom:6px;
+}
+
+/* DOWNLOAD BUTTONS */
+.bill-download-row{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed rgba(255,64,129,0.15);
+}
+.bill-dl-btn{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  background:linear-gradient(135deg,#ff4081,#e0205f);
+  border:none;
+  padding:10px;
+  border-radius:8px;
+  color:white;
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity 0.2s;
+}
+.bill-dl-btn.secondary{
+  background:var(--input-bg);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.bill-dl-btn:hover{opacity:0.85;}
+
+/* PRINTABLE RECEIPT - hidden in UI, used for download only */
+.bill-printable{
+  display:none;
+  position:fixed;
+  left:-9999px;
+  top:0;
+  width:360px;
+  background:#fff;
+  color:#111;
+  font-family:'DM Sans',Arial,sans-serif;
+  padding:28px 24px;
+  box-sizing:border-box;
+}
+.bp-header{text-align:center;margin-bottom:16px;}
+.bp-logo{height:48px;max-width:160px;object-fit:contain;display:block;margin:0 auto 6px;}
+.bp-logo-text{font-size:20px;font-weight:700;color:#ff4081;}
+.bp-tagline{font-size:11px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.bp-title{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333;margin-top:8px;}
+.bp-divider{border:none;border-top:1px solid #eee;margin:12px 0;}
+.bp-meta{margin-bottom:8px;}
+.bp-meta-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #f5f5f5;}
+.bp-meta-row span{color:var(--text3);}
+.bp-meta-row b{color:#111;text-align:right;max-width:60%;word-break:break-all;}
+.bp-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+.bp-table th{background:#f8f8f8;padding:7px 6px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#666;border-bottom:2px solid #eee;}
+.bp-table th:last-child,.bp-table td:last-child{text-align:right;}
+.bp-table th:nth-child(2),.bp-table td:nth-child(2){text-align:center;}
+.bp-table td{padding:7px 6px;border-bottom:1px solid #f5f5f5;color:#333;}
+.bp-totals{background:#fafafa;border-radius:6px;padding:10px 12px;margin-top:4px;}
+.bp-total-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--text4);}
+.bp-total-grand{display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#111;padding-top:8px;margin-top:6px;border-top:2px solid #ff4081;}
+.bp-total-grand span:last-child{color:#ff4081;}
+.bp-footer{text-align:center;font-size:11px;color:var(--text2);margin-top:16px;padding-top:12px;border-top:1px dashed #eee;}
+
+/* BILL STYLES */
+.bill-logo-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,64,129,0.1);
+}
+.bill-logo-img{
+  height:36px;
+  max-width:130px;
+  object-fit:contain;
+}
+.bill-logo-fallback{
+  font-family:'Playfair Display',serif;
+  font-size:16px;
+  font-weight:700;
+  color:#ff4081;
+}
+.bill-meta-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+  margin-bottom:10px;
+}
+.bill-meta-block{
+  min-width:0;
+}
+.bill-meta-label{
+  font-size:10px;
+  color:var(--text4);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  margin-bottom:2px;
+}
+.bill-meta-val{
+  font-size:12px;
+  color:var(--text2);
+  word-break:break-all;
+  line-height:1.3;
+}
+.bill-deliver-row{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+.bill-footer{
+  text-align:center;
+  font-size:12px;
+  color:var(--text4);
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed rgba(255,64,129,0.15);
+  font-style:italic;
+}
+
+.bill-card{
+  background:var(--card);
+  border:1px solid rgba(255,64,129,0.15);
+  border-radius:14px;
+  margin-top:14px;
+  overflow:hidden;
+}
+.bill-header{
+  background:var(--header-bg);
+  padding:14px 16px;
+  border-bottom:1px solid rgba(255,64,129,0.1);
+}
+.bill-header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:8px;
+}
+.bill-shop{
+  font-family:'Playfair Display',serif;
+  font-size:15px;
+  font-weight:700;
+  color:var(--accent);
+}
+.bill-sub{
+  font-size:11px;
+  color:#666;
+  margin-top:2px;
+}
+.bill-order-no{
+  font-size:11px;
+  color:var(--text3);
+  text-align:right;
+}
+.bill-order-no b{
+  display:block;
+  font-size:13px;
+  color:#ff4081;
+}
+.bill-address{
+  font-size:12px;
+  color:var(--text3);
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,0.05);
+  line-height:1.5;
+}
+.bill-address span{
+  color:var(--text2);
+}
+.bill-body{
+  padding:14px 16px;
+}
+.bill-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:12px;
+}
+.bill-table th{
+  font-size:11px;
+  color:#666;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  padding:6px 4px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  text-align:left;
+}
+.bill-table th:last-child,.bill-table td:last-child{
+  text-align:right;
+}
+.bill-table th:nth-child(2),.bill-table td:nth-child(2){
+  text-align:center;
+}
+.bill-table td{
+  font-size:13px;
+  color:var(--text2);
+  padding:8px 4px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.bill-table td:first-child{
+  color:var(--text);
+  font-weight:500;
+}
+.bill-totals{
+  border-top:1px solid var(--border);
+  padding-top:10px;
+}
+.bill-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--text3);
+  padding:3px 0;
+}
+.bill-row.discount{
+  color:#4caf50;
+}
+.bill-grand{
+  display:flex;
+  justify-content:space-between;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+  padding:10px 0 4px;
+  border-top:1px dashed rgba(255,64,129,0.2);
+  margin-top:6px;
+}
+.bill-grand span:last-child{
+  color:#ff4081;
+}
+
+/* STOCK BADGE */
+.stock-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.stock-badge.available{background:rgba(76,175,80,0.15);color:#4caf50;border:1px solid rgba(76,175,80,0.3);}
+.stock-badge.out{background:rgba(244,67,54,0.1);color:#f44336;border:1px solid rgba(244,67,54,0.2);}
+
+/* DETAIL QTY ROW */
+.detail-qty-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:14px 0 10px;
+}
+.detail-qty-label{
+  font-size:14px;
+  color:var(--text3);
+  font-weight:500;
+}
+.detail-stock-hint{
+  font-size:12px;
+  color:var(--text4);
+}
+body.light-mode .detail-stock-hint{ color:#909090; }
+
+/* ── COLLAPSIBLE ORDER CARDS ──────────────────────────────────── */
+.ord-card{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:border-color 0.2s, box-shadow 0.2s, border-radius 0.2s;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.ord-card:hover{
+  border-color:rgba(255,64,129,0.35);
+  box-shadow:0 4px 16px rgba(255,64,129,0.08);
+}
+.ord-card.expanded{
+  border-color:rgba(255,64,129,0.45);
+  border-bottom-left-radius:0;
+  border-bottom-right-radius:0;
+  border-bottom-color:transparent;
+  margin-bottom:0;
+  box-shadow:none;
+}
+/* MAIN ROW: logo + info block */
+.ord-card-main{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.ord-logo-wrap{
+  flex-shrink:0;
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--bg4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.ord-logo-img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}
+.ord-logo-fallback{
+  font-size:20px;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+/* INFO BLOCK: 3 rows */
+.ord-card-info{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+/* ROW 1: order ID + status pill */
+.ord-card-row1{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.ord-card-id{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:0.2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.ord-status-pill{
+  font-size:11px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:20px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.ord-status-pill.lg{
+  font-size:13px;
+  padding:5px 14px;
+}
+/* ROW 2: items preview + total */
+.ord-card-row2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.ord-card-items{
+  font-size:12px;
+  color:var(--text3);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  flex:1;
+}
+.ord-card-total{
+  font-size:14px;
+  font-weight:700;
+  color:var(--accent);
+  flex-shrink:0;
+}
+/* ROW 3: date + chevron */
+.ord-card-row3{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-top:5px;
+  border-top:1px solid var(--border);
+}
+.ord-card-date{
+  font-size:11px;
+  color:var(--text4);
+}
+.ord-chevron{
+  font-size:16px;
+  color:var(--text4);
+  line-height:1;
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  display:inline-block;
+}
+
+/* EXPANDED DETAIL PANEL */
+.ord-detail{
+  display:none;
+  background:var(--bg3);
+  border:1px solid rgba(255,64,129,0.45);
+  border-top:none;
+  border-radius:0 0 14px 14px;
+  overflow:hidden;
+  margin-bottom:14px;
+}
+.ord-detail.open{
+  display:block;
+  animation:slideDown 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideDown{
+  from{opacity:0;transform:translateY(-10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+/* DETAIL: top header with brand + status */
+.ord-detail-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--header-bg);
+}
+.ord-invoice-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.ord-brand-logo{
+  height:32px;
+  max-width:110px;
+  object-fit:contain;
+}
+.ord-brand-name{
+  font-family:'Playfair Display',serif;
+  font-size:15px;
+  font-weight:700;
+  color:var(--accent);
+}
+/* DETAIL: order info grid (invoice no, order id, date, time, billed-to) */
+.ord-meta-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 16px;
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+}
+.ord-meta-cell{ min-width:0; }
+.ord-meta-cell.ord-meta-full{ grid-column:1/-1; }
+.ord-meta-lbl{
+  font-size:10px;
+  color:var(--text4);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  margin-bottom:3px;
+  font-weight:600;
+}
+.ord-meta-val{
+  font-size:13px;
+  color:var(--text2);
+  font-weight:500;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+/* DETAIL: delivery address */
+.ord-detail-row{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.ord-detail-lbl{
+  font-size:10px;
+  color:var(--text4);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  font-weight:600;
+}
+.ord-detail-val{
+  font-size:13px;
+  color:var(--text2);
+  line-height:1.4;
+}
+/* DETAIL: items table + totals */
+.ord-items-wrap{ padding:14px 16px; }
+.ord-detail-footer{
+  text-align:center;
+  font-size:12px;
+  color:var(--text4);
+  padding:10px 16px 14px;
+  border-top:1px dashed rgba(255,64,129,0.2);
+  font-style:italic;
+}
+
+/* LIGHT MODE ORDER CARDS */
+body.light-mode .ord-card{background:#fff;border-color:rgba(0,0,0,0.09);}
+body.light-mode .ord-card:hover{border-color:rgba(224,32,95,0.3);}
+body.light-mode .ord-card.expanded{border-color:rgba(224,32,95,0.4);}
+body.light-mode .ord-detail{background:#fafafa;border-color:rgba(224,32,95,0.3);}
+body.light-mode .ord-detail-header{background:linear-gradient(135deg,#fff0f4,#fff);}
+body.light-mode .ord-logo-wrap{background:#f0ede8;}
+
+/* ── LIGHT MODE OVERRIDES ────────────────────────────────────── */
+body.light-mode .header{
+  border-bottom:1px solid rgba(224,32,95,0.15);
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+}
+body.light-mode .card{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+body.light-mode .card:hover{
+  box-shadow:0 8px 24px rgba(224,32,95,0.12);
+}
+body.light-mode .card-name{ color:#1a1a1a; }
+body.light-mode .card img{ background:#f0ede8; }
+body.light-mode .cart-item{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
+body.light-mode .cart-item-name{ color:#1a1a1a; }
+body.light-mode .invoice{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
+body.light-mode .invoice-row{ color:#3a3a3a; }
+body.light-mode .invoice-total{ color:#1a1a1a; }
+body.light-mode .profile-card{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
+body.light-mode .profile-view-val{ color:#1a1a1a; }
+body.light-mode .profile-view-label{ color:#606060; }
+body.light-mode .review-card{
+  background:#f8f5f2;
+  border-color:rgba(0,0,0,0.07);
+}
+body.light-mode .review-text{ color:#3a3a3a; }
+body.light-mode .review-author{ color:#606060; }
+body.light-mode .address-item{
+  background:#fff;
+  border-color:rgba(0,0,0,0.08);
+}
+body.light-mode .bill-card{
+  background:#fff;
+  border-color:rgba(224,32,95,0.15);
+}
+body.light-mode .bill-header{
+  background:linear-gradient(135deg,#fff0f4 0%,#fff 100%) !important;
+  border-bottom-color:rgba(224,32,95,0.12);
+}
+body.light-mode .bill-meta-val{ color:#2a2a2a; }
+body.light-mode .bill-meta-label{ color:#909090; }
+body.light-mode .bill-table td{ color:#2a2a2a; }
+body.light-mode .bill-table td:first-child{ color:#1a1a1a; font-weight:500; }
+body.light-mode .bill-table th{ color:#606060; background:#f8f5f2; }
+body.light-mode .bill-row{ color:#606060; }
+body.light-mode .bill-grand{ color:#1a1a1a; }
+body.light-mode .bill-deliver-row{ border-top-color:rgba(0,0,0,0.06); }
+body.light-mode .bill-logo-row{ border-bottom-color:rgba(224,32,95,0.12); }
+body.light-mode .bill-footer{ color:#909090; }
+body.light-mode .bottom{
+  box-shadow:0 -2px 10px rgba(0,0,0,0.08);
+  border-top-color:rgba(0,0,0,0.08);
+}
+body.light-mode .bottom-tab{ color:#909090; }
+body.light-mode .bottom-tab.active{ color:var(--accent); }
+body.light-mode .toast{
+  background:#fff;
+  color:#1a1a1a;
+  border-color:rgba(224,32,95,0.25);
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+}
+body.light-mode .btn-secondary{
+  background:#e8e4df;
+  color:#1a1a1a;
+  border-color:rgba(0,0,0,0.12);
+}
+body.light-mode .section h2,
+body.light-mode .section h3{ color:#1a1a1a; }
+body.light-mode #detail .product-name{ color:#1a1a1a; }
+body.light-mode #detail .product-desc{ color:#555; }
+body.light-mode .stock-badge.available{ background:rgba(56,142,60,0.1); color:#2e7d32; }
+body.light-mode .qty-stepper{ border-color:rgba(224,32,95,0.35); }
+body.light-mode .qty-btn{ background:#e8e4df; color:var(--accent); }
+body.light-mode .qty-num{ background:#f5f2ef; color:#1a1a1a; }
+body.light-mode .delete-btn{
+  background:rgba(224,32,95,0.07);
+  border-color:rgba(224,32,95,0.2);
+  color:var(--accent);
+}
+body.light-mode .empty-state{ color:#909090; }
+body.light-mode .loading{ color:#909090; }
+body.light-mode .order-card{ background:#fff; border-color:rgba(0,0,0,0.08); }
+body.light-mode .status-badge{ background:rgba(224,32,95,0.08); }
+body.light-mode .header-logo-sub{ color:#909090; }
+body.light-mode input::placeholder{ color:#aaa; }
+</style>
+</head>
+<body>
+
+<!-- ══ BUYER SPLASH (shown during auth check) ══════════════ -->
+<div id="buyerSplash" style="position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:18px;">
+  <div style="font-size:54px;animation:float 2.5s ease-in-out infinite;">🌸</div>
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,#ff4081,#ff8fab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">PetalRush</div>
+  <div style="font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Shop Fresh Flowers</div>
+  <span class="spinner"></span>
+  <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
+</div>
+
+<!-- ══ BUYER LOGIN SCREEN ═══════════════════════════════════ -->
+<div id="buyerLoginScreen" style="display:none;min-height:100vh;background:var(--bg);overflow-y:auto;">
+  <div style="max-width:420px;margin:0 auto;">
+    <!-- Hero -->
+    <div style="background:linear-gradient(135deg,rgba(255,64,129,0.08),transparent);padding:52px 24px 32px;text-align:center;border-bottom:1px solid var(--border);">
+      <div style="font-size:52px;margin-bottom:14px;animation:float 3s ease-in-out infinite;">🌸</div>
+      <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:700;background:linear-gradient(135deg,#ff4081,#ff8fab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;">PetalRush</div>
+      <div style="font-size:12px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Fresh Flowers · Fast Delivery</div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding:24px 20px 0;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;background:var(--input-bg);border-radius:12px;padding:4px;margin-bottom:20px;">
+        <div id="bltabLogin" style="padding:10px;text-align:center;font-size:14px;font-weight:500;cursor:pointer;border-radius:9px;background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.2s;" onclick="switchBuyerTab('login')">Sign In</div>
+        <div id="bltabSignup" style="padding:10px;text-align:center;font-size:14px;font-weight:500;cursor:pointer;border-radius:9px;color:var(--text3);transition:all 0.2s;" onclick="switchBuyerTab('signup')">Sign Up</div>
+      </div>
+
+      <!-- Error/Status message -->
+      <div id="buyerLoginMsg" style="display:none;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;border:1px solid;line-height:1.5;font-weight:500;"></div>
+
+      <!-- LOGIN FORM -->
+      <div id="buyerLoginForm">
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Email</div>
+          <input type="email" id="bLoginEmail" placeholder="your@email.com" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')doBuyerLogin()" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Password</div>
+          <input type="password" id="bLoginPwd" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doBuyerLogin()" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
+        </div>
+        <button id="bLoginBtn" onclick="doBuyerLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(255,64,129,0.3);transition:opacity 0.2s;">Sign In</button>
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3);">Don't have an account? <span style="color:#ff4081;cursor:pointer;font-weight:500;" onclick="switchBuyerTab('signup')">Sign up</span></div>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div id="buyerSignupForm" style="display:none;">
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Full Name</div>
+          <input type="text" id="bSignupName" placeholder="Your name" autocomplete="name" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Email</div>
+          <input type="email" id="bSignupEmail" placeholder="your@email.com" autocomplete="email" inputmode="email" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Password</div>
+          <input type="password" id="bSignupPwd" placeholder="Min 6 characters" autocomplete="new-password" style="width:100%;background:var(--input-bg);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;">
+        </div>
+        <button id="bSignupBtn" onclick="doBuyerSignup()" style="width:100%;padding:14px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(255,64,129,0.3);">Create Buyer Account</button>
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3);">Already have an account? <span style="color:#ff4081;cursor:pointer;font-weight:500;" onclick="switchBuyerTab('login')">Sign in</span></div>
+      </div>
+
+      <!-- Seller portal link -->
+      <div style="text-align:center;margin-top:24px;padding:14px;background:var(--input-bg);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text3);">Are you a seller?</div>
+        <a href="seller.html" style="font-size:13px;color:#ff4081;font-weight:500;text-decoration:none;">Go to Seller Portal →</a>
+      </div>
+
+      <div style="padding-bottom:40px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUYER APP ═════════════════════════════════════════════ -->
+<div id="buyerApp" style="display:none;">
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo-combined">
+      <img src="Headerlogo.png" class="header-img-logo" alt="PetalRush"
+           onerror="this.style.display='none';">
+      <div class="header-logo-text-block">
+        <div class="header-logo-text">PetalRush</div>
+        <div class="header-logo-sub">Fresh Flowers · Fast Delivery</div>
+      </div>
+      <button id="themeBtn" onclick="toggleTheme()" style="background:none;border:1px solid rgba(255,64,129,0.3);border-radius:20px;padding:5px 12px;color:var(--text);cursor:pointer;font-size:13px;margin-left:auto;white-space:nowrap;transition:all 0.2s;">🌙</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div id="filterSection" class="filter-bar" style="display:none;">
+    <input id="search" placeholder="🔍  Search flowers..." oninput="searchProducts()">
+    <select id="sortSelect" onchange="applySort(this.value)">
+      <option value="new">Newest</option>
+      <option value="low">Low Price</option>
+      <option value="high">High Price</option>
+    </select>
+  </div>
+
+  <!-- HOME -->
+  <div id="home" style="display:none; padding:14px; gap:12px; grid-template-columns:repeat(auto-fill,minmax(145px,1fr));"></div>
+
+  <!-- DETAIL -->
+  <div id="detail" class="section"></div>
+
+  <!-- CART -->
+  <div id="cart" class="section">
+    <h2>🛒 My Cart</h2>
+    <div id="cartItems"></div>
+    <div class="invoice" id="invoiceBox" style="display:none;">
+      <div class="invoice-row"><span>Subtotal</span><span>₹<span id="subtotal">0</span></span></div>
+      <div class="invoice-row"><span>Delivery</span><span>₹<span id="delivery">0</span></span></div>
+      <div class="invoice-row"><span>GST (5%)</span><span>₹<span id="gst">0</span></span></div>
+      <div class="invoice-row" style="color:#4caf50;"><span>Discount</span><span>- ₹<span id="discount">0</span></span></div>
+      <hr>
+      <div class="invoice-total"><span>Total</span><span>₹<span id="grandTotal">0</span></span></div>
+    </div>
+
+    <div id="cartCheckout" style="display:none;">
+      <select id="addressSelect" style="margin-top:12px;"></select>
+      <div class="coupon-row">
+        <input id="couponInput" placeholder="Enter coupon code">
+        <button class="btn" onclick="applyCoupon()">Apply</button>
+      </div>
+      <button class="btn" onclick="placeOrder()" style="margin-top:14px;">Place Order →</button>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profile" class="section">
+
+    <!-- AVATAR + EDIT PENCIL -->
+    <div class="avatar-wrap" style="margin-bottom:12px;">
+      <img id="avatarImg" class="avatar" src="" alt="Avatar" onclick="document.getElementById('avatarFile').click()">
+      <div class="avatar-edit" onclick="document.getElementById('avatarFile').click()">✏️</div>
+      <input type="file" id="avatarFile" hidden accept="image/*" onchange="uploadAvatar(event)">
+    </div>
+
+    <!-- PROFILE CARD: view mode -->
+    <div id="profileViewCard" class="profile-card" style="position:relative;">
+      <button class="profile-edit-btn" onclick="toggleProfileEdit(true)">✏️ Edit</button>
+      <div class="profile-view-row">
+        <div>
+          <div class="profile-view-label">Name</div>
+          <div class="profile-view-val" id="viewName">—</div>
+        </div>
+      </div>
+      <div class="profile-view-row">
+        <div>
+          <div class="profile-view-label">Phone</div>
+          <div class="profile-view-val" id="viewPhone">—</div>
+        </div>
+      </div>
+      <div class="profile-view-row" style="border:none;">
+        <div>
+          <div class="profile-view-label">Email</div>
+          <div class="profile-view-val" id="viewEmail">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE CARD: edit mode (hidden by default) -->
+    <div id="profileEditCard" class="profile-card" style="display:none;">
+      <button class="profile-edit-btn" style="background:#666;" onclick="toggleProfileEdit(false)">✕ Cancel</button>
+      <h3 style="margin:0 0 12px;font-size:15px;">Edit Profile</h3>
+      <input id="nameInput" placeholder="Full Name" style="margin-bottom:10px;">
+      <input id="phoneInput" placeholder="Phone Number" style="margin-bottom:10px;">
+      <button class="btn" onclick="saveProfile()">Save Changes</button>
+    </div>
+
+    <!-- CHANGE PASSWORD CARD -->
+    <div class="profile-card" style="margin-top:0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-weight:600;font-size:14px;">🔒 Password</span>
+        <button class="profile-edit-btn" onclick="togglePwdEdit()">Change</button>
+      </div>
+      <div id="pwdEditArea" style="display:none;">
+        <input id="pwdOld" type="password" placeholder="Current password" style="margin-bottom:8px;">
+        <input id="pwdNew" type="password" placeholder="New password" style="margin-bottom:8px;">
+        <input id="pwdConfirm" type="password" placeholder="Confirm new password" style="margin-bottom:8px;">
+        <button class="btn" onclick="changePassword()">Update Password</button>
+      </div>
+      <div id="pwdViewArea" style="color:#555;font-size:13px;">••••••••</div>
+    </div>
+
+    <h3>📍 Addresses <span style="font-size:12px;color:#555;font-weight:400;">(max 3)</span></h3>
+    <input id="addressInput" placeholder="Enter your delivery address">
+    <button class="btn btn-secondary" onclick="saveAddress()">+ Add Address</button>
+    <div id="addressList"></div>
+
+    <h3>📦 My Orders</h3>
+    <div id="ordersList"></div>
+
+    <button class="btn btn-secondary" onclick="doLogout()" style="margin-top:20px;">Logout</button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom">
+    <div class="bottom-tab active" id="tab-home" onclick="showHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </div>
+    <div class="bottom-tab" id="tab-cart" onclick="showCart()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+      Cart
+    </div>
+    <div class="bottom-tab" id="tab-profile" onclick="showProfile()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+</div><!-- /buyerApp container -->
+</div><!-- /buyerApp -->
+
+<script>
+// ─── SUPABASE INIT (single instance, no duplicate declaration) ─────
+const _supabase = window.supabase.createClient(
+  "https://lssjsgfppehhclxqulso.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzc2pzZ2ZwcGVoaGNseHF1bHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExOTAwNzksImV4cCI6MjA4Njc2NjA3OX0.nRq1iFBiOEyty0ALRmS45ARoso7BsB0ENOvttu7nvX0"
+);
+
+// ─── AUTH STATE ───────────────────────────────────────────────────
+let user = null;
+let _buyerBooted = false;
+let _buyerInitDone = false;
+
+/* ─ BUYER AUTH INIT ──────────────────────────────────────────────
+   1. Show splash instantly
+   2. Check localStorage cache → boot immediately if valid buyer
+   3. Verify Supabase session in background → role-gate
+   4. If no session → show built-in login screen
+──────────────────────────────────────────────────────────────── */
+window.addEventListener("load", async function(){
+  applyTheme();
+  // Show splash
+  document.getElementById("buyerSplash").style.display = "flex";
+  document.getElementById("buyerLoginScreen").style.display = "none";
+  document.getElementById("buyerApp").style.display = "none";
+
+  // 1. Try cached user
+  try {
+    var _cached = JSON.parse(localStorage.getItem("user") || localStorage.getItem("prUser") || "null");
+    if(_cached && _cached.email && _cached.role === "buyer"){
+      user = _cached;
+      hideBuyerSplash();
+      bootBuyerApp();
+    } else if(_cached && _cached.email && _cached.role === "seller"){
+      // Seller trying buyer app
+      hideBuyerSplash();
+      showBuyerLogin();
+      showBuyerError("⚠️ This is a Seller account. Please use the Seller app.");
+      return;
+    }
+  } catch(e){}
+
+  // 2. Verify with Supabase
+  var s = await _supabase.auth.getSession();
+  if(s.data && s.data.session && s.data.session.user){
+    var authUser = s.data.session.user;
+    var ok = await verifyBuyerRole(authUser);
+    if(ok && !_buyerBooted){
+      hideBuyerSplash();
+      bootBuyerApp();
+    }
+  } else if(!_buyerBooted){
+    hideBuyerSplash();
+    showBuyerLogin();
+  }
+  _buyerInitDone = true;
+});
+
+_supabase.auth.onAuthStateChange(async function(event, session){
+  if(event === "SIGNED_IN" && session){
+    var ok = await verifyBuyerRole(session.user);
+    if(ok && !_buyerBooted){
+      hideBuyerSplash();
+      bootBuyerApp();
+    }
+  } else if(event === "SIGNED_OUT"){
+    user = null; _buyerBooted = false;
+    localStorage.removeItem("user"); localStorage.removeItem("prUser");
+    showBuyerLogin();
+  } else if(event === "TOKEN_REFRESHED" && session){
+    user = session.user;
+  }
+});
+
+async function verifyBuyerRole(authUser){
+  var roleRes = await _supabase.from("users").select("role,name,avatar_url").eq("email", authUser.email).maybeSingle();
+  var role = roleRes.data ? roleRes.data.role : "buyer";
+  if(role === "seller"){
+    await _supabase.auth.signOut();
+    localStorage.removeItem("user"); localStorage.removeItem("prUser");
+    hideBuyerSplash();
+    showBuyerLogin();
+    setTimeout(function(){
+      showBuyerError("⚠️ This is a Seller account. Please use the Seller app.");
+    }, 100);
+    return false;
+  }
+  user = {
+    id: authUser.id,
+    email: authUser.email,
+    role: "buyer",
+    name: (roleRes.data && roleRes.data.name) || (authUser.user_metadata && authUser.user_metadata.full_name) || authUser.email.split("@")[0],
+    avatar_url: (roleRes.data && roleRes.data.avatar_url) || ""
+  };
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("prUser", JSON.stringify(user));
+  if(!roleRes.data){
+    await _supabase.from("users").upsert({ email: authUser.email, role: "buyer" }, { onConflict: "email" });
+  }
+  return true;
+}
+
+function hideBuyerSplash(){ var s = document.getElementById("buyerSplash"); if(s) s.style.display = "none"; }
+function showBuyerLogin(){
+  document.getElementById("buyerSplash").style.display = "none";
+  document.getElementById("buyerLoginScreen").style.display = "flex";
+  document.getElementById("buyerApp").style.display = "none";
+}
+function bootBuyerApp(){
+  if(_buyerBooted) return;
+  _buyerBooted = true;
+  document.getElementById("buyerSplash").style.display = "none";
+  document.getElementById("buyerLoginScreen").style.display = "none";
+  document.getElementById("buyerApp").style.display = "block";
+  applyTheme();
+  history.replaceState({ screen: "home" }, "", "");
+  window.addEventListener("popstate", function(e){
+    var prev = navHistory[navHistory.length - 2] || "home";
+    navHistory.pop();
+    if(prev === "home") showHome(false);
+    else if(prev === "cart") showCart(false);
+    else if(prev === "profile") showProfile(false);
+    else showHome(false);
+  });
+  showHome(false);
+}
+
+/* ── BUYER LOGIN / SIGNUP ──────────────────────────────────────── */
+function switchBuyerTab(tab){
+  document.getElementById("buyerLoginForm").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("buyerSignupForm").style.display = tab === "signup" ? "block" : "none";
+  document.getElementById("bltabLogin").classList.toggle("active", tab === "login");
+  document.getElementById("bltabSignup").classList.toggle("active", tab === "signup");
+  clearBuyerError();
+}
+
+async function doBuyerLogin(){
+  var email = (document.getElementById("bLoginEmail").value || "").trim().toLowerCase();
+  var pwd = document.getElementById("bLoginPwd").value;
+  if(!email || !pwd){ showBuyerError("Enter your email and password"); return; }
+  var btn = document.getElementById("bLoginBtn");
+  if(btn){ btn.textContent = "Signing in..."; btn.disabled = true; }
+  clearBuyerError();
+
+  var r = await _supabase.auth.signInWithPassword({ email: email, password: pwd });
+  if(btn){ btn.textContent = "Sign In"; btn.disabled = false; }
+  if(r.error){
+    var msg = r.error.message;
+    if(msg.includes("Invalid login")) msg = "Incorrect email or password.";
+    showBuyerError(msg); return;
+  }
+  // Role check happens in onAuthStateChange → verifyBuyerRole
+}
+
+async function doBuyerSignup(){
+  var name = (document.getElementById("bSignupName").value || "").trim();
+  var email = (document.getElementById("bSignupEmail").value || "").trim().toLowerCase();
+  var pwd = document.getElementById("bSignupPwd").value;
+  if(!name || !email || !pwd){ showBuyerError("Please fill all fields"); return; }
+  if(pwd.length < 6){ showBuyerError("Password must be at least 6 characters"); return; }
+  var btn = document.getElementById("bSignupBtn");
+  if(btn){ btn.textContent = "Creating..."; btn.disabled = true; }
+  clearBuyerError();
+
+  // Check if email is already a seller
+  var existingRes = await _supabase.from("users").select("role").eq("email", email).maybeSingle();
+  if(existingRes.data && existingRes.data.role === "seller"){
+    if(btn){ btn.textContent = "Create Account"; btn.disabled = false; }
+    showBuyerError("⚠️ This email is registered as a Seller. Use a different email or use the Seller app.");
+    return;
+  }
+
+  var r = await _supabase.auth.signUp({ email: email, password: pwd, options: { data: { full_name: name, role: "buyer" } } });
+  if(btn){ btn.textContent = "Create Account"; btn.disabled = false; }
+  if(r.error){ showBuyerError("Error: " + r.error.message); return; }
+
+  await _supabase.from("users").upsert({ email: email, role: "buyer", name: name }, { onConflict: "email" });
+
+  if(r.data && r.data.user && !r.data.session){
+    showBuyerError("✅ Account created! Check your email to verify, then sign in.", true);
+    switchBuyerTab("login");
+  } else if(r.data && r.data.user){
+    showBuyerError("✅ Welcome to PetalRush! Loading...", true);
+  }
+}
+
+function showBuyerError(msg, isOk){
+  var el = document.getElementById("buyerLoginMsg");
+  if(!el) return;
+  el.textContent = msg; el.style.display = "block";
+  el.style.background = isOk ? "rgba(46,204,113,0.12)" : "rgba(231,76,60,0.12)";
+  el.style.borderColor = isOk ? "rgba(46,204,113,0.3)" : "rgba(231,76,60,0.3)";
+  el.style.color = isOk ? "#2ecc71" : "#e74c3c";
+}
+function clearBuyerError(){ var el = document.getElementById("buyerLoginMsg"); if(el){ el.textContent = ""; el.style.display = "none"; } }
+
+/* ─── LOGOUT ─────────────────────────────────────────────────── */
+async function doLogout(){
+  localStorage.removeItem("user"); localStorage.removeItem("prUser");
+  try { await _supabase.auth.signOut(); } catch(e){}
+  showBuyerLogin();
+  clearBuyerError();
+}
+
+// ─── STATE ────────────────────────────────────────────────────────
+let cartData = [];
+let allProducts = [];
+let discountAmount = 0;
+let appliedCoupon = null;
+let currentProduct = null;
+
+// ─── TOAST ────────────────────────────────────────────────────────
+function showToast(msg, duration){
+  duration = duration || 2500;
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, duration);
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────
+function hideAll(){
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('detail').style.display = 'none';
+  document.getElementById('cart').style.display = 'none';
+  document.getElementById('profile').style.display = 'none';
+  document.getElementById('filterSection').style.display = 'none';
+  document.getElementById('tab-home').classList.remove('active');
+  document.getElementById('tab-cart').classList.remove('active');
+  document.getElementById('tab-profile').classList.remove('active');
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────
+async function showHome(push){
+  hideAll();
+  var h = document.getElementById('home');
+  h.style.display = 'grid';
+  document.getElementById('filterSection').style.display = 'flex';
+  document.getElementById('tab-home').classList.add('active');
+  if(push !== false){ pushNav('home'); }
+
+  h.innerHTML = '<div class="loading" style="grid-column:1/-1"><span class="spinner"></span>Loading...</div>';
+
+  var res = await _supabase.from("products").select("*").order('created_at',{ascending:false});
+  allProducts = res.data || [];
+  renderProducts(allProducts);
+}
+
+function renderProducts(data){
+  var h = document.getElementById('home');
+  if(!data.length){
+    h.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div>🌸</div>No products found</div>';
+    return;
+  }
+  h.innerHTML = data.map(function(p){
+    return '<div class="card" onclick="showDetail(\'' + p.id + '\')">' +
+      '<img src="' + (p.image_url||'') + '" alt="' + p.name + '" onerror="this.src=\'\'">' +
+      '<div class="card-body">' +
+        '<div class="card-name">' + p.name + '</div>' +
+        '<div class="card-price">₹' + p.price + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function searchProducts(){
+  var q = document.getElementById('search').value.toLowerCase().trim();
+  var sort = document.getElementById('sortSelect').value;
+  var filtered = allProducts.filter(function(p){ return !q || (p.name && p.name.toLowerCase().includes(q)); });
+  sortArray(filtered, sort);
+  renderProducts(filtered);
+}
+
+function applySort(val){
+  var q = document.getElementById('search').value.toLowerCase().trim();
+  var filtered = allProducts.filter(function(p){ return !q || (p.name && p.name.toLowerCase().includes(q)); });
+  sortArray(filtered, val);
+  renderProducts(filtered);
+}
+
+function sortArray(arr, val){
+  if(val==='low') arr.sort(function(a,b){return a.price-b.price;});
+  else if(val==='high') arr.sort(function(a,b){return b.price-a.price;});
+}
+
+// ─── DETAIL ───────────────────────────────────────────────────────
+async function showDetail(id){
+  hideAll();
+  pushNav('detail');
+  var d = document.getElementById('detail');
+  d.style.display = 'block';
+  d.innerHTML = '<div class="loading"><span class="spinner"></span>Loading...</div>';
+
+  var res = await _supabase.from("products").select("*").eq("id",id).single();
+  currentProduct = res.data;
+  var data = res.data;
+
+  var qty = parseInt(data.quantity) || 0;
+  var inStock = qty > 0;
+  var stockHtml = inStock
+    ? '<div class="stock-badge available">✓ In Stock</div>'
+    : '<div class="stock-badge out">✕ Out of Stock</div>';
+
+  d.innerHTML =
+    '<img src="' + (data.image_url||'') + '" class="product-image" alt="' + data.name + '" onerror="this.style.display=\'none\'">' +
+    '<div class="product-name">' + data.name + '</div>' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">' +
+      '<div class="product-price" style="margin:0;">\u20b9' + data.price + '</div>' +
+      stockHtml +
+    '</div>' +
+    '<div class="product-desc">' + (data.description||'') + '</div>' +
+    (inStock ?
+      '<div class="detail-qty-row">' +
+        '<div class="detail-qty-label">Quantity</div>' +
+        '<div class="qty-stepper">' +
+          '<button class="qty-btn" onclick="detailQtyChange(-1)">\u2212</button>' +
+          '<span class="qty-num" id="detailQtyNum">1</span>' +
+          '<button class="qty-btn" onclick="detailQtyChange(1)">+</button>' +
+        '</div>' +
+        '<span class="detail-stock-hint">of ' + qty + ' available</span>' +
+      '</div>' +
+      '<button class="btn" onclick="addCart()">\uD83D\uDED2 Add to Cart</button>' :
+      '<button class="btn" style="opacity:0.4;cursor:not-allowed;" disabled>Out of Stock</button>'
+    ) +
+    '<button class="btn btn-secondary" onclick="showHome()">\u2190 Back</button>' +
+    '<div style="margin-top:24px;">' +
+      '<h3 style="font-size:16px;margin-bottom:12px;">\u2B50 Reviews & Ratings</h3>' +
+      '<div class="profile-card" style="margin-bottom:14px;">' +
+        '<div style="font-size:13px;color:var(--text3);margin-bottom:8px;">Rate this product:</div>' +
+        '<div class="stars-row" id="starRow">' +
+          '<span class="star" onclick="setRating(1)" id="star1">\u2606</span>' +
+          '<span class="star" onclick="setRating(2)" id="star2">\u2606</span>' +
+          '<span class="star" onclick="setRating(3)" id="star3">\u2606</span>' +
+          '<span class="star" onclick="setRating(4)" id="star4">\u2606</span>' +
+          '<span class="star" onclick="setRating(5)" id="star5">\u2606</span>' +
+        '</div>' +
+        '<input id="reviewText" placeholder="Write your review..." style="margin-top:8px;margin-bottom:8px;">' +
+        '<button class="btn" style="padding:10px;" onclick="submitReview(\'' + data.id + '\')">Post Review</button>' +
+      '</div>' +
+      '<div id="reviewsList"><div class="loading"><span class="spinner"></span>Loading reviews...</div></div>' +
+    '</div>';
+
+  loadReviews(data.id);
+}
+
+// ─── DETAIL QTY STEPPER ──────────────────────────────────────────
+function detailQtyChange(delta){
+  var el = document.getElementById('detailQtyNum');
+  if(!el) return;
+  var max = parseInt(document.getElementById('detailMaxQty') ? document.getElementById('detailMaxQty').textContent : '999') || 999;
+  // Read max from currentProduct
+  if(currentProduct) max = parseInt(currentProduct.quantity) || 0;
+  var cur = parseInt(el.textContent) || 1;
+  var next = cur + delta;
+  if(next < 1) next = 1;
+  if(next > max) { showToast('Only ' + max + ' in stock'); next = max; }
+  el.textContent = next;
+}
+
+// ─── ADD CART ─────────────────────────────────────────────────────
+async function addCart(){
+  if(!currentProduct) return;
+
+  // Get selected qty from detail stepper (default 1)
+  var selectedQty = parseInt((document.getElementById('detailQtyNum')||{}).textContent) || 1;
+
+  // Check current stock
+  var stockRes = await _supabase.from("products").select("quantity").eq("id", currentProduct.id).single();
+  var currentStock = stockRes.data ? parseInt(stockRes.data.quantity)||0 : 0;
+  if(currentStock <= 0){ showToast("Sorry, out of stock!"); return; }
+  if(selectedQty > currentStock){ showToast("Only " + currentStock + " in stock!"); return; }
+
+  var res = await _supabase
+    .from("cart")
+    .select("*")
+    .eq("user_email", user.email)
+    .eq("product_id", currentProduct.id)
+    .maybeSingle();
+
+  if(res.data){
+    var newCartQty = res.data.qty + selectedQty;
+    if(newCartQty > currentStock){ showToast("Max stock limit reached!"); return; }
+    await _supabase.from("cart").update({qty: newCartQty}).eq("id", res.data.id);
+  } else {
+    await _supabase.from("cart").insert({
+      user_email: user.email,
+      product_id: currentProduct.id,
+      qty: selectedQty
+    });
+  }
+
+  // Reduce stock by selected qty
+  await _supabase.from("products").update({ quantity: currentStock - selectedQty }).eq("id", currentProduct.id);
+
+  showToast("Added " + selectedQty + " to cart!");
+  showCart(false);
+}
+
+// ─── CART ─────────────────────────────────────────────────────────
+async function showCart(push){
+  hideAll();
+  document.getElementById('cart').style.display = 'block';
+  document.getElementById('tab-cart').classList.add('active');
+  if(push !== false){ pushNav('cart'); }
+
+  var cartItemsEl = document.getElementById('cartItems');
+  cartItemsEl.innerHTML = '<div class="loading"><span class="spinner"></span>Loading cart...</div>';
+
+  var res = await _supabase
+    .from("cart")
+    .select("id,qty,product_id,products(name,price,seller_email)")
+    .eq("user_email", user.email);
+
+  cartData = res.data || [];
+  cartItemsEl.innerHTML = '';
+
+  if(!cartData.length){
+    cartItemsEl.innerHTML = '<div class="empty-state"><div>🛒</div>Your cart is empty</div>';
+    document.getElementById('invoiceBox').style.display = 'none';
+    document.getElementById('cartCheckout').style.display = 'none';
+    return;
+  }
+
+  var sub = 0;
+  cartItemsEl.innerHTML = cartData.map(function(i){
+    var price = i.qty * i.products.price;
+    sub += price;
+    return '<div class="cart-item">' +
+      '<div class="cart-item-info">' +
+        '<div class="cart-item-name">' + i.products.name + '</div>' +
+        '<div style="color:var(--text3);font-size:12px;">₹' + i.products.price + ' each</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div class="qty-stepper">' +
+          '<button class="qty-btn" onclick="changeQty(\'' + i.id + '\',-1)">−</button>' +
+          '<span class="qty-num">' + i.qty + '</span>' +
+          '<button class="qty-btn" onclick="changeQty(\'' + i.id + '\',1)">+</button>' +
+        '</div>' +
+        '<span class="cart-item-price">₹' + price.toFixed(2) + '</span>' +
+        '<button class="delete-btn" onclick="removeCart(\'' + i.id + '\')">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('invoiceBox').style.display = 'block';
+  document.getElementById('cartCheckout').style.display = 'block';
+
+  calculateTotals(sub);
+  loadAddressesForCart();
+}
+
+function calculateTotals(sub){
+  var deliveryFee = sub === 0 ? 0 : 50;
+  var gstAmt = sub * 0.05;
+  var total = sub + deliveryFee + gstAmt - discountAmount;
+  if(total < 0) total = 0;
+
+  document.getElementById('subtotal').textContent = sub.toFixed(2);
+  document.getElementById('delivery').textContent = deliveryFee.toFixed(2);
+  document.getElementById('gst').textContent = gstAmt.toFixed(2);
+  document.getElementById('discount').textContent = discountAmount.toFixed(2);
+  document.getElementById('grandTotal').textContent = total.toFixed(2);
+}
+
+async function removeCart(id){
+  // Restore stock for removed item
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===id){ item=cartData[i]; break; } }
+  if(item && item.product_id){
+    var sr = await _supabase.from("products").select("quantity").eq("id", item.product_id).single();
+    var curSt = sr.data ? parseInt(sr.data.quantity)||0 : 0;
+    await _supabase.from("products").update({ quantity: curSt + item.qty }).eq("id", item.product_id);
+  }
+  await _supabase.from("cart").delete().eq("id", id);
+  showToast("Item removed");
+  showCart();
+}
+
+// ─── COUPON ──────────────────────────────────────────────
+async function applyCoupon(){
+  var code = document.getElementById('couponInput').value.trim();
+  if(!code){ showToast("Enter a coupon code"); return; }
+
+  var codeUpper = code.toUpperCase();
+  var foundCoupon = null;
+
+  // Try DB exact match first
+  var res = await _supabase
+    .from("coupons")
+    .select("code,discount,usage_limit,used_count,multi_use")
+    .eq("code", code)
+    .maybeSingle();
+
+  if(res.data){
+    foundCoupon = res.data;
+  } else {
+    // Try uppercase version
+    var res2 = await _supabase
+      .from("coupons")
+      .select("code,discount,usage_limit,used_count,multi_use")
+      .eq("code", codeUpper)
+      .maybeSingle();
+    if(res2.data){ foundCoupon = res2.data; }
+  }
+
+  // RLS fallback: hardcoded known coupons from your DB
+  if(!foundCoupon){
+    var knownCoupons = {
+      "PETALRUSH": { code:"PetalRush", discount:100, usage_limit:5, used_count:0, multi_use:true }
+    };
+    if(knownCoupons[codeUpper]){ foundCoupon = knownCoupons[codeUpper]; }
+  }
+
+  if(!foundCoupon){ showToast("Invalid coupon code"); return; }
+
+  if(foundCoupon.usage_limit && foundCoupon.used_count >= foundCoupon.usage_limit){
+    showToast("Coupon limit reached"); return;
+  }
+
+  appliedCoupon = foundCoupon;
+  discountAmount = parseFloat(foundCoupon.discount) || 0;
+  showToast("Coupon applied! Rs." + discountAmount + " off");
+  showCart();
+}
+
+// ─── PLACE ORDER ──────────────────────────────────────────────────
+async function placeOrder(){
+  if(!cartData.length){ showToast("Cart is empty"); return; }
+
+  // Mandatory address check
+  var addrSelect = document.getElementById('addressSelect');
+  if(!addrSelect || addrSelect.selectedIndex <= 0){
+    addrSelect.classList.add('required-err');
+    showToast("Please select a delivery address");
+    addrSelect.focus();
+    setTimeout(function(){ addrSelect.classList.remove('required-err'); }, 2500);
+    return;
+  }
+
+  var orderId = "ORD" + Date.now();
+  var total = parseFloat(document.getElementById('grandTotal').textContent);
+  // Get the actual address TEXT from the selected option (not the UUID value)
+  var addrSelect = document.getElementById('addressSelect');
+  var addr = '';
+  if(addrSelect && addrSelect.selectedIndex > 0){
+    addr = addrSelect.options[addrSelect.selectedIndex].text;
+  }
+  // Build flower names (plain text) for flower_name column
+  var flowerNames = cartData.map(function(i){ return i.products.name; }).join(", ");
+
+  // Store full item details as JSON string in flower_name column
+  // Format: "JSON::[{name,qty,price},...]" so loadOrders can parse it
+  var now = new Date();
+  var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
+  var orderDate = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var orderTime = pad(now.getHours())+':'+pad(now.getMinutes());
+  var invoiceId = 'INV-' + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+
+  var itemsJson = "JSON::" + JSON.stringify({
+    items: cartData.map(function(i){ return { name: i.products.name, qty: i.qty, price: i.products.price }; }),
+    date: orderDate,
+    time: orderTime,
+    invoiceId: invoiceId
+  });
+
+  // orders table: id=uuid(auto), order_id=text, user_email, flower_name, price, total_amount, status, delivery_address
+  // Group cart items by seller — create one order per seller
+  var sellerGroups = {};
+  cartData.forEach(function(item){
+    var sellerEmail = (item.products && item.products.seller_email) || "__shared__";
+    if(!sellerGroups[sellerEmail]) sellerGroups[sellerEmail] = [];
+    sellerGroups[sellerEmail].push(item);
+  });
+
+  var sellers = Object.keys(sellerGroups);
+  var res = null;
+
+  for(var si = 0; si < sellers.length; si++){
+    var sellerEmail = sellers[si];
+    var sellerItems = sellerGroups[sellerEmail];
+    // Pro-rate total if multiple sellers
+    var groupTotal = sellers.length === 1 ? total :
+      parseFloat((sellerItems.reduce(function(s,it){ return s + it.qty*it.products.price; }, 0)).toFixed(2));
+
+    var groupItemsJson = "JSON::" + JSON.stringify({
+      items: sellerItems.map(function(i){ return { name: i.products.name, qty: i.qty, price: i.products.price }; }),
+      date: orderDate,
+      time: orderTime,
+      invoiceId: invoiceId
+    });
+
+    res = await _supabase.from("orders").insert({
+      order_id: orderId + (sellers.length > 1 ? "_" + (si+1) : ""),
+      user_email: user.email,
+      seller_email: sellerEmail !== "__shared__" ? sellerEmail : null,
+      flower_name: groupItemsJson,
+      price: groupTotal,
+      total_amount: sellers.length === 1 ? total : groupTotal,
+      status: "Placed",
+      delivery_address: addr
+    });
+    if(res.error){ showToast("Order failed: " + res.error.message); return; }
+  }
+
+  if(res.error){ showToast("Order failed: " + res.error.message); return; }
+
+  // Also try inserting order_items (best effort, may fail due to RLS/uuid - not critical)
+  for(var i=0; i<cartData.length; i++){
+    var item = cartData[i];
+    await _supabase.from("order_items").insert({
+      order_id: orderId,
+      product_id: item.product_id,
+      qty: item.qty,
+      price: item.products.price
+    });
+  }
+
+  if(appliedCoupon){
+    await _supabase.from("coupons")
+      .update({ used_count: (appliedCoupon.used_count||0)+1 })
+      .eq("code", appliedCoupon.code);
+  }
+
+  await _supabase.from("cart").delete().eq("user_email", user.email);
+
+  discountAmount = 0;
+  appliedCoupon = null;
+  cartData = [];
+
+  showToast("🎉 Order placed successfully!");
+  setTimeout(function(){ showProfile(); }, 800);
+}
+
+// ─── PROFILE ──────────────────────────────────────────────────────
+async function showProfile(push){
+  hideAll();
+  document.getElementById('profile').style.display = 'block';
+  document.getElementById('tab-profile').classList.add('active');
+  if(push !== false){ pushNav('profile'); }
+  loadProfile();
+  loadAddressesList();
+  loadOrders();
+}
+
+async function loadProfile(){
+  var res = await _supabase
+    .from("users")
+    .select("*")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  var avatarEl = document.getElementById('avatarImg');
+
+  if(res.data){
+    // Populate view card
+    var vn = document.getElementById('viewName');
+    var vp = document.getElementById('viewPhone');
+    var ve = document.getElementById('viewEmail');
+    if(vn) vn.textContent = res.data.name || '—';
+    if(vp) vp.textContent = res.data.phone || '—';
+    if(ve) ve.textContent = user.email || '—';
+    // Populate edit inputs
+    var ni = document.getElementById('nameInput');
+    var pi = document.getElementById('phoneInput');
+    if(ni) ni.value = res.data.name || '';
+    if(pi) pi.value = res.data.phone || '';
+    var storedAvatar = localStorage.getItem('avatar_' + user.email);
+    if(res.data.avatar_url){
+      avatarEl.src = res.data.avatar_url;
+    } else if(storedAvatar){
+      avatarEl.src = storedAvatar;
+    } else {
+      avatarEl.src = generateDefaultAvatar(res.data.name || user.email);
+    }
+  } else {
+    var storedAvatar = localStorage.getItem('avatar_' + user.email);
+    avatarEl.src = storedAvatar || generateDefaultAvatar(user.email);
+  }
+}
+
+function generateDefaultAvatar(nameOrEmail){
+  var canvas = document.createElement('canvas');
+  canvas.width = 110; canvas.height = 110;
+  var ctx = canvas.getContext('2d');
+  // Background
+  var grad = ctx.createLinearGradient(0,0,110,110);
+  grad.addColorStop(0,'#1a0a0f');
+  grad.addColorStop(1,'#2a1020');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,110,110);
+  // Letter
+  ctx.fillStyle = '#ff4081';
+  ctx.font = 'bold 52px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  var letter = (nameOrEmail||'U')[0].toUpperCase();
+  ctx.fillText(letter, 55, 58);
+  return canvas.toDataURL();
+}
+
+async function saveProfile(){
+  var name = document.getElementById('nameInput').value.trim();
+  var phone = document.getElementById('phoneInput').value.trim();
+
+  var res = await _supabase.from("users").upsert({
+    email: user.email,
+    name: name,
+    phone: phone
+  }, {onConflict:'email'});
+
+  if(res.error){
+    showToast("Error: " + res.error.message);
+  } else {
+    // Update view card immediately
+    var vn = document.getElementById('viewName');
+    var vp = document.getElementById('viewPhone');
+    if(vn) vn.textContent = name || '—';
+    if(vp) vp.textContent = phone || '—';
+    toggleProfileEdit(false); // Switch back to view mode
+    showToast("Profile saved!");
+  }
+}
+
+// ─── AVATAR ──────────────────────────────────────────────
+async function uploadAvatar(e){
+  var file = e.target.files[0];
+  if(!file) return;
+
+  showToast("Saving avatar...");
+
+  // Use FileReader to convert to base64 - works without any storage bucket
+  var reader = new FileReader();
+  reader.onload = async function(ev){
+    var base64 = ev.target.result;
+
+    // Show immediately in UI
+    document.getElementById('avatarImg').src = base64;
+
+    // Save base64 to users table avatar_url column
+    var saveRes = await _supabase.from("users").upsert({
+      email: user.email,
+      avatar_url: base64
+    }, {onConflict:'email'});
+
+    if(saveRes.error){
+      // If users table upsert fails, at least save in localStorage as fallback
+      localStorage.setItem('avatar_' + user.email, base64);
+      showToast("Avatar saved locally!");
+    } else {
+      showToast("Avatar updated!");
+    }
+  };
+  reader.onerror = function(){ showToast("Failed to read image file"); };
+  reader.readAsDataURL(file);
+}
+
+// ─── ADDRESS ──────────────────────────────────────────────────────
+async function saveAddress(){
+  var addr = document.getElementById('addressInput').value.trim();
+  if(!addr){ showToast("Enter an address"); return; }
+
+  // Check 3-address limit
+  var checkRes = await _supabase.from("addresses").select("id").eq("user_email", user.email);
+  if(checkRes.data && checkRes.data.length >= 3){
+    showToast("Max 3 addresses allowed. Delete one first.");
+    return;
+  }
+
+  async function doInsert(gps){
+    var fullAddr = addr + (gps ? '  [GPS: '+gps+']' : '');
+    await _supabase.from("addresses").insert({
+      user_email: user.email,
+      address: fullAddr
+    });
+    document.getElementById('addressInput').value = '';
+    showToast("✅ Address saved!");
+    loadAddressesList();
+    loadAddressesForCart();
+  }
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){ doInsert(pos.coords.latitude.toFixed(5)+","+pos.coords.longitude.toFixed(5)); },
+      function(){ doInsert(''); },
+      {timeout:5000}
+    );
+  } else {
+    doInsert('');
+  }
+}
+
+async function loadAddressesList(){
+  var res = await _supabase.from("addresses").select("*").eq("user_email", user.email);
+  var el = document.getElementById('addressList');
+  var data = res.data || [];
+  if(!data.length){
+    el.innerHTML = '<div style="color:#555;font-size:13px;margin-top:8px;">No addresses saved yet</div>';
+    return;
+  }
+  el.innerHTML = data.map(function(a){
+    return '<div class="address-item">' +
+      '<span>' + a.address + '</span>' +
+      '<button class="delete-btn" onclick="deleteAddress(\'' + a.id + '\')">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+async function loadAddressesForCart(){
+  var res = await _supabase.from("addresses").select("*").eq("user_email", user.email);
+  var sel = document.getElementById('addressSelect');
+  if(!sel) return;
+  var data = res.data || [];
+  sel.innerHTML = '<option value="">— Select delivery address —</option>' +
+    data.map(function(a){ return '<option value="' + a.id + '">' + a.address + '</option>'; }).join('');
+}
+
+async function deleteAddress(id){
+  await _supabase.from("addresses").delete().eq("id", id);
+  showToast("🗑️ Address removed");
+  loadAddressesList();
+}
+
+// ─── ORDERS ──────────────────────────────────────────────
+async function loadOrders(){
+  var el = document.getElementById('ordersList');
+  if(!el) return;
+  el.innerHTML = '<div class="loading"><span class="spinner"></span>Loading orders...</div>';
+
+  var res;
+  try {
+    res = await _supabase
+      .from("orders")
+      .select("id,order_id,flower_name,price,total_amount,status,delivery_address")
+      .eq("user_email", user.email)
+      .order("order_id", {ascending:false})
+      .limit(50);
+  } catch(fetchErr) {
+    el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>Network error.<br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
+    return;
+  }
+
+  if(res.error){
+    el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>Could not load orders.<br><small style="color:var(--text4);">' + (res.error.message||'Unknown error') + '</small><br><button class="btn btn-secondary" style="margin-top:10px;width:auto;padding:8px 16px;" onclick="loadOrders()">Retry</button></div>';
+    return;
+  }
+
+  var orders = res.data || [];
+  orders.sort(function(a,b){
+    return (parseInt((b.order_id||'').replace('ORD',''))||0) - (parseInt((a.order_id||'').replace('ORD',''))||0);
+  });
+
+  if(!orders.length){ el.innerHTML = '<div class="empty-state"><div>\uD83D\uDCE6</div>No orders yet</div>'; return; }
+  el.innerHTML = '';
+
+  for(var j=0;j<orders.length;j++){
+    var order=orders[j];
+    var displayId=order.order_id||order.id||'';
+    var grandTotal=parseFloat(order.total_amount||order.price||0);
+
+    var items=[],orderDate='',orderTime='',invoiceId='';
+    var fn=order.flower_name||'';
+    if(fn.indexOf('JSON::')===0){
+      try{
+        var parsed=JSON.parse(fn.substring(6));
+        if(parsed.items){items=parsed.items;orderDate=parsed.date||'';orderTime=parsed.time||'';invoiceId=parsed.invoiceId||'';}
+        else if(Array.isArray(parsed)){items=parsed;}
+      }catch(e){items=[];}
+    }else if(fn){
+      items=fn.split(', ').map(function(n){return{name:n.trim(),qty:null,price:null};});
+    }
+
+    if(!invoiceId&&displayId){
+      var ts=displayId.replace('ORD','');
+      if(ts&&!isNaN(ts)){
+        var dd=new Date(parseInt(ts));
+        var pad=function(n){return n<10?'0'+n:''+n;};
+        invoiceId='INV-'+dd.getFullYear()+pad(dd.getMonth()+1)+pad(dd.getDate())+'-'+pad(dd.getHours())+pad(dd.getMinutes())+pad(dd.getSeconds());
+        if(!orderDate)orderDate=dd.getFullYear()+'-'+pad(dd.getMonth()+1)+'-'+pad(dd.getDate());
+        if(!orderTime)orderTime=pad(dd.getHours())+':'+pad(dd.getMinutes());
+      }
+    }
+
+    var itemNames=items.length?items.slice(0,3).map(function(it){return it.name;}).join(', ')+(items.length>3?' +' + (items.length-3)+' more':''):(fn||'Order');
+
+    var sColor='#ff4081',sBg='rgba(255,64,129,0.12)';
+    if(order.status==='Delivered'){sColor='#4caf50';sBg='rgba(76,175,80,0.12)';}
+    else if(order.status==='Cancelled'){sColor='#f44336';sBg='rgba(244,67,54,0.12)';}
+    else if(order.status==='Shipped'){sColor='#ff9800';sBg='rgba(255,152,0,0.12)';}
+    else if(order.status==='Confirmed'){sColor='#2196f3';sBg='rgba(33,150,243,0.12)';}
+
+    var itemRowsHtml='',itemSubtotal=0;
+    if(items.length>0){
+      for(var k=0;k<items.length;k++){
+        var it=items[k];
+        var hasD=it.qty!==null&&it.qty!==undefined&&it.price!==null&&it.price!==undefined;
+        var itT=hasD?it.qty*it.price:null;
+        if(itT)itemSubtotal+=itT;
+        itemRowsHtml+='<tr><td>'+it.name+'</td><td>'+(hasD?it.qty:'-')+'</td><td>'+(hasD?'\u20B9'+parseFloat(it.price).toFixed(2):'-')+'</td><td>'+(itT?'\u20B9'+itT.toFixed(2):'-')+'</td></tr>';
+      }
+      if(itemSubtotal===0)itemSubtotal=grandTotal;
+    }else{
+      itemRowsHtml='<tr><td colspan="4" style="color:var(--text4);text-align:center;padding:10px;">No item details</td></tr>';
+      itemSubtotal=grandTotal;
+    }
+
+    var delivery=itemSubtotal>0?50:0;
+    var gst=parseFloat((itemSubtotal*0.05).toFixed(2));
+    var discount=parseFloat(Math.max(0,itemSubtotal+delivery+gst-grandTotal).toFixed(2));
+
+    var addrVal=order.delivery_address||'';
+    var addrHtml='';
+    if(addrVal&&addrVal.indexOf('Select delivery')===-1&&addrVal.trim()){
+      addrHtml='<div class="ord-detail-row"><span class="ord-detail-lbl">\uD83D\uDCCD Deliver To</span><span class="ord-detail-val">'+addrVal+'</span></div>';
+    }
+
+    var detailId='ord-detail-'+j;
+
+    el.innerHTML+=
+      '<div class="ord-card" id="ord-card-'+j+'" onclick="toggleOrderDetail(''+detailId+'','+j+')">' +
+        '<div class="ord-card-main">' +
+          '<div class="ord-logo-wrap">' +
+            '<img src="Headerlogo.png" class="ord-logo-img" alt="PR" onerror="this.style.display=' + "'" + 'none' + "'" + ';this.nextElementSibling.style.display=' + "'" + 'flex' + "'" + ';">' +
+            '<div class="ord-logo-fallback" style="display:none;">\uD83C\uDF38</div>' +
+          '</div>' +
+          '<div class="ord-card-info">' +
+            '<div class="ord-card-row1">' +
+              '<div class="ord-card-id">' + (displayId.length > 14 ? displayId.substring(0,14)+'\u2026' : displayId) + '</div>' +
+              '<span class="ord-status-pill" style="background:' + sBg + ';color:' + sColor + ';">' + (order.status||'Placed') + '</span>' +
+            '</div>' +
+            '<div class="ord-card-row2">' +
+              '<div class="ord-card-items">' + itemNames + '</div>' +
+              '<div class="ord-card-total">\u20B9' + grandTotal.toLocaleString('en-IN') + '</div>' +
+            '</div>' +
+            '<div class="ord-card-row3">' +
+              '<span class="ord-card-date">' + (orderDate||'') + (orderTime ? ' \u00B7 ' + orderTime : '') + '</span>' +
+              '<span class="ord-chevron" id="ord-chev-' + j + '">\u203A</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ord-detail" id="'+detailId+'">' +
+        '<div class="ord-detail-header">' +
+          '<div class="ord-invoice-brand">' +
+            '<img src="Headerlogo.png" class="ord-brand-logo" onerror="this.style.display='none';">' +
+            '<div class="ord-brand-name">\uD83C\uDF38 PetalRush</div>' +
+          '</div>' +
+          '<span class="ord-status-pill lg" style="background:'+sBg+';color:'+sColor+';">'+(order.status||'Placed')+'</span>' +
+        '</div>' +
+        '<div class="ord-meta-grid">' +
+          '<div class="ord-meta-cell"><div class="ord-meta-lbl">Invoice No.</div><div class="ord-meta-val">'+(invoiceId||displayId)+'</div></div>' +
+          '<div class="ord-meta-cell"><div class="ord-meta-lbl">Order ID</div><div class="ord-meta-val">'+displayId+'</div></div>' +
+          (orderDate?'<div class="ord-meta-cell"><div class="ord-meta-lbl">Date</div><div class="ord-meta-val">'+orderDate+'</div></div>':'') +
+          (orderTime?'<div class="ord-meta-cell"><div class="ord-meta-lbl">Time</div><div class="ord-meta-val">'+orderTime+'</div></div>':'') +
+          '<div class="ord-meta-cell ord-meta-full"><div class="ord-meta-lbl">Billed To</div><div class="ord-meta-val">'+(user.email||'-')+'</div></div>' +
+        '</div>' +
+        addrHtml +
+        '<div class="ord-items-wrap">' +
+          '<table class="bill-table"><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+itemRowsHtml+'</tbody></table>' +
+          '<div class="bill-totals">' +
+            '<div class="bill-row"><span>Item Total</span><span>\u20B9'+itemSubtotal.toFixed(2)+'</span></div>' +
+            '<div class="bill-row"><span>Delivery Fee</span><span>'+(delivery>0?'\u20B9'+delivery.toFixed(2):'FREE')+'</span></div>' +
+            '<div class="bill-row"><span>GST (5%)</span><span>\u20B9'+gst.toFixed(2)+'</span></div>' +
+            (discount>1?'<div class="bill-row discount"><span>Discount</span><span>- \u20B9'+discount.toFixed(2)+'</span></div>':'') +
+            '<div class="bill-grand"><span>Order Total</span><span>\u20B9'+grandTotal.toFixed(2)+'</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ord-detail-footer">Thank you for choosing PetalRush \uD83C\uDF38</div>' +
+        '<div class="bill-download-row">' +
+          '<button class="bill-dl-btn" onclick="event.stopPropagation();downloadBill(\'bill-'+displayId+'\',\'pdf\',\''+(invoiceId||displayId)+'\')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            ' Download Receipt' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="bill-'+displayId+'" class="bill-printable">' +
+        '<div class="bp-header"><img src="Headerlogo.png" class="bp-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="bp-logo-text" style="display:none">PetalRush</span><div class="bp-tagline">Fresh Flowers \u00B7 Fast Delivery</div><div class="bp-title">ORDER RECEIPT</div></div>' +
+        '<div class="bp-divider"></div>' +
+        '<div class="bp-meta">' +
+          '<div class="bp-meta-row"><span>Invoice No.</span><b>'+(invoiceId||displayId)+'</b></div>' +
+          '<div class="bp-meta-row"><span>Order ID</span><b>'+displayId+'</b></div>' +
+          (orderDate?'<div class="bp-meta-row"><span>Date</span><b>'+orderDate+'</b></div>':'') +
+          (orderTime?'<div class="bp-meta-row"><span>Time</span><b>'+orderTime+'</b></div>':'') +
+          '<div class="bp-meta-row"><span>Billed To</span><b>'+(user.email||'-')+'</b></div>' +
+          (addrVal?'<div class="bp-meta-row"><span>Deliver To</span><b>'+addrVal+'</b></div>':'') +
+        '</div>' +
+        '<div class="bp-divider"></div>' +
+        '<table class="bp-table"><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+itemRowsHtml+'</tbody></table>' +
+        '<div class="bp-totals">' +
+          '<div class="bp-total-row"><span>Item Total</span><span>\u20B9'+itemSubtotal.toFixed(2)+'</span></div>' +
+          '<div class="bp-total-row"><span>Delivery Fee</span><span>'+(delivery>0?'\u20B9'+delivery.toFixed(2):'FREE')+'</span></div>' +
+          '<div class="bp-total-row"><span>GST (5%)</span><span>\u20B9'+gst.toFixed(2)+'</span></div>' +
+          (discount>1?'<div class="bp-total-row" style="color:#4caf50"><span>Discount</span><span>- \u20B9'+discount.toFixed(2)+'</span></div>':'') +
+          '<div class="bp-total-grand"><span>Order Total</span><span>\u20B9'+grandTotal.toFixed(2)+'</span></div>' +
+        '</div>' +
+        '<div class="bp-footer">Thank you for choosing PetalRush \uD83C\uDF38 | petalrush.com</div>' +
+      '</div>';
+  }
+}
+
+function toggleOrderDetail(detailId, idx){
+  var detail = document.getElementById(detailId);
+  var card   = document.getElementById('ord-card-'+idx);
+  var chev   = document.getElementById('ord-chev-'+idx);
+  if(!detail) return;
+  var isOpen = detail.classList.contains('open');
+  // Close all first
+  document.querySelectorAll('.ord-detail.open').forEach(function(d){d.classList.remove('open');});
+  document.querySelectorAll('.ord-card.expanded').forEach(function(c){c.classList.remove('expanded');});
+  document.querySelectorAll('.ord-chevron').forEach(function(ch){ch.style.transform='rotate(0deg)';});
+  if(!isOpen){
+    detail.classList.add('open');
+    if(card)card.classList.add('expanded');
+    if(chev)chev.style.transform='rotate(90deg)';
+    setTimeout(function(){detail.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
+  }
+}
+
+// ─── DOWNLOAD BILL ────────────────────────────────────────────────
+function downloadBill(billId, format, invoiceName){
+  var el = document.getElementById(billId);
+  if(!el){ showToast("Receipt not found"); return; }
+
+  // Show modal overlay with receipt preview + action buttons
+  var overlay = document.createElement('div');
+  overlay.id = 'bill-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);z-index:9998;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:16px 0 100px;box-sizing:border-box;';
+
+  // Top bar: close + title
+  var topBar = document.createElement('div');
+  topBar.style.cssText = 'width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;padding:0 8px 10px;box-sizing:border-box;flex-shrink:0;';
+  topBar.innerHTML = '<span style="color:#fff;font-weight:600;font-size:14px;">Order Receipt</span><button onclick="document.getElementById(\'bill-overlay\').remove()" style="background:#333;border:none;color:#ff4081;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✕ Close</button>';
+  overlay.appendChild(topBar);
+
+  // Clone receipt
+  el.style.display = 'block';
+  var clone = el.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.cssText = 'display:block;position:static;left:0;width:340px;max-width:92vw;background:#fff;color:#111;font-family:Arial,sans-serif;padding:24px 20px;box-sizing:border-box;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,0.5);';
+  overlay.appendChild(clone);
+  el.style.display = 'none';
+
+  // Action buttons row
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:14px;width:340px;max-width:92vw;';
+  btnRow.innerHTML =
+    '<button onclick="captureAndSave(\'pdf\',\''+invoiceName+'\')" style="flex:1;padding:12px 6px;background:linear-gradient(135deg,#ff4081,#e0205f);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇ PDF</button>' +
+    '<button onclick="captureAndSave(\'share\',\''+invoiceName+'\')" style="flex:1;padding:12px 6px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f0ede8;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Share PNG</button>';
+  overlay.appendChild(btnRow);
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+async function captureAndSave(format, invoiceName){
+  var overlay = document.getElementById('bill-overlay');
+  if(!overlay){ showToast("No preview open"); return; }
+
+  // The receipt clone is children[1] (children[0] = top bar, [1] = clone, [2] = buttons)
+  var clone = overlay.children[1];
+  if(!clone || clone.tagName === 'DIV' && clone.children.length === 0){
+    showToast("Receipt not found"); return;
+  }
+
+  showToast("Generating...");
+
+  // Ensure clone is visible and properly sized for capture
+  var origStyle = clone.style.cssText;
+  clone.style.cssText = origStyle +
+    ';visibility:visible;opacity:1;display:block;position:static;';
+
+  try {
+    var canvas = await html2canvas(clone, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      removeContainer: true
+    });
+
+    var fname = (invoiceName || 'PetalRush-Receipt').replace(/[^a-zA-Z0-9\-_]/g, '-');
+
+    if(format === 'share'){
+      canvas.toBlob(async function(blob){
+        if(!blob){ downloadPNG(canvas, fname); return; }
+        var file = new File([blob], fname+'.png', { type:'image/png' });
+        var canShareFile = navigator.share &&
+          typeof navigator.canShare === 'function' &&
+          navigator.canShare({ files:[file] });
+        if(canShareFile){
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'PetalRush Receipt',
+              text: 'My order receipt from PetalRush'
+            });
+            showToast("Shared!");
+          } catch(shareErr){
+            if(shareErr.name !== 'AbortError') downloadPNG(canvas, fname);
+          }
+        } else {
+          // Fallback: PNG download
+          downloadPNG(canvas, fname);
+        }
+      }, 'image/png', 0.95);
+
+    } else {
+      // PDF: use jsPDF
+      var jsPDFLib = null;
+      if(window.jspdf && window.jspdf.jsPDF) jsPDFLib = window.jspdf.jsPDF;
+      else if(window.jsPDF) jsPDFLib = window.jsPDF;
+
+      if(!jsPDFLib){
+        showToast("PDF lib unavailable - saving PNG");
+        downloadPNG(canvas, fname);
+        return;
+      }
+
+      // A4 portrait at 72dpi effective
+      var SCALE = 3;
+      var pxW = canvas.width / SCALE;
+      var pxH = canvas.height / SCALE;
+      var mmW = pxW * 0.2646;
+      var mmH = pxH * 0.2646;
+
+      var pdf = new jsPDFLib({
+        orientation: mmH > mmW ? 'portrait' : 'landscape',
+        unit: 'mm',
+        format: [mmW, mmH]
+      });
+
+      var imgData = canvas.toDataURL('image/jpeg', 0.92);
+      pdf.addImage(imgData, 'JPEG', 0, 0, mmW, mmH, undefined, 'FAST');
+      pdf.save(fname + '.pdf');
+      showToast("PDF saved!");
+
+      // Small delay then close overlay
+      setTimeout(function(){
+        var ov = document.getElementById('bill-overlay');
+        if(ov) ov.remove();
+      }, 600);
+    }
+  } catch(err){
+    showToast("Error: " + err.message);
+    console.error("captureAndSave error:", err);
+  }
+}
+
+function downloadPNG(canvas, name){
+  try {
+    var fname = (name || 'PetalRush-Receipt').replace(/[^a-zA-Z0-9\-_]/g, '-');
+    var dataUrl = canvas.toDataURL('image/png');
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fname + '.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); }, 100);
+    showToast("PNG saved!");
+  } catch(e){
+    showToast("Save failed: " + e.message);
+  }
+  setTimeout(function(){
+    var ov = document.getElementById('bill-overlay');
+    if(ov) ov.remove();
+  }, 400);
+}
+
+// ─── QTY STEPPER IN CART ──────────────────────────────────────────
+async function changeQty(cartId, delta){
+  var item = null;
+  for(var i=0;i<cartData.length;i++){ if(cartData[i].id===cartId){ item=cartData[i]; break; } }
+  if(!item) return;
+  var newQty = item.qty + delta;
+  if(delta > 0){
+    var sr = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+    var stock = sr.data ? parseInt(sr.data.quantity)||0 : 0;
+    if(stock <= 0){ showToast("Out of stock!"); return; }
+    await _supabase.from("products").update({quantity:stock-1}).eq("id",item.product_id);
+  }
+  if(newQty < 1){
+    var sr2 = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+    var st2 = sr2.data ? parseInt(sr2.data.quantity)||0 : 0;
+    await _supabase.from("products").update({quantity:st2+item.qty}).eq("id",item.product_id);
+    await _supabase.from("cart").delete().eq("id",cartId);
+    showToast("Item removed");
+  } else {
+    if(delta < 0){
+      var sr3 = await _supabase.from("products").select("quantity").eq("id",item.product_id).single();
+      var st3 = sr3.data ? parseInt(sr3.data.quantity)||0 : 0;
+      await _supabase.from("products").update({quantity:st3+1}).eq("id",item.product_id);
+    }
+    await _supabase.from("cart").update({qty:newQty}).eq("id",cartId);
+  }
+  showCart(false);
+}
+
+// ─── REVIEWS ──────────────────────────────────────────────────────
+var currentRating = 0;
+
+function setRating(n){
+  currentRating = n;
+  for(var i=1;i<=5;i++){
+    var s = document.getElementById('star'+i);
+    if(s) s.textContent = i<=n ? '★' : '☆';
+  }
+}
+
+async function loadReviews(productId){
+  var el = document.getElementById('reviewsList');
+  if(!el) return;
+
+  var res = await _supabase
+    .from("reviews")
+    .select("rating,review_text,user_email,created_at")
+    .eq("product_id", productId)
+    .order("created_at", {ascending:false})
+    .limit(50);
+
+  // Handle RLS or table-missing gracefully
+  if(res.error){
+    // If reviews table blocked by RLS or doesn't exist, show empty state silently
+    el.innerHTML = '<div style="color:var(--text4);font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  if(!res.data || !res.data.length){
+    el.innerHTML = '<div style="color:var(--text4);font-size:13px;padding:10px 0;">No reviews yet. Be the first!</div>';
+    return;
+  }
+
+  el.innerHTML = res.data.map(function(r){
+    var filled = Math.max(0, Math.min(5, parseInt(r.rating)||0));
+    var stars = '★'.repeat(filled) + '☆'.repeat(5-filled);
+    var d = r.created_at ? new Date(r.created_at) : null;
+    var ds = d ? (d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()) : '';
+    var email = (r.user_email||'Anonymous');
+    var shortEmail = email.length > 24 ? email.substring(0,12)+'...'+email.split('@')[1] : email;
+    return '<div class="review-card">' +
+      '<div class="review-stars">'+stars+'</div>' +
+      '<div class="review-author">'+shortEmail+(ds?' &middot; '+ds:'')+'</div>' +
+      '<div class="review-text">'+((r.review_text||'').replace(/</g,'&lt;'))+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function submitReview(productId){
+  if(!currentRating){ showToast("Please select a star rating"); return; }
+  var textEl = document.getElementById('reviewText');
+  if(!textEl || !textEl.value.trim()){ showToast("Please write a review"); return; }
+
+  var reviewText = textEl.value.trim();
+  var ratingVal = currentRating;
+
+  // Immediately render review card in UI (optimistic update)
+  var stars = '★'.repeat(ratingVal) + '☆'.repeat(5-ratingVal);
+  var now = new Date();
+  var ds = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var email = user.email || 'You';
+  var shortEmail = email.length > 24 ? email.substring(0,12)+'...'+email.split('@')[1] : email;
+  var newCard =
+    '<div class="review-card" style="border-left:3px solid var(--accent);">' +
+      '<div class="review-stars">'+stars+'</div>' +
+      '<div class="review-author">'+shortEmail+' &middot; '+ds+'</div>' +
+      '<div class="review-text">'+reviewText.replace(/</g,'&lt;')+'</div>' +
+    '</div>';
+
+  var rl = document.getElementById('reviewsList');
+  if(rl){
+    if(rl.textContent.includes('No reviews yet')) rl.innerHTML = newCard;
+    else rl.innerHTML = newCard + rl.innerHTML;
+  }
+
+  // Reset form immediately so user feels it worked
+  textEl.value = '';
+  currentRating = 0;
+  setRating(0);
+
+  // Persist to Supabase
+  var res = await _supabase.from("reviews").insert({
+    product_id: productId,
+    user_email: user.email,
+    rating: ratingVal,
+    review_text: reviewText
+  });
+
+  if(res.error){
+    // Review already shown - just warn silently
+    console.warn("Review insert error:", res.error.message);
+    showToast("Review shown (sync pending)");
+  } else {
+    showToast("Review posted!");
+    // Reload from DB to get server timestamp and ensure consistency
+    setTimeout(function(){ loadReviews(productId); }, 800);
+  }
+}
+
+// ─── PROFILE EDIT TOGGLE ──────────────────────────────────────────
+function toggleProfileEdit(show){
+  document.getElementById('profileViewCard').style.display = show ? 'none' : 'block';
+  document.getElementById('profileEditCard').style.display = show ? 'block' : 'none';
+}
+
+function togglePwdEdit(){
+  var area = document.getElementById('pwdEditArea');
+  var view = document.getElementById('pwdViewArea');
+  var showing = area.style.display !== 'none';
+  area.style.display = showing ? 'none' : 'block';
+  view.style.display = showing ? 'block' : 'none';
+}
+
+async function changePassword(){
+  var oldPwd = document.getElementById('pwdOld').value.trim();
+  var newPwd = document.getElementById('pwdNew').value.trim();
+  var conf  = document.getElementById('pwdConfirm').value.trim();
+  if(!oldPwd||!newPwd||!conf){ showToast("Fill in all password fields"); return; }
+  if(newPwd!==conf){ showToast("New passwords don't match"); return; }
+  if(newPwd.length<6){ showToast("Password must be at least 6 characters"); return; }
+
+  // Re-authenticate
+  var signInRes = await _supabase.auth.signInWithPassword({ email:user.email, password:oldPwd });
+  if(signInRes.error){ showToast("Current password is incorrect"); return; }
+
+  // Update via Supabase Auth (do NOT store in users table)
+  var updateRes = await _supabase.auth.updateUser({ password:newPwd });
+  if(updateRes.error){
+    showToast("Error: " + updateRes.error.message);
+  } else {
+    showToast("Password updated!");
+    document.getElementById('pwdOld').value='';
+    document.getElementById('pwdNew').value='';
+    document.getElementById('pwdConfirm').value='';
+    togglePwdEdit();
+  }
+}
+
+
+// ─── THEME TOGGLE ──────────────────────────────────────────────────
+function toggleTheme(){
+  var isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+}
+
+function applyTheme(){
+  var saved = localStorage.getItem('theme');
+  // Auto-detect system preference if no saved preference
+  if(!saved){
+    saved = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    var btn = document.getElementById('themeBtn');
+    if(btn) btn.textContent = '☀️';
+  }
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e){
+    if(!localStorage.getItem('theme')){
+      if(e.matches){ document.body.classList.add('light-mode'); var b=document.getElementById('themeBtn'); if(b)b.textContent='☀️'; }
+      else { document.body.classList.remove('light-mode'); var b=document.getElementById('themeBtn'); if(b)b.textContent='🌙'; }
+    }
+  });
+}
+
+// ─── PHONE BACK BUTTON (History API) ──────────────────────────────
+var navHistory = ['home'];
+
+function pushNav(screen){
+  navHistory.push(screen);
+  history.pushState({ screen: screen }, '', '');
+}
+
+window.addEventListener('popstate', function(e){
+  navHistory.pop();
+  var prev = navHistory[navHistory.length - 1] || 'home';
+  if(prev === 'home') showHome(false);
+  else if(prev === 'cart') showCart(false);
+  else if(prev === 'profile') showProfile(false);
+  else showHome(false);
+});
+
+// ─── START ────────────────────────────────────────────────────────
+applyTheme();
+</script>
+
+</body>
+</html>
