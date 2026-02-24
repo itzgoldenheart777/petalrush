@@ -970,14 +970,20 @@ async function loadDashboard(){
       _supabase.from("reviews").select("rating,product_id")
     ]);
     allProducts = pR.data || [];
-    allOrders = oR.data || [];
-    allReviews = rR.data || [];
+    allOrders   = oR.data || [];
+    allReviews  = rR.data || [];
     allProducts.forEach(function(p){ productMap[p.id] = p.name; });
     buildDashStats();
     buildRevenueChart();
     buildDonut();
     buildRecentOrders();
-  } catch(e){ console.error("Dashboard error:", e); }
+  } catch(e){
+    console.error("Dashboard error:", e);
+    buildDashStats();
+    buildDonut();
+    var el = document.getElementById("recentOrders");
+    if(el) el.innerHTML = "<div class=\"empty-state\"><div class=\"empty-icon\">&#x1F4E6;</div>No orders yet<br><small style=\"font-size:11px;color:var(--text4);\">Orders placed by buyers will appear here</small></div>";
+  }
 }
 
 function buildDashStats(){
