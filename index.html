@@ -1,95 +1,2465 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1a0e">
+<meta name="description" content="Petal Rush - Premium Flower Marketplace">
+<title>Petal Rush 🌸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>PetalRush</title>
-
-<link rel="stylesheet" href="css/index.css">
-
-<!-- Supabase CDN (ONLY ONCE) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+<style>
+:root {
+  --bg: #0e0e07;
+  --bg2: #141410;
+  --bg3: #1c1c14;
+  --surface: #22221a;
+  --surface2: #2a2a20;
+  --border: #3a3a2a;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --green: #4a7c59;
+  --green-light: #6aad7f;
+  --rose: #c4535a;
+  --rose-light: #e87882;
+  --cream: #f0e8d0;
+  --text: #e8e0c8;
+  --text-muted: #888872;
+  --text-dim: #555548;
+  --radius: 12px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
-</script>
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(74,124,89,0.06) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── TYPOGRAPHY ── */
+.serif { font-family: 'Cormorant Garamond', serif; }
+h1,h2,h3 { font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+
+/* ── UTILS ── */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.col { flex-direction: column; }
+.gap-1 { gap: 8px; } .gap-2 { gap: 16px; } .gap-3 { gap: 24px; }
+.center { align-items: center; justify-content: center; }
+.between { justify-content: space-between; align-items: center; }
+.w-full { width: 100%; }
+.text-gold { color: var(--gold); }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.mt-1 { margin-top: 8px; } .mt-2 { margin-top: 16px; } .mt-3 { margin-top: 24px; }
+.mb-1 { margin-bottom: 8px; } .mb-2 { margin-bottom: 16px; }
+.p-2 { padding: 16px; } .p-3 { padding: 24px; }
+.rounded { border-radius: var(--radius); }
+
+/* ── LOADING SCREEN ── */
+#loading-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease;
+}
+.loading-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 300;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  animation: fadeInUp 0.8s ease both;
+}
+.loading-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  animation: fadeInUp 0.8s 0.2s ease both;
+}
+.loading-bar {
+  width: 180px; height: 1px;
+  background: var(--border);
+  margin-top: 32px;
+  position: relative;
+  animation: fadeInUp 0.8s 0.4s ease both;
+  overflow: hidden;
+}
+.loading-bar::after {
+  content: '';
+  position: absolute; left: -100%; top: 0;
+  width: 100%; height: 100%;
+  background: var(--gold);
+  animation: loadBar 1.5s 0.6s ease forwards;
+}
+@keyframes loadBar { to { left: 100%; } }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TOAST ── */
+#toast-container {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 9998;
+}
+.toast {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  animation: slideIn 0.3s ease;
+  backdrop-filter: blur(10px);
+  max-width: 300px;
+}
+.toast.error { border-left-color: var(--rose); }
+.toast.success { border-left-color: var(--green-light); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── CONFIG BANNER ── */
+#config-banner {
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+#config-banner h3 {
+  color: var(--gold);
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+#config-banner p { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
+.config-inputs { display: flex; flex-direction: column; gap: 8px; max-width: 400px; margin: 0 auto; }
+
+/* ── AUTH SCREEN ── */
+#auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+}
+.auth-logo {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.auth-logo h1 {
+  font-size: clamp(36px, 6vw, 52px);
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+.auth-logo p {
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.auth-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.role-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 28px;
+  background: var(--bg2);
+  padding: 4px;
+  border-radius: 10px;
+}
+.role-tab {
+  padding: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.role-tab .icon { font-size: 16px; }
+.role-tab.active {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.3);
+}
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.auth-tab {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  position: relative;
+  transition: color 0.2s;
+}
+.auth-tab.active {
+  color: var(--gold);
+}
+.auth-tab.active::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: var(--gold);
+}
+
+/* ── FORM ELEMENTS ── */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+input, select, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+select option { background: var(--surface); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--bg);
+}
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger {
+  background: rgba(196,83,90,0.15);
+  color: var(--rose-light);
+  border: 1px solid rgba(196,83,90,0.3);
+}
+.btn-danger:hover { background: rgba(196,83,90,0.25); }
+.btn-success {
+  background: rgba(74,124,89,0.2);
+  color: var(--green-light);
+  border: 1px solid rgba(74,124,89,0.4);
+}
+.btn-success:hover { background: rgba(74,124,89,0.3); }
+.btn-sm { padding: 8px 16px; font-size: 12px; }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.btn-full { width: 100%; }
+
+/* ── DASHBOARD LAYOUT ── */
+#dashboard {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+.sidebar-brand {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-brand h1 {
+  font-size: 26px;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+.sidebar-role {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.sidebar-user {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 1px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-user-name { font-size: 14px; font-weight: 500; }
+.sidebar-user-email { font-size: 11px; color: var(--text-muted); }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 8px 12px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: all 0.15s;
+  position: relative;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.nav-item .icon { font-size: 16px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--rose);
+  color: white;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── MAIN CONTENT ── */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 32px;
+  overflow-x: hidden;
+}
+
+/* ── TOP BAR (mobile) ── */
+.topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar h1 { font-size: 22px; color: var(--gold); }
+.menu-btn {
+  background: none; border: none;
+  color: var(--text); font-size: 22px; cursor: pointer;
+}
+
+/* ── PAGE PANELS ── */
+.panel { display: none; }
+.panel.active { display: block; }
+.page-title {
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title h2 {
+  font-size: clamp(24px, 4vw, 36px);
+  color: var(--cream);
+  font-weight: 300;
+}
+.page-title h2 span { color: var(--gold); }
+.breadcrumb {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ── STAT CARDS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: rgba(201,168,76,0.3); }
+.stat-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.stat-card:hover::after { opacity: 1; }
+.stat-icon { font-size: 24px; margin-bottom: 10px; }
+.stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── PRODUCT GRID ── */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.25s;
+  cursor: pointer;
+  position: relative;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201,168,76,0.4);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.product-img {
+  height: 180px;
+  background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.product-img img { width: 100%; height: 100%; object-fit: cover; }
+.product-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.product-info { padding: 16px; }
+.product-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  color: var(--cream);
+  margin-bottom: 4px;
+}
+.product-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.product-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  color: var(--gold);
+}
+.product-price span { font-size: 13px; }
+.product-qty { font-size: 12px; color: var(--text-muted); }
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim); font-size: 14px;
+}
+.search-input-wrap input { padding-left: 40px; }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+thead { background: var(--bg2); }
+th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:hover td { background: rgba(255,255,255,0.015); }
+
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+.badge-green { background: rgba(74,124,89,0.15); color: var(--green-light); border: 1px solid rgba(74,124,89,0.2); }
+.badge-rose { background: rgba(196,83,90,0.15); color: var(--rose-light); border: 1px solid rgba(196,83,90,0.2); }
+.badge-dim { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+  padding: 24px 24px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-header h3 { font-size: 22px; color: var(--cream); }
+.modal-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 20px; cursor: pointer; padding: 4px;
+  transition: color 0.2s;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 0 24px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 12px; justify-content: flex-end;
+}
+
+/* ── ORDER CARD (mobile) ── */
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.order-card:hover { border-color: rgba(201,168,76,0.3); }
+.order-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.order-id { font-size: 12px; color: var(--text-dim); font-family: monospace; }
+.order-detail { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.order-detail-label { font-size: 12px; color: var(--text-muted); min-width: 80px; }
+.order-detail-value { font-size: 13px; }
+.order-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+/* ── DELIVERY CARD ── */
+.delivery-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  border-left: 3px solid var(--gold);
+}
+.delivery-route {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+.route-point {
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.route-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-top: 4px; flex-shrink: 0;
+}
+.route-dot.pickup { background: var(--gold); }
+.route-dot.drop { background: var(--green-light); }
+
+/* ── GPS BUTTON ── */
+.gps-btn {
+  background: linear-gradient(135deg, #1a6b3c, #0d3d22);
+  border: 1px solid rgba(106,173,127,0.3);
+  color: var(--green-light);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.gps-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(74,124,89,0.3); }
+
+/* ── OVERLAY (mobile sidebar) ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state h3 { font-size: 20px; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: 14px; }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+}
+.section-header h3 { font-size: 18px; color: var(--cream); font-weight: 400; }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.visible {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 20px 16px;
+  }
+  .topbar { display: flex; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ── PRICE RANGE DISPLAY ── */
+.price-range {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.price-range input[type=range] {
+  flex: 1; padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  -webkit-appearance: auto;
+}
+
+/* ── FORM ROW ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+/* ── PROGRESS BAR ── */
+.progress { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s; }
+
+/* ── ADMIN TABLE ROW ACTIONS ── */
+.action-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── SETUP CARD ── */
+.setup-steps {
+  display: flex; flex-direction: column; gap: 16px;
+  margin-top: 20px;
+}
+.setup-step {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.step-num {
+  width: 32px; height: 32px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--gold); flex-shrink: 0; font-weight: 600;
+}
+.step-content h4 { font-size: 14px; margin-bottom: 4px; }
+.step-content p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+code {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--gold-light);
+  font-family: monospace;
+}
+
+.code-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+</style>
 </head>
-
 <body>
 
-
-<!-- Splash Screen -->
-<div id="splash">
-
-<img src="logo.png" class="logo">
-
-<h1>PetalRush</h1>
-
-<p>Order Flowers Like Never Before</p>
-
-<button onclick="showAuth()">Get Started</button>
-
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="loading-logo">Petal Rush</div>
+  <div class="loading-sub">Premium Flower Marketplace</div>
+  <div class="loading-bar"></div>
 </div>
 
+<!-- Toast Container -->
+<div id="toast-container"></div>
 
-<!-- Auth Options -->
-<div id="auth" class="hidden">
+<!-- Auth Screen -->
+<div id="auth-screen" class="hidden">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <h1>Petal Rush</h1>
+      <p>Premium Flower Marketplace</p>
+    </div>
 
-<h2>Welcome</h2>
+    <!-- Config Banner (shown when Supabase not configured) -->
+    <div id="config-banner">
+      <h3>⚙️ Configure Supabase</h3>
+      <p>Enter your Supabase credentials to connect the database. You can find these in your Supabase project settings.</p>
+      <div class="config-inputs">
+        <input type="text" id="supabase-url-input" placeholder="https://your-project.supabase.co" />
+        <input type="text" id="supabase-key-input" placeholder="your-anon-public-key" />
+        <button class="btn btn-primary btn-full" onclick="saveConfig()">Connect to Supabase</button>
+      </div>
+      <p class="mt-2 text-sm">Or use <strong style="color:var(--gold)">Demo Mode</strong> to explore without a database:</p>
+      <button class="btn btn-secondary btn-sm mt-1" onclick="enableDemoMode()">🎭 Enter Demo Mode</button>
+    </div>
 
-<button onclick="showLogin()">Login</button>
+    <div class="auth-card" id="auth-card" style="margin-top: 20px;">
+      <!-- Role tabs -->
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="selectRole('buyer', this)">
+          <span class="icon">🛍️</span>Buyer
+        </button>
+        <button class="role-tab" onclick="selectRole('seller', this)">
+          <span class="icon">🏪</span>Seller
+        </button>
+        <button class="role-tab" onclick="selectRole('delivery', this)">
+          <span class="icon">🚚</span>Delivery
+        </button>
+        <button class="role-tab" onclick="selectRole('admin', this)">
+          <span class="icon">🛠️</span>Admin
+        </button>
+      </div>
 
-<button onclick="showSignup()">Signup</button>
+      <!-- Auth tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="login-tab" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" id="signup-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
 
-<button onclick="backSplash()">Back</button>
+      <!-- Login Form -->
+      <div id="login-form">
+        <div class="flex col gap-2">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" />
+          </div>
+          <button class="btn btn-primary btn-full mt-1" onclick="handleLogin()" id="login-btn">
+            Sign In
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="showForgotPassword()" style="border:none;background:transparent;color:var(--text-muted)">
+            Forgot password?
+          </button>
+        </div>
+      </div>
 
+      <!-- Signup Form -->
+      <div id="signup-form" class="hidden">
+        <div class="flex col gap-2">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="signup-name" placeholder="Jane Rose" />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="signup-phone" placeholder="+91 9999..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="signup-email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signup-password" placeholder="Min 8 characters" />
+          </div>
+          <div class="form-group" id="shop-name-group" style="display:none">
+            <label>Shop Name</label>
+            <input type="text" id="signup-shop" placeholder="Rose Garden Co." />
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="signup-address" placeholder="Your location" />
+            <button class="btn btn-secondary btn-sm mt-1" onclick="detectLocation()" style="font-size:11px;padding:6px 12px">
+              📍 Auto-detect location
+            </button>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="handleSignup()" id="signup-btn">
+            Create Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- Dashboard -->
+<div id="dashboard" class="hidden">
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-<!-- Login -->
-<div id="login" class="hidden">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h1>Petal Rush</h1>
+      <div class="sidebar-role" id="sidebar-role-label">Buyer Panel</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebar-avatar">👤</div>
+      <div>
+        <div class="sidebar-user-name" id="sidebar-name">Loading...</div>
+        <div class="sidebar-user-email" id="sidebar-email">...</div>
+      </div>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav"></div>
+    <div class="sidebar-footer">
+      <button class="nav-item w-full" onclick="handleLogout()">
+        <span class="icon">🚪</span> Logout
+      </button>
+    </div>
+  </nav>
 
-<h2>Login</h2>
+  <!-- Top bar (mobile) -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <h1>Petal Rush</h1>
+    <div class="avatar" style="width:32px;height:32px;font-size:14px">👤</div>
+  </div>
 
-<input type="email" id="loginEmail" placeholder="Email">
-
-<input type="password" id="loginPassword" placeholder="Password">
-
-<button onclick="login()">Login</button>
-
-<button onclick="forgot()">Forgot Password</button>
-
-<button onclick="backAuth()">Back</button>
-
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+    <!-- Dynamic panels loaded here -->
+  </main>
 </div>
 
-
-<!-- Signup -->
-<div id="signup" class="hidden">
-
-<h2>Create Account</h2>
-
-<input type="email" id="signupEmail" placeholder="Email">
-
-<input type="password" id="signupPassword" placeholder="Password">
-
-<select id="role">
-<option value="buyer">Buyer</option>
-<option value="seller">Seller</option>
-</select>
-
-<button onclick="signup()">Signup</button>
-
-<button onclick="backAuth()">Back</button>
-
+<!-- Product Detail Modal -->
+<div id="product-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-product-name">Product Name</h3>
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="product-img rounded mb-2" id="modal-product-img" style="height:200px;font-size:64px"></div>
+      <p id="modal-product-desc" class="text-muted mb-2" style="font-size:14px;line-height:1.6"></p>
+      <div class="flex between mb-2">
+        <div class="stat-value" id="modal-product-price"></div>
+        <div class="text-muted text-sm" id="modal-product-qty"></div>
+      </div>
+      <div class="form-group mb-2">
+        <label>Quantity</label>
+        <input type="number" id="modal-qty" value="1" min="1" max="100" />
+      </div>
+      <div class="form-group mb-2">
+        <label>Delivery Address</label>
+        <input type="text" id="modal-address" placeholder="Enter delivery address" />
+        <button class="btn btn-secondary btn-sm mt-1" onclick="detectLocationForOrder()" style="font-size:11px;padding:6px 12px">
+          📍 Use my location
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select id="modal-payment">
+          <option value="online">Online Payment</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="placeOrder()" id="place-order-btn">🌸 Place Order</button>
+    </div>
+  </div>
 </div>
 
+<!-- Add/Edit Product Modal -->
+<div id="product-form-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="product-form-title">Add Product</h3>
+      <button class="modal-close" onclick="closeProductFormModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-product-id" />
+      <div class="flex col gap-2">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="product-name-input" placeholder="Red Roses Bouquet" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="product-category-input">
+              <option value="flowers">Flowers</option>
+              <option value="bouquets">Bouquets</option>
+              <option value="plants">Plants</option>
+              <option value="gifts">Gift Sets</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="product-desc-input" placeholder="Fresh, hand-picked..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="product-price-input" placeholder="299" />
+          </div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="product-qty-input" placeholder="50" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Image URL (optional)</label>
+          <input type="url" id="product-img-input" placeholder="https://..." />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeProductFormModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()" id="save-product-btn">Save Product</button>
+    </div>
+  </div>
+</div>
 
-<script src="js/index.js"></script>
+<script>
+// =============================================
+// PETAL RUSH — Full Application
+// =============================================
 
+// ── STATE ──
+let SUPABASE_URL = localStorage.getItem('pr_url') || '';
+let SUPABASE_KEY = localStorage.getItem('pr_key') || '';
+let supabase = null;
+let currentUser = null;
+let currentRole = 'buyer';
+let selectedProduct = null;
+let DEMO_MODE = false;
+
+// ── DEMO DATA ──
+const DEMO_PRODUCTS = [
+  { id: '1', seller_id: 'demo-seller', name: 'Red Roses Bouquet', description: 'A stunning arrangement of 12 fresh red roses, hand-picked at dawn for maximum freshness and fragrance.', price: 699, quantity: 25, category: 'bouquets', image_url: '', is_active: true },
+  { id: '2', seller_id: 'demo-seller', name: 'Sunflower Delight', description: 'Bright and cheerful sunflowers to light up any room. Each bouquet contains 8 premium stems.', price: 449, quantity: 18, category: 'flowers', image_url: '', is_active: true },
+  { id: '3', seller_id: 'demo-seller', name: 'Lavender Dreams', description: 'Fresh lavender sprigs bundled beautifully. Known for their calming scent and purple elegance.', price: 349, quantity: 30, category: 'flowers', image_url: '', is_active: true },
+  { id: '4', seller_id: 'demo-seller', name: 'White Lily Bundle', description: 'Elegant white lilies representing purity. Perfect for weddings and special occasions.', price: 599, quantity: 12, category: 'bouquets', image_url: '', is_active: true },
+  { id: '5', seller_id: 'demo-seller2', name: 'Succulent Garden', description: 'A curated pot of 5 different succulents in a decorative planter. Low maintenance, high beauty.', price: 899, quantity: 8, category: 'plants', image_url: '', is_active: true },
+  { id: '6', seller_id: 'demo-seller2', name: 'Orchid Elegance', description: 'Premium Phalaenopsis orchid in bloom. Comes in a ceramic pot with care instructions.', price: 1299, quantity: 5, category: 'plants', image_url: '', is_active: true },
+  { id: '7', seller_id: 'demo-seller', name: 'Tulip Spring Mix', description: 'Colorful mix of tulips in pink, yellow, and purple. Brings spring inside your home.', price: 499, quantity: 20, category: 'flowers', image_url: '', is_active: true },
+  { id: '8', seller_id: 'demo-seller2', name: 'Love Gift Box', description: 'Premium gift set with roses, chocolates, and a personalized card. The perfect romantic gesture.', price: 1599, quantity: 10, category: 'gifts', image_url: '', is_active: true },
+];
+
+const DEMO_ORDERS = [
+  { id: 'ORD-001', product: 'Red Roses Bouquet', buyer: 'Priya Sharma', amount: 699, status: 'delivered', payment: 'online', date: '2024-01-15', drop: 'Mumbai, Andheri West' },
+  { id: 'ORD-002', product: 'Sunflower Delight', buyer: 'Rahul Mehta', amount: 449, status: 'picked', payment: 'cod', date: '2024-01-16', drop: 'Mumbai, Bandra East' },
+  { id: 'ORD-003', product: 'White Lily Bundle', buyer: 'Aarav Singh', amount: 599, status: 'placed', payment: 'online', date: '2024-01-17', drop: 'Pune, Koregaon Park' },
+];
+
+const PRODUCT_EMOJIS = { flowers: '🌸', bouquets: '💐', plants: '🪴', gifts: '🎁', default: '🌼' };
+
+// ── INIT ──
+window.onload = function() {
+  setTimeout(() => {
+    document.getElementById('loading-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      initApp();
+    }, 600);
+  }, 2000);
+};
+
+async function initApp() {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    await connectSupabase();
+  } else {
+    showAuth();
+  }
+}
+
+async function connectSupabase() {
+  try {
+    const { createClient } = await loadSupabaseClient();
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Check existing session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await loadUserAndDashboard(session.user.id);
+    } else {
+      showAuth(false);
+    }
+  } catch(e) {
+    console.error('Supabase init failed:', e);
+    showAuth(false);
+  }
+}
+
+async function loadSupabaseClient() {
+  return new Promise((resolve, reject) => {
+    if (window.supabase) { resolve(window.supabase); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onload = () => resolve(window.supabase);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function showAuth(showConfig = true) {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+  if (!showConfig || (SUPABASE_URL && SUPABASE_KEY)) {
+    document.getElementById('config-banner').style.display = 'none';
+  }
+  if (SUPABASE_URL) document.getElementById('supabase-url-input').value = SUPABASE_URL;
+  if (SUPABASE_KEY) document.getElementById('supabase-key-input').value = SUPABASE_KEY;
+}
+
+function saveConfig() {
+  const url = document.getElementById('supabase-url-input').value.trim();
+  const key = document.getElementById('supabase-key-input').value.trim();
+  if (!url || !key) { toast('Please enter both Supabase URL and Key', 'error'); return; }
+  localStorage.setItem('pr_url', url);
+  localStorage.setItem('pr_key', key);
+  SUPABASE_URL = url; SUPABASE_KEY = key;
+  document.getElementById('config-banner').style.display = 'none';
+  toast('Supabase connected! ✅', 'success');
+  connectSupabase();
+}
+
+function enableDemoMode() {
+  DEMO_MODE = true;
+  currentUser = { id: 'demo-buyer', email: 'demo@petalrush.com', role: 'buyer', name: 'Demo Buyer', phone: '+91 9999999999', address: 'Mumbai, Maharashtra' };
+  document.getElementById('config-banner').style.display = 'none';
+  document.getElementById('auth-screen').classList.add('hidden');
+  loadDashboard();
+  toast('🎭 Demo Mode active – explore all features!', 'success');
+}
+
+// ── AUTH ──
+let selectedRole = 'buyer';
+function selectRole(role, el) {
+  selectedRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('shop-name-group').style.display = role === 'seller' ? 'block' : 'none';
+  document.getElementById('signup-tab').style.display = role === 'admin' ? 'none' : '';
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('signup-form').classList.toggle('hidden', tab !== 'signup');
+  document.getElementById('login-tab').classList.toggle('active', tab === 'login');
+  document.getElementById('signup-tab').classList.toggle('active', tab !== 'login');
+}
+
+async function handleLogin() {
+  if (DEMO_MODE || !supabase) {
+    const email = document.getElementById('login-email').value;
+    const roleMap = { buyer: '🛍️ Buyer', seller: '🏪 Seller', delivery: '🚚 Delivery', admin: '🛠️ Admin' };
+    currentUser = { id: `demo-${selectedRole}`, email: email || `demo@${selectedRole}.com`, role: selectedRole, name: `Demo ${roleMap[selectedRole].split(' ')[1]}`, address: 'Mumbai, Maharashtra' };
+    document.getElementById('auth-screen').classList.add('hidden');
+    loadDashboard();
+    return;
+  }
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { toast('Please fill all fields', 'error'); return; }
+  setLoading('login-btn', true);
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    await loadUserAndDashboard(data.user.id);
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally { setLoading('login-btn', false); }
+}
+
+async function handleSignup() {
+  if (DEMO_MODE || !supabase) { toast('Demo mode – use Login instead', 'error'); return; }
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const phone = document.getElementById('signup-phone').value.trim();
+  const address = document.getElementById('signup-address').value.trim();
+  const shopName = document.getElementById('signup-shop').value.trim();
+  if (!name || !email || !password) { toast('Please fill required fields', 'error'); return; }
+  setLoading('signup-btn', true);
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    const { error: uErr } = await supabase.from('users').insert({
+      id: data.user.id, role: selectedRole, name, email, phone, address, is_verified: false
+    });
+    if (uErr) throw uErr;
+    if (selectedRole === 'seller' && shopName) {
+      await supabase.from('sellers').insert({ user_id: data.user.id, shop_name: shopName });
+    }
+    toast('Account created! Check your email ✅', 'success');
+    switchAuthTab('login');
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally { setLoading('signup-btn', false); }
+}
+
+async function loadUserAndDashboard(uid) {
+  const { data, error } = await supabase.from('users').select('*').eq('id', uid).single();
+  if (error || !data) { toast('User not found. Please complete signup.', 'error'); return; }
+  currentUser = data;
+  document.getElementById('auth-screen').classList.add('hidden');
+  loadDashboard();
+}
+
+function handleLogout() {
+  if (!DEMO_MODE && supabase) supabase.auth.signOut();
+  currentUser = null; DEMO_MODE = false;
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('config-banner').style.display = (SUPABASE_URL ? 'none' : 'block');
+  toast('Logged out', 'success');
+}
+
+function showForgotPassword() {
+  const email = prompt('Enter your email for password reset:');
+  if (email && supabase) {
+    supabase.auth.resetPasswordForEmail(email);
+    toast('Password reset email sent ✅', 'success');
+  }
+}
+
+// ── DASHBOARD LOADER ──
+function loadDashboard() {
+  const role = currentUser.role;
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('sidebar-name').textContent = currentUser.name || 'User';
+  document.getElementById('sidebar-email').textContent = currentUser.email || '';
+  const roleLabels = { buyer: 'Buyer Panel', seller: 'Seller Panel', delivery: 'Delivery Panel', admin: 'Admin Panel' };
+  document.getElementById('sidebar-role-label').textContent = roleLabels[role] || '';
+  buildSidebar(role);
+  const defaultPanel = role === 'buyer' ? 'shop' : role === 'seller' ? 'products' : role === 'delivery' ? 'deliveries' : 'overview';
+  navigateTo(defaultPanel);
+}
+
+// ── SIDEBAR BUILDER ──
+const NAV_CONFIG = {
+  buyer: [
+    { icon: '🌸', label: 'Shop', panel: 'shop' },
+    { icon: '📦', label: 'My Orders', panel: 'orders' },
+    { icon: '👤', label: 'Profile', panel: 'profile' },
+  ],
+  seller: [
+    { icon: '📊', label: 'Dashboard', panel: 'seller-overview' },
+    { icon: '🌺', label: 'My Products', panel: 'products' },
+    { icon: '📦', label: 'Orders', panel: 'seller-orders' },
+    { icon: '💰', label: 'Payments', panel: 'seller-payments' },
+    { icon: '👤', label: 'Profile', panel: 'profile' },
+  ],
+  delivery: [
+    { icon: '📦', label: 'Deliveries', panel: 'deliveries' },
+    { icon: '✅', label: 'Completed', panel: 'completed' },
+    { icon: '👤', label: 'Profile', panel: 'profile' },
+  ],
+  admin: [
+    { icon: '📊', label: 'Overview', panel: 'overview' },
+    { icon: '👥', label: 'Users', panel: 'admin-users' },
+    { icon: '📦', label: 'All Orders', panel: 'admin-orders' },
+    { icon: '💰', label: 'Payments', panel: 'admin-payments' },
+    { icon: '🚚', label: 'Deliveries', panel: 'admin-deliveries' },
+    { icon: '🌺', label: 'Products', panel: 'admin-products' },
+  ]
+};
+
+function buildSidebar(role) {
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = NAV_CONFIG[role].map(item =>
+    `<button class="nav-item" data-panel="${item.panel}" onclick="navigateTo('${item.panel}')">
+      <span class="icon">${item.icon}</span> ${item.label}
+    </button>`
+  ).join('');
+}
+
+function navigateTo(panelId) {
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.panel === panelId);
+  });
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = buildPanel(panelId);
+  // Load data for panel
+  loadPanelData(panelId);
+  closeSidebar();
+}
+
+// ── PANEL BUILDER ──
+function buildPanel(id) {
+  const builders = {
+    shop: buildShopPanel,
+    orders: buildOrdersPanel,
+    profile: buildProfilePanel,
+    'seller-overview': buildSellerOverview,
+    products: buildProductsPanel,
+    'seller-orders': buildSellerOrdersPanel,
+    'seller-payments': buildSellerPaymentsPanel,
+    deliveries: buildDeliveriesPanel,
+    completed: buildCompletedPanel,
+    overview: buildAdminOverview,
+    'admin-users': buildAdminUsersPanel,
+    'admin-orders': buildAdminOrdersPanel,
+    'admin-payments': buildAdminPaymentsPanel,
+    'admin-deliveries': buildAdminDeliveriesPanel,
+    'admin-products': buildAdminProductsPanel,
+  };
+  return (builders[id] || (() => '<div class="empty-state"><div class="icon">🔧</div><h3>Coming Soon</h3></div>'))();
+}
+
+// =============================================
+// BUYER PANELS
+// =============================================
+function buildShopPanel() {
+  return `
+    <div class="page-title">
+      <div>
+        <h2>Browse <span>Flowers</span></h2>
+        <div class="breadcrumb">Fresh blooms, delivered to your door</div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap" style="flex:1;min-width:200px">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input-wrap" placeholder="Search flowers, bouquets..." id="product-search" oninput="filterProducts()" style="padding-left:40px;width:100%"/>
+      </div>
+      <select id="category-filter" onchange="filterProducts()" style="width:140px">
+        <option value="">All Categories</option>
+        <option value="flowers">🌸 Flowers</option>
+        <option value="bouquets">💐 Bouquets</option>
+        <option value="plants">🪴 Plants</option>
+        <option value="gifts">🎁 Gifts</option>
+      </select>
+    </div>
+    <div class="products-grid" id="products-grid">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading products...</h3></div>
+    </div>`;
+}
+
+function buildOrdersPanel() {
+  return `
+    <div class="page-title">
+      <h2>My <span>Orders</span></h2>
+    </div>
+    <div id="orders-list">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading orders...</h3></div>
+    </div>`;
+}
+
+function buildProfilePanel() {
+  return `
+    <div class="page-title">
+      <h2>My <span>Profile</span></h2>
+    </div>
+    <div style="max-width:480px">
+      <div class="card mb-2">
+        <div class="flex gap-3 center mb-3">
+          <div class="avatar" style="width:64px;height:64px;font-size:28px">
+            ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="">` : '👤'}
+          </div>
+          <div>
+            <h3 style="font-size:22px">${currentUser.name}</h3>
+            <div class="text-muted text-sm">${currentUser.role}</div>
+          </div>
+        </div>
+        <div class="flex col gap-2">
+          <div class="form-group"><label>Full Name</label><input type="text" id="p-name" value="${currentUser.name || ''}" /></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="p-phone" value="${currentUser.phone || ''}" /></div>
+          <div class="form-group"><label>Address</label><input type="text" id="p-address" value="${currentUser.address || ''}" /></div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+      ${!DEMO_MODE ? `<div class="card">
+        <h3 style="font-size:16px;margin-bottom:16px">Security</h3>
+        <button class="btn btn-secondary btn-full" onclick="showForgotPassword()">🔑 Change Password</button>
+      </div>` : ''}
+    </div>`;
+}
+
+// =============================================
+// SELLER PANELS
+// =============================================
+function buildSellerOverview() {
+  return `
+    <div class="page-title">
+      <h2>Seller <span>Dashboard</span></h2>
+    </div>
+    <div class="stats-grid" id="seller-stats">
+      ${makeStatCard('📦', '0', 'Products')}
+      ${makeStatCard('🛒', '0', 'Total Orders')}
+      ${makeStatCard('💰', '₹0', 'Revenue')}
+      ${makeStatCard('⏳', '0', 'Pending')}
+    </div>
+    <div class="section-header">
+      <h3>Recent Orders</h3>
+    </div>
+    <div id="recent-orders-list"></div>`;
+}
+
+function buildProductsPanel() {
+  return `
+    <div class="page-title">
+      <h2>My <span>Products</span></h2>
+      <button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button>
+    </div>
+    <div id="seller-products-grid">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>
+    </div>`;
+}
+
+function buildSellerOrdersPanel() {
+  return `
+    <div class="page-title"><h2>My <span>Orders</span></h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Order ID</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
+        <tbody id="seller-orders-body">
+          <tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildSellerPaymentsPanel() {
+  return `
+    <div class="page-title"><h2>My <span>Payments</span></h2></div>
+    <div class="stats-grid mb-3">
+      ${makeStatCard('✅', '₹0', 'Released')}
+      ${makeStatCard('⏳', '₹0', 'Pending')}
+      ${makeStatCard('🔄', '₹0', 'Returned')}
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Order ID</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="seller-payments-body">
+          <tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// =============================================
+// DELIVERY PANELS
+// =============================================
+function buildDeliveriesPanel() {
+  return `
+    <div class="page-title">
+      <h2>Active <span>Deliveries</span></h2>
+      <button class="btn btn-secondary" onclick="loadPanelData('deliveries')">🔄 Refresh</button>
+    </div>
+    <div id="deliveries-list">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>
+    </div>`;
+}
+
+function buildCompletedPanel() {
+  return `
+    <div class="page-title"><h2>Completed <span>Deliveries</span></h2></div>
+    <div id="completed-list">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>
+    </div>`;
+}
+
+// =============================================
+// ADMIN PANELS
+// =============================================
+function buildAdminOverview() {
+  return `
+    <div class="page-title"><h2>Admin <span>Overview</span></h2></div>
+    <div class="stats-grid mb-3">
+      ${makeStatCard('👥', '0', 'Total Users')}
+      ${makeStatCard('📦', '0', 'Total Orders')}
+      ${makeStatCard('💰', '₹0', 'Total Revenue')}
+      ${makeStatCard('🏪', '0', 'Active Sellers')}
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="section-header"><h3>Recent Orders</h3></div>
+        <div id="admin-recent-orders"></div>
+      </div>
+      <div>
+        <div class="section-header"><h3>Pending Actions</h3></div>
+        <div id="admin-pending-actions"></div>
+      </div>
+    </div>`;
+}
+
+function buildAdminUsersPanel() {
+  return `
+    <div class="page-title"><h2>Manage <span>Users</span></h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="admin-users-body">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildAdminOrdersPanel() {
+  return `
+    <div class="page-title"><h2>All <span>Orders</span></h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Order ID</th><th>Buyer</th><th>Amount</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="admin-orders-body">
+          <tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildAdminPaymentsPanel() {
+  return `
+    <div class="page-title"><h2>Payment <span>Control</span></h2></div>
+    <div class="stats-grid mb-3">
+      ${makeStatCard('🏦', '₹0', 'Admin Wallet')}
+      ${makeStatCard('⏳', '₹0', 'Pending Release')}
+      ${makeStatCard('✅', '₹0', 'Released')}
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Order ID</th><th>Seller</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="admin-payments-body">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildAdminDeliveriesPanel() {
+  return `
+    <div class="page-title"><h2>Assign <span>Deliveries</span></h2></div>
+    <div id="admin-deliveries-list">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>
+    </div>`;
+}
+
+function buildAdminProductsPanel() {
+  return `
+    <div class="page-title"><h2>All <span>Products</span></h2></div>
+    <div class="products-grid" id="admin-products-grid">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>
+    </div>`;
+}
+
+// ── HELPER ──
+function makeStatCard(icon, value, label) {
+  return `<div class="stat-card">
+    <div class="stat-icon">${icon}</div>
+    <div class="stat-value">${value}</div>
+    <div class="stat-label">${label}</div>
+  </div>`;
+}
+
+// =============================================
+// DATA LOADERS
+// =============================================
+async function loadPanelData(panelId) {
+  if (DEMO_MODE) return loadDemoPanelData(panelId);
+  if (!supabase) return;
+  
+  try {
+    switch(panelId) {
+      case 'shop': await loadProducts(); break;
+      case 'orders': await loadBuyerOrders(); break;
+      case 'seller-overview': await loadSellerOverviewData(); break;
+      case 'products': await loadSellerProducts(); break;
+      case 'seller-orders': await loadSellerOrders(); break;
+      case 'seller-payments': await loadSellerPayments(); break;
+      case 'deliveries': await loadDeliveries(); break;
+      case 'completed': await loadCompletedDeliveries(); break;
+      case 'overview': await loadAdminOverview(); break;
+      case 'admin-users': await loadAdminUsers(); break;
+      case 'admin-orders': await loadAdminOrders(); break;
+      case 'admin-payments': await loadAdminPayments(); break;
+      case 'admin-deliveries': await loadAdminDeliveries(); break;
+      case 'admin-products': await loadProducts(true); break;
+    }
+  } catch(e) {
+    console.error('Panel load error:', e);
+    toast('Error loading data', 'error');
+  }
+}
+
+function loadDemoPanelData(panelId) {
+  switch(panelId) {
+    case 'shop': case 'admin-products': renderProducts(DEMO_PRODUCTS); break;
+    case 'orders': renderBuyerOrders(getDemoOrders()); break;
+    case 'seller-overview': renderSellerOverview(DEMO_PRODUCTS.slice(0,3), DEMO_ORDERS.slice(0,3)); break;
+    case 'products': renderSellerProducts(DEMO_PRODUCTS.filter(p => p.seller_id === 'demo-seller')); break;
+    case 'seller-orders': renderSellerOrders(DEMO_ORDERS); break;
+    case 'seller-payments': renderSellerPayments(DEMO_ORDERS); break;
+    case 'deliveries': renderDeliveries(DEMO_ORDERS.filter(o => o.status !== 'delivered')); break;
+    case 'completed': renderDeliveries(DEMO_ORDERS.filter(o => o.status === 'delivered'), true); break;
+    case 'overview': renderAdminOverview(); break;
+    case 'admin-users': renderAdminUsers(getDemoUsers()); break;
+    case 'admin-orders': renderAdminOrders(DEMO_ORDERS); break;
+    case 'admin-payments': renderAdminPayments(DEMO_ORDERS); break;
+    case 'admin-deliveries': renderAdminDeliveries(DEMO_ORDERS); break;
+  }
+}
+
+function getDemoOrders() {
+  return DEMO_ORDERS.map(o => ({...o, product_name: o.product, drop_address: o.drop, payment_type: o.payment, order_status: o.status, total_amount: o.amount }));
+}
+function getDemoUsers() {
+  return [
+    { id: '1', name: 'Priya Sharma', email: 'priya@demo.com', role: 'buyer', is_verified: true, is_banned: false },
+    { id: '2', name: 'Rahul Gardens', email: 'rahul@demo.com', role: 'seller', is_verified: true, is_banned: false },
+    { id: '3', name: 'Arjun Delivery', email: 'arjun@demo.com', role: 'delivery', is_verified: false, is_banned: false },
+  ];
+}
+
+// ── PRODUCT LOADERS ──
+async function loadProducts(admin = false) {
+  const { data, error } = await supabase.from('products').select('*').eq('is_active', true);
+  if (error) throw error;
+  renderProducts(data || [], admin);
+}
+
+function renderProducts(products, admin = false) {
+  const grid = document.getElementById('products-grid') || document.getElementById('admin-products-grid');
+  if (!grid) return;
+  if (!products.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🌸</div><h3>No products found</h3><p>Check back later!</p></div>`;
+    return;
+  }
+  window._products = products;
+  grid.innerHTML = products.map(p => renderProductCard(p, admin)).join('');
+}
+
+function renderProductCard(p, admin = false) {
+  const emoji = PRODUCT_EMOJIS[p.category] || PRODUCT_EMOJIS.default;
+  const imgContent = p.image_url 
+    ? `<img src="${p.image_url}" alt="${p.name}" onerror="this.parentElement.innerHTML='${emoji}'" />`
+    : emoji;
+  const isSellerPanel = currentUser.role === 'seller';
+  const actions = isSellerPanel
+    ? `<div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="editProduct('${p.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑️ Delete</button>
+       </div>`
+    : admin ? '' 
+    : `<button class="btn btn-primary btn-sm btn-full" style="margin:0 16px 16px" onclick="openProductModal('${p.id}')">🛒 Add to Cart</button>`;
+  return `
+    <div class="product-card" id="prod-${p.id}">
+      <div class="product-img">${imgContent}
+        <span class="product-badge">${p.category}</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.description || 'Fresh and beautiful flowers'}</div>
+        <div class="product-footer">
+          <div class="product-price"><span>₹</span>${p.price}</div>
+          <div class="product-qty">${p.quantity} left</div>
+        </div>
+      </div>
+      ${actions}
+    </div>`;
+}
+
+function filterProducts() {
+  const q = (document.getElementById('product-search')?.value || '').toLowerCase();
+  const cat = document.getElementById('category-filter')?.value || '';
+  const products = window._products || DEMO_PRODUCTS;
+  const filtered = products.filter(p =>
+    (!q || p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q)) &&
+    (!cat || p.category === cat)
+  );
+  renderProducts(filtered);
+}
+
+// ── ORDER FUNCS ──
+function openProductModal(id) {
+  const p = (window._products || DEMO_PRODUCTS).find(x => x.id === id);
+  if (!p) return;
+  selectedProduct = p;
+  const emoji = PRODUCT_EMOJIS[p.category] || '🌼';
+  const imgEl = document.getElementById('modal-product-img');
+  imgEl.style.display = 'flex'; imgEl.style.alignItems = 'center'; imgEl.style.justifyContent = 'center';
+  imgEl.innerHTML = p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${emoji}'" />` : emoji;
+  document.getElementById('modal-product-name').textContent = p.name;
+  document.getElementById('modal-product-desc').textContent = p.description || '';
+  document.getElementById('modal-product-price').textContent = `₹${p.price}`;
+  document.getElementById('modal-product-qty').textContent = `${p.quantity} available`;
+  document.getElementById('modal-address').value = currentUser.address || '';
+  document.getElementById('product-modal').classList.remove('hidden');
+}
+
+function closeProductModal() {
+  document.getElementById('product-modal').classList.add('hidden');
+  selectedProduct = null;
+}
+
+async function placeOrder() {
+  if (!selectedProduct) return;
+  const qty = parseInt(document.getElementById('modal-qty').value) || 1;
+  const address = document.getElementById('modal-address').value.trim();
+  const paymentType = document.getElementById('modal-payment').value;
+  if (!address) { toast('Please enter delivery address', 'error'); return; }
+  
+  setLoading('place-order-btn', true);
+  try {
+    if (DEMO_MODE || !supabase) {
+      await new Promise(r => setTimeout(r, 800));
+      toast(`✅ Order placed! Total: ₹${selectedProduct.price * qty}`, 'success');
+      closeProductModal();
+      return;
+    }
+    const { error } = await supabase.from('orders').insert({
+      buyer_id: currentUser.id, seller_id: selectedProduct.seller_id,
+      product_id: selectedProduct.id, quantity: qty,
+      total_amount: selectedProduct.price * qty,
+      drop_address: address, payment_type: paymentType,
+      order_status: 'placed', payment_status: paymentType === 'cod' ? 'pending' : 'pending'
+    });
+    if (error) throw error;
+    if (paymentType === 'online') {
+      await supabase.from('payments').insert({
+        order_id: (await getLastOrder()).id,
+        seller_id: selectedProduct.seller_id,
+        buyer_id: currentUser.id,
+        amount: selectedProduct.price * qty,
+        status: 'admin_wallet', payment_method: 'online'
+      });
+    }
+    toast(`✅ Order placed! ₹${selectedProduct.price * qty}`, 'success');
+    closeProductModal();
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally { setLoading('place-order-btn', false); }
+}
+
+async function getLastOrder() {
+  const { data } = await supabase.from('orders').select('id').eq('buyer_id', currentUser.id).order('created_at', { ascending: false }).limit(1).single();
+  return data;
+}
+
+// ── BUYER ORDERS ──
+async function loadBuyerOrders() {
+  const { data } = await supabase.from('orders').select('*, products(name)').eq('buyer_id', currentUser.id).order('created_at', { ascending: false });
+  renderBuyerOrders(data || []);
+}
+
+function renderBuyerOrders(orders) {
+  const el = document.getElementById('orders-list');
+  if (!el) return;
+  if (!orders.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No orders yet</h3><p>Start shopping to see your orders here</p></div>`;
+    return;
+  }
+  el.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-id">#${o.id?.toString().slice(-8) || o.id}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;margin-top:4px">${o.product_name || (o.products?.name) || 'Product'}</div>
+        </div>
+        ${getStatusBadge(o.order_status || o.status)}
+      </div>
+      <div class="order-detail"><span class="order-detail-label">Amount</span><span class="order-detail-value text-gold">₹${o.total_amount || o.amount}</span></div>
+      <div class="order-detail"><span class="order-detail-label">Payment</span>${getPaymentBadge(o.payment_type || o.payment)}</div>
+      <div class="order-detail"><span class="order-detail-label">Deliver to</span><span class="order-detail-value">${o.drop_address || o.drop || '—'}</span></div>
+      <div class="order-detail"><span class="order-detail-label">Date</span><span class="order-detail-value text-muted">${formatDate(o.created_at || o.date)}</span></div>
+      <div class="order-actions">
+        ${o.order_status === 'delivered' || o.status === 'delivered' ? `<button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">↩️ Return</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── SELLER FUNCTIONS ──
+async function loadSellerProducts() {
+  const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).order('created_at', { ascending: false });
+  renderSellerProducts(data || []);
+}
+
+function renderSellerProducts(products) {
+  const el = document.getElementById('seller-products-grid');
+  if (!el) return;
+  if (!products.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">🌸</div><h3>No products yet</h3><button class="btn btn-primary mt-2" onclick="openAddProduct()">+ Add First Product</button></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="products-grid">${products.map(p => renderProductCard(p)).join('')}</div>`;
+}
+
+function renderSellerOverview(products, orders) {
+  const statsEl = document.getElementById('seller-stats');
+  if (statsEl) {
+    const revenue = orders.reduce((s, o) => s + (o.total_amount || o.amount || 0), 0);
+    statsEl.innerHTML = `
+      ${makeStatCard('📦', products.length, 'Products')}
+      ${makeStatCard('🛒', orders.length, 'Total Orders')}
+      ${makeStatCard('💰', '₹' + revenue, 'Revenue')}
+      ${makeStatCard('⏳', orders.filter(o => (o.order_status||o.status) === 'placed').length, 'Pending')}
+    `;
+  }
+  const recentEl = document.getElementById('recent-orders-list');
+  if (recentEl) renderSellerOrders(orders, recentEl);
+}
+
+async function loadSellerOverviewData() {
+  const [prods, ords] = await Promise.all([
+    supabase.from('products').select('*').eq('seller_id', currentUser.id),
+    supabase.from('orders').select('*').eq('seller_id', currentUser.id).order('created_at', { ascending: false }).limit(5)
+  ]);
+  renderSellerOverview(prods.data || [], ords.data || []);
+}
+
+async function loadSellerOrders() {
+  const { data } = await supabase.from('orders').select('*, products(name), users!buyer_id(name)').eq('seller_id', currentUser.id).order('created_at', { ascending: false });
+  renderSellerOrders(data || []);
+}
+
+function renderSellerOrders(orders, targetEl = null) {
+  const el = targetEl || document.getElementById('seller-orders-body');
+  if (!el) return;
+  const isTable = el.tagName === 'TBODY' || el.id === 'seller-orders-body';
+  if (isTable) {
+    el.innerHTML = orders.length ? orders.map(o => `
+      <tr>
+        <td><code>#${String(o.id||o.id).slice(-6)}</code></td>
+        <td>${o.buyer || (o.users?.name) || '—'}</td>
+        <td>${o.product || (o.products?.name) || '—'}</td>
+        <td class="text-gold">₹${o.total_amount || o.amount}</td>
+        <td>${getPaymentBadge(o.payment_type || o.payment)}</td>
+        <td>${getStatusBadge(o.order_status || o.status)}</td>
+      </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No orders yet</td></tr>';
+  } else {
+    el.innerHTML = orders.slice(0,3).map(o => `
+      <div class="order-card">
+        <div class="order-card-header">
+          <code>#${String(o.id||o.id).slice(-6)}</code>
+          ${getStatusBadge(o.order_status || o.status)}
+        </div>
+        <div class="order-detail"><span class="order-detail-label">Product</span> ${o.product || (o.products?.name) || '—'}</div>
+        <div class="order-detail"><span class="order-detail-label">Amount</span> <span class="text-gold">₹${o.total_amount || o.amount}</span></div>
+      </div>`).join('') || '<div class="empty-state"><div class="icon">📦</div><h3>No orders</h3></div>';
+  }
+}
+
+async function loadSellerPayments() {
+  const { data } = await supabase.from('payments').select('*, orders(id)').eq('seller_id', currentUser.id);
+  renderSellerPayments(data || []);
+}
+
+function renderSellerPayments(payments) {
+  const el = document.getElementById('seller-payments-body');
+  if (!el) return;
+  el.innerHTML = payments.length ? payments.map(p => `
+    <tr>
+      <td><code>#${String(p.order_id || p.id).slice(-6)}</code></td>
+      <td class="text-gold">₹${p.amount || p.total_amount || p.amount}</td>
+      <td>${getStatusBadge(p.status)}</td>
+      <td class="text-muted">${formatDate(p.created_at || p.date)}</td>
+    </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No payments yet</td></tr>';
+}
+
+// ── PRODUCT CRUD ──
+function openAddProduct() {
+  document.getElementById('product-form-title').textContent = 'Add New Product';
+  document.getElementById('edit-product-id').value = '';
+  ['product-name-input','product-desc-input','product-price-input','product-qty-input','product-img-input'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('product-form-modal').classList.remove('hidden');
+}
+
+function editProduct(id) {
+  const p = (window._products || DEMO_PRODUCTS).find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('product-form-title').textContent = 'Edit Product';
+  document.getElementById('edit-product-id').value = id;
+  document.getElementById('product-name-input').value = p.name;
+  document.getElementById('product-desc-input').value = p.description || '';
+  document.getElementById('product-price-input').value = p.price;
+  document.getElementById('product-qty-input').value = p.quantity;
+  document.getElementById('product-img-input').value = p.image_url || '';
+  document.getElementById('product-category-input').value = p.category || 'flowers';
+  document.getElementById('product-form-modal').classList.remove('hidden');
+}
+
+function closeProductFormModal() {
+  document.getElementById('product-form-modal').classList.add('hidden');
+}
+
+async function saveProduct() {
+  const name = document.getElementById('product-name-input').value.trim();
+  const price = parseFloat(document.getElementById('product-price-input').value);
+  const qty = parseInt(document.getElementById('product-qty-input').value) || 0;
+  const desc = document.getElementById('product-desc-input').value.trim();
+  const img = document.getElementById('product-img-input').value.trim();
+  const cat = document.getElementById('product-category-input').value;
+  const editId = document.getElementById('edit-product-id').value;
+  if (!name || !price) { toast('Name and price are required', 'error'); return; }
+  setLoading('save-product-btn', true);
+  try {
+    if (DEMO_MODE || !supabase) {
+      await new Promise(r => setTimeout(r, 500));
+      if (editId) {
+        const idx = DEMO_PRODUCTS.findIndex(p => p.id === editId);
+        if (idx !== -1) { DEMO_PRODUCTS[idx] = { ...DEMO_PRODUCTS[idx], name, price, quantity: qty, description: desc, image_url: img, category: cat }; }
+        toast('Product updated ✅', 'success');
+      } else {
+        DEMO_PRODUCTS.push({ id: Date.now().toString(), seller_id: 'demo-seller', name, price, quantity: qty, description: desc, image_url: img, category: cat, is_active: true });
+        toast('Product added ✅', 'success');
+      }
+      closeProductFormModal();
+      loadDemoPanelData('products');
+      return;
+    }
+    if (editId) {
+      const { error } = await supabase.from('products').update({ name, price, quantity: qty, description: desc, image_url: img, category: cat }).eq('id', editId);
+      if (error) throw error;
+      toast('Product updated ✅', 'success');
+    } else {
+      const { error } = await supabase.from('products').insert({ seller_id: currentUser.id, name, price, quantity: qty, description: desc, image_url: img, category: cat });
+      if (error) throw error;
+      toast('Product added ✅', 'success');
+    }
+    closeProductFormModal();
+    loadPanelData('products');
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally { setLoading('save-product-btn', false); }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  if (DEMO_MODE || !supabase) {
+    const idx = DEMO_PRODUCTS.findIndex(p => p.id === id);
+    if (idx !== -1) DEMO_PRODUCTS.splice(idx, 1);
+    toast('Product deleted', 'success');
+    loadDemoPanelData('products');
+    return;
+  }
+  const { error } = await supabase.from('products').update({ is_active: false }).eq('id', id);
+  if (error) { toast(error.message, 'error'); return; }
+  toast('Product deleted', 'success');
+  loadPanelData('products');
+}
+
+// ── DELIVERY FUNCTIONS ──
+async function loadDeliveries() {
+  const { data } = await supabase.from('orders').select('*, products(name)').eq('delivery_partner_id', currentUser.id).in('order_status', ['assigned','picked']).order('created_at', { ascending: false });
+  renderDeliveries(data || []);
+}
+
+async function loadCompletedDeliveries() {
+  const { data } = await supabase.from('orders').select('*, products(name)').eq('delivery_partner_id', currentUser.id).in('order_status', ['delivered','returned']);
+  renderDeliveries(data || [], true);
+}
+
+function renderDeliveries(orders, completed = false) {
+  const el = document.getElementById(completed ? 'completed-list' : 'deliveries-list');
+  if (!el) return;
+  if (!orders.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">${completed ? '✅' : '📭'}</div><h3>${completed ? 'No completed deliveries' : 'No active deliveries'}</h3><p>${completed ? '' : 'New deliveries will appear here'}</p></div>`;
+    return;
+  }
+  el.innerHTML = orders.map(o => {
+    const pickup = o.pickup_address || o.pickup || 'Seller Location, Mumbai';
+    const drop = o.drop_address || o.drop || 'Buyer Location';
+    const statusBtns = !completed ? `
+      ${(o.order_status||o.status) === 'assigned' ? `<button class="btn btn-secondary btn-sm" onclick="updateDeliveryStatus('${o.id}','picked')">📦 Mark Picked</button>` : ''}
+      ${(o.order_status||o.status) === 'picked' ? `<button class="btn btn-success btn-sm" onclick="updateDeliveryStatus('${o.id}','delivered')">✅ Mark Delivered</button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="updateDeliveryStatus('${o.id}','returned')">↩️ Return</button>
+    ` : '';
+    return `
+      <div class="delivery-card">
+        <div class="flex between">
+          <div>
+            <code style="font-size:11px;color:var(--text-dim)">#${String(o.id).slice(-8)}</code>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;margin-top:4px">${o.product || (o.products?.name) || 'Order'}</div>
+          </div>
+          <div class="flex col" style="align-items:flex-end;gap:4px">
+            ${getStatusBadge(o.order_status || o.status)}
+            ${getPaymentBadge(o.payment_type || o.payment)}
+          </div>
+        </div>
+        <div class="delivery-route">
+          <div class="route-point">
+            <div class="route-dot pickup"></div>
+            <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:2px">Pickup</div><div style="font-size:13px">${pickup}</div></div>
+          </div>
+          <div class="route-point">
+            <div class="route-dot drop"></div>
+            <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-light);margin-bottom:2px">Drop</div><div style="font-size:13px">${drop}</div></div>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <a class="gps-btn" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(drop)}" target="_blank">
+            🗺️ Navigate to Drop
+          </a>
+          <a class="gps-btn" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(pickup)}" target="_blank" style="background:linear-gradient(135deg,#3d2a00,#1a0d00);border-color:rgba(201,168,76,0.3);color:var(--gold)">
+            📍 Navigate to Pickup
+          </a>
+        </div>
+        ${statusBtns ? `<div class="order-actions">${statusBtns}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function updateDeliveryStatus(orderId, status) {
+  if (DEMO_MODE || !supabase) {
+    const order = DEMO_ORDERS.find(o => o.id === orderId);
+    if (order) order.status = status;
+    toast(`Status updated: ${status} ✅`, 'success');
+    loadDemoPanelData('deliveries');
+    return;
+  }
+  const { error } = await supabase.from('orders').update({ order_status: status }).eq('id', orderId);
+  if (error) { toast(error.message, 'error'); return; }
+  toast(`Status: ${status} ✅`, 'success');
+  loadPanelData('deliveries');
+}
+
+// ── ADMIN FUNCTIONS ──
+function renderAdminOverview() {
+  const allOrders = DEMO_ORDERS;
+  const statsEl = document.querySelectorAll('.stat-card .stat-value');
+  if (statsEl.length >= 4) {
+    statsEl[0].textContent = getDemoUsers().length + 1; // +1 admin
+    statsEl[1].textContent = allOrders.length;
+    statsEl[2].textContent = '₹' + allOrders.reduce((s, o) => s + (o.amount||0), 0);
+    statsEl[3].textContent = '2';
+  }
+  const recentEl = document.getElementById('admin-recent-orders');
+  if (recentEl) {
+    recentEl.innerHTML = allOrders.map(o => `
+      <div class="order-card" style="margin-bottom:10px">
+        <div class="flex between">
+          <code>#${o.id}</code> ${getStatusBadge(o.status)}
+        </div>
+        <div class="order-detail"><span class="order-detail-label">Buyer</span> ${o.buyer}</div>
+        <div class="order-detail"><span class="order-detail-label">Amount</span> <span class="text-gold">₹${o.amount}</span></div>
+      </div>`).join('');
+  }
+  const pendingEl = document.getElementById('admin-pending-actions');
+  if (pendingEl) {
+    pendingEl.innerHTML = `
+      <div class="card" style="margin-bottom:10px">
+        <div class="flex between mb-1">
+          <span style="font-size:14px">🔄 Return: ORD-002</span>
+          <button class="btn btn-success btn-sm" onclick="toast('Payment released ✅', 'success')">Release ₹449</button>
+        </div>
+        <div class="text-muted text-sm">Sunflower Delight • Rahul Mehta</div>
+      </div>
+      <div class="card">
+        <div class="flex between mb-1">
+          <span style="font-size:14px">⏳ Pending: ORD-003</span>
+          <button class="btn btn-primary btn-sm" onclick="toast('Delivery assigned ✅', 'success')">Assign Delivery</button>
+        </div>
+        <div class="text-muted text-sm">White Lily Bundle • Aarav Singh</div>
+      </div>`;
+  }
+}
+
+async function loadAdminOverview() {
+  const [users, orders] = await Promise.all([
+    supabase.from('users').select('count', { count: 'exact' }),
+    supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(5)
+  ]);
+  const statsCards = document.querySelectorAll('.stat-card .stat-value');
+  if (statsCards.length >= 2) {
+    statsCards[0].textContent = users.count || 0;
+    statsCards[1].textContent = orders.data?.length || 0;
+  }
+}
+
+async function loadAdminUsers() {
+  const { data } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+  renderAdminUsers(data || []);
+}
+
+function renderAdminUsers(users) {
+  const el = document.getElementById('admin-users-body');
+  if (!el) return;
+  el.innerHTML = users.length ? users.map(u => `
+    <tr>
+      <td>${u.name}</td>
+      <td class="text-muted">${u.email}</td>
+      <td>${getRoleBadge(u.role)}</td>
+      <td>${u.is_banned ? '<span class="badge badge-rose">Banned</span>' : u.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-dim">Pending</span>'}</td>
+      <td>
+        <div class="action-group">
+          ${!u.is_verified ? `<button class="btn btn-success btn-sm" onclick="verifyUser('${u.id}')">✅ Verify</button>` : ''}
+          ${!u.is_banned ? `<button class="btn btn-danger btn-sm" onclick="banUser('${u.id}')">🚫 Ban</button>` : `<button class="btn btn-secondary btn-sm" onclick="unbanUser('${u.id}')">✅ Unban</button>`}
+        </div>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No users</td></tr>';
+}
+
+async function loadAdminOrders() {
+  const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+  renderAdminOrders(data || []);
+}
+
+function renderAdminOrders(orders) {
+  const el = document.getElementById('admin-orders-body');
+  if (!el) return;
+  el.innerHTML = orders.length ? orders.map(o => `
+    <tr>
+      <td><code>#${String(o.id).slice(-6)}</code></td>
+      <td>${o.buyer || '—'}</td>
+      <td class="text-gold">₹${o.total_amount || o.amount}</td>
+      <td>${getPaymentBadge(o.payment_type || o.payment)}</td>
+      <td>${getStatusBadge(o.order_status || o.status)}</td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-primary btn-sm" onclick="assignDelivery('${o.id}')">🚚 Assign</button>
+          ${(o.order_status||o.status) === 'delivered' ? `<button class="btn btn-success btn-sm" onclick="releasePayment('${o.id}')">💰 Release</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No orders</td></tr>';
+}
+
+async function loadAdminPayments() {
+  const { data } = await supabase.from('payments').select('*, sellers(shop_name)').order('created_at', { ascending: false });
+  renderAdminPayments(data || []);
+}
+
+function renderAdminPayments(payments) {
+  const el = document.getElementById('admin-payments-body');
+  if (!el) return;
+  el.innerHTML = payments.length ? payments.map(p => `
+    <tr>
+      <td><code>#${String(p.order_id || p.id).slice(-6)}</code></td>
+      <td>${p.sellers?.shop_name || '—'}</td>
+      <td class="text-gold">₹${p.amount || p.total_amount || p.amount}</td>
+      <td>${getStatusBadge(p.status)}</td>
+      <td>
+        ${(p.status === 'admin_wallet' || p.payment_status === 'paid') ? `<button class="btn btn-success btn-sm" onclick="releasePayment('${p.id}')">💰 Release to Seller</button>` : ''}
+        ${p.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="holdPayment('${p.id}')">⏸ Hold</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No payments</td></tr>';
+}
+
+function renderAdminDeliveries(orders) {
+  const el = document.getElementById('admin-deliveries-list');
+  if (!el) return;
+  if (!orders.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No unassigned orders</h3></div>`;
+    return;
+  }
+  el.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="flex between">
+        <div>
+          <code>#${String(o.id).slice(-6)}</code>
+          <div style="font-size:16px;font-family:'Cormorant Garamond',serif;margin-top:4px">${o.product || '—'}</div>
+        </div>
+        ${getStatusBadge(o.order_status || o.status)}
+      </div>
+      <div class="order-detail"><span class="order-detail-label">Buyer</span> ${o.buyer || '—'}</div>
+      <div class="order-detail"><span class="order-detail-label">Deliver to</span> ${o.drop_address || o.drop || '—'}</div>
+      <div class="order-actions">
+        <button class="btn btn-primary btn-sm" onclick="assignDelivery('${o.id}')">🚚 Assign Delivery Partner</button>
+      </div>
+    </div>`).join('');
+}
+
+// Admin actions
+async function verifyUser(id) {
+  if (DEMO_MODE || !supabase) { toast('User verified ✅', 'success'); return; }
+  await supabase.from('users').update({ is_verified: true }).eq('id', id);
+  toast('User verified ✅', 'success'); loadPanelData('admin-users');
+}
+async function banUser(id) {
+  if (!confirm('Ban this user?')) return;
+  if (DEMO_MODE || !supabase) { toast('User banned', 'success'); return; }
+  await supabase.from('users').update({ is_banned: true }).eq('id', id);
+  toast('User banned', 'success'); loadPanelData('admin-users');
+}
+async function unbanUser(id) {
+  if (DEMO_MODE || !supabase) { toast('User unbanned ✅', 'success'); return; }
+  await supabase.from('users').update({ is_banned: false }).eq('id', id);
+  toast('User unbanned ✅', 'success'); loadPanelData('admin-users');
+}
+async function releasePayment(id) {
+  if (DEMO_MODE || !supabase) { toast('Payment released to seller ✅', 'success'); return; }
+  await supabase.from('payments').update({ status: 'released' }).eq('id', id);
+  toast('Payment released to seller ✅', 'success'); loadPanelData('admin-payments');
+}
+async function holdPayment(id) {
+  if (DEMO_MODE || !supabase) { toast('Payment held ✅', 'success'); return; }
+  await supabase.from('payments').update({ status: 'held' }).eq('id', id);
+  toast('Payment held', 'success'); loadPanelData('admin-payments');
+}
+async function assignDelivery(orderId) {
+  const partner = prompt('Enter Delivery Partner User ID:');
+  if (!partner) return;
+  if (DEMO_MODE || !supabase) { toast('Delivery assigned ✅', 'success'); return; }
+  await supabase.from('orders').update({ delivery_partner_id: partner, order_status: 'assigned' }).eq('id', orderId);
+  toast('Delivery partner assigned ✅', 'success'); loadPanelData('admin-deliveries');
+}
+async function returnOrder(id) {
+  if (!confirm('Request return for this order?')) return;
+  if (DEMO_MODE || !supabase) { toast('Return requested', 'success'); return; }
+  await supabase.from('orders').update({ order_status: 'returned' }).eq('id', id);
+  await supabase.from('payments').update({ status: 'returned' }).eq('order_id', id);
+  toast('Return requested', 'success'); loadPanelData('orders');
+}
+
+// ── PROFILE SAVE ──
+async function saveProfile() {
+  const name = document.getElementById('p-name').value.trim();
+  const phone = document.getElementById('p-phone').value.trim();
+  const address = document.getElementById('p-address').value.trim();
+  if (DEMO_MODE || !supabase) {
+    currentUser = { ...currentUser, name, phone, address };
+    document.getElementById('sidebar-name').textContent = name;
+    toast('Profile saved ✅', 'success'); return;
+  }
+  const { error } = await supabase.from('users').update({ name, phone, address }).eq('id', currentUser.id);
+  if (error) { toast(error.message, 'error'); return; }
+  currentUser = { ...currentUser, name, phone, address };
+  document.getElementById('sidebar-name').textContent = name;
+  toast('Profile saved ✅', 'success');
+}
+
+// ── GPS ──
+function detectLocation() {
+  if (!navigator.geolocation) { toast('Geolocation not supported', 'error'); return; }
+  toast('Detecting location...', 'success');
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const { latitude, longitude } = pos.coords;
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+        const d = await r.json();
+        const addr = d.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        const el = document.getElementById('signup-address');
+        if (el) { el.value = addr; toast('Location detected ✅', 'success'); }
+      } catch {
+        const el = document.getElementById('signup-address');
+        if (el) el.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      }
+    },
+    () => toast('Location access denied', 'error')
+  );
+}
+
+function detectLocationForOrder() {
+  if (!navigator.geolocation) { toast('Geolocation not supported', 'error'); return; }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const { latitude, longitude } = pos.coords;
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+        const d = await r.json();
+        document.getElementById('modal-address').value = d.display_name || `${latitude}, ${longitude}`;
+      } catch {
+        document.getElementById('modal-address').value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+      }
+    },
+    () => toast('Location access denied', 'error')
+  );
+}
+
+// ── HELPERS ──
+function getStatusBadge(status) {
+  const map = {
+    placed: ['badge-gold', '🕐'],
+    assigned: ['badge-gold', '👤'],
+    picked: ['badge-gold', '📦'],
+    delivered: ['badge-green', '✅'],
+    returned: ['badge-rose', '↩️'],
+    cancelled: ['badge-rose', '✕'],
+    pending: ['badge-dim', '⏳'],
+    released: ['badge-green', '💚'],
+    admin_wallet: ['badge-gold', '🏦'],
+    held: ['badge-rose', '⏸'],
+    cod_collected: ['badge-green', '💵'],
+  };
+  const [cls, icon] = map[status] || ['badge-dim', '—'];
+  return `<span class="badge ${cls}">${icon} ${status}</span>`;
+}
+function getPaymentBadge(type) {
+  return type === 'cod' ? '<span class="badge badge-gold">💵 COD</span>' : '<span class="badge badge-green">💳 Online</span>';
+}
+function getRoleBadge(role) {
+  const map = { buyer: 'badge-dim', seller: 'badge-gold', delivery: 'badge-green', admin: 'badge-rose' };
+  const icons = { buyer: '🛍️', seller: '🏪', delivery: '🚚', admin: '🛠️' };
+  return `<span class="badge ${map[role]||'badge-dim'}">${icons[role]||''} ${role}</span>`;
+}
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(40px)'; el.style.transition = 'all 0.3s'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.style.opacity = loading ? '0.7' : '1';
+  if (loading) { btn._orig = btn.textContent; btn.textContent = '⏳ Please wait...'; }
+  else { btn.textContent = btn._orig || btn.textContent; }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+}
+
+// ── KEYBOARD SHORTCUTS ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('product-modal').classList.add('hidden');
+    document.getElementById('product-form-modal').classList.add('hidden');
+    closeSidebar();
+  }
+});
+</script>
 </body>
 </html>
